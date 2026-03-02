@@ -1,0 +1,307 @@
+{
+  "cache_date": "2026-03-02",
+  "cache_time": "2026-03-02T14:28:06.587297",
+  "ticker_count": 60,
+  "tickers": {
+    "AAPL": {
+      "report_date": "2026-04-30",
+      "days_until": 59,
+      "fiscal_quarter": null
+    },
+    "AMD": {
+      "report_date": "2026-05-05",
+      "days_until": 64,
+      "fiscal_quarter": null
+    },
+    "MSFT": {
+      "report_date": "2026-04-29",
+      "days_until": 58,
+      "fiscal_quarter": null
+    },
+    "NVDA": {
+      "report_date": "2026-05-20",
+      "days_until": 79,
+      "fiscal_quarter": null
+    },
+    "TSLA": {
+      "report_date": "2026-04-21",
+      "days_until": 50,
+      "fiscal_quarter": null
+    },
+    "PLTR": {
+      "report_date": "2026-05-04",
+      "days_until": 64,
+      "fiscal_quarter": null
+    },
+    "GOOGL": {
+      "report_date": "2026-04-23",
+      "days_until": 52,
+      "fiscal_quarter": null
+    },
+    "AMZN": {
+      "report_date": "2026-04-30",
+      "days_until": 59,
+      "fiscal_quarter": null
+    },
+    "META": {
+      "report_date": "2026-04-29",
+      "days_until": 58,
+      "fiscal_quarter": null
+    },
+    "BLK": {
+      "report_date": "2026-04-10",
+      "days_until": 40,
+      "fiscal_quarter": null
+    },
+    "INTC": {
+      "report_date": "2026-04-23",
+      "days_until": 52,
+      "fiscal_quarter": null
+    },
+    "MU": {
+      "report_date": "2026-03-18",
+      "days_until": 16,
+      "fiscal_quarter": null
+    },
+    "AVGO": {
+      "report_date": "2026-03-04",
+      "days_until": 2,
+      "fiscal_quarter": null
+    },
+    "NFLX": {
+      "report_date": "2026-04-16",
+      "days_until": 45,
+      "fiscal_quarter": null
+    },
+    "DIS": {
+      "report_date": "2026-05-06",
+      "days_until": 65,
+      "fiscal_quarter": null
+    },
+    "BA": {
+      "report_date": "2026-04-22",
+      "days_until": 51,
+      "fiscal_quarter": null
+    },
+    "JPM": {
+      "report_date": "2026-04-14",
+      "days_until": 43,
+      "fiscal_quarter": null
+    },
+    "V": {
+      "report_date": "2026-04-28",
+      "days_until": 57,
+      "fiscal_quarter": null
+    },
+    "MA": {
+      "report_date": "2026-04-30",
+      "days_until": 59,
+      "fiscal_quarter": null
+    },
+    "XOM": {
+      "report_date": "2026-05-01",
+      "days_until": 60,
+      "fiscal_quarter": null
+    },
+    "CVX": {
+      "report_date": "2026-05-01",
+      "days_until": 60,
+      "fiscal_quarter": null
+    },
+    "UNH": {
+      "report_date": "2026-04-16",
+      "days_until": 45,
+      "fiscal_quarter": null
+    },
+    "COIN": {
+      "report_date": "2026-05-07",
+      "days_until": 66,
+      "fiscal_quarter": null
+    },
+    "MSTR": {
+      "report_date": "2026-04-30",
+      "days_until": 59,
+      "fiscal_quarter": null
+    },
+    "GME": {
+      "report_date": "2026-03-24",
+      "days_until": 22,
+      "fiscal_quarter": null
+    },
+    "AMC": {
+      "report_date": "2026-05-06",
+      "days_until": 65,
+      "fiscal_quarter": null
+    },
+    "GS": {
+      "report_date": "2026-04-13",
+      "days_until": 42,
+      "fiscal_quarter": null
+    },
+    "BAC": {
+      "report_date": "2026-04-15",
+      "days_until": 44,
+      "fiscal_quarter": null
+    },
+    "WFC": {
+      "report_date": "2026-04-14",
+      "days_until": 43,
+      "fiscal_quarter": null
+    },
+    "SMCI": {
+      "report_date": "2026-05-05",
+      "days_until": 64,
+      "fiscal_quarter": null
+    },
+    "TSM": {
+      "report_date": "2026-04-16",
+      "days_until": 45,
+      "fiscal_quarter": null
+    },
+    "ASML": {
+      "report_date": "2026-04-15",
+      "days_until": 44,
+      "fiscal_quarter": null
+    },
+    "ARM": {
+      "report_date": "2026-05-06",
+      "days_until": 65,
+      "fiscal_quarter": null
+    },
+    "SNOW": {
+      "report_date": "2026-02-25",
+      "days_until": -5,
+      "fiscal_quarter": null
+    },
+    "DDOG": {
+      "report_date": "2026-05-05",
+      "days_until": 64,
+      "fiscal_quarter": null
+    },
+    "MDB": {
+      "report_date": "2026-03-02",
+      "days_until": 0,
+      "fiscal_quarter": null
+    },
+    "NET": {
+      "report_date": "2026-05-07",
+      "days_until": 66,
+      "fiscal_quarter": null
+    },
+    "CRM": {
+      "report_date": "2026-05-27",
+      "days_until": 86,
+      "fiscal_quarter": null
+    },
+    "ORCL": {
+      "report_date": "2026-03-09",
+      "days_until": 7,
+      "fiscal_quarter": null
+    },
+    "LMT": {
+      "report_date": "2026-04-21",
+      "days_until": 50,
+      "fiscal_quarter": null
+    },
+    "NOC": {
+      "report_date": "2026-04-21",
+      "days_until": 50,
+      "fiscal_quarter": null
+    },
+    "RTX": {
+      "report_date": "2026-04-21",
+      "days_until": 50,
+      "fiscal_quarter": null
+    },
+    "GD": {
+      "report_date": "2026-04-22",
+      "days_until": 51,
+      "fiscal_quarter": null
+    },
+    "KTOS": {
+      "report_date": "2026-05-07",
+      "days_until": 66,
+      "fiscal_quarter": null
+    },
+    "AXON": {
+      "report_date": "2026-05-06",
+      "days_until": 65,
+      "fiscal_quarter": null
+    },
+    "TYL": {
+      "report_date": "2026-04-29",
+      "days_until": 58,
+      "fiscal_quarter": null
+    },
+    "DOCU": {
+      "report_date": "2026-03-17",
+      "days_until": 15,
+      "fiscal_quarter": null
+    },
+    "SAIC": {
+      "report_date": "2026-03-16",
+      "days_until": 14,
+      "fiscal_quarter": null
+    },
+    "CACI": {
+      "report_date": "2026-04-22",
+      "days_until": 51,
+      "fiscal_quarter": null
+    },
+    "BBAI": {
+      "report_date": "2026-03-02",
+      "days_until": 0,
+      "fiscal_quarter": null
+    },
+    "AI": {
+      "report_date": "2026-02-25",
+      "days_until": -5,
+      "fiscal_quarter": null
+    },
+    "SOUN": {
+      "report_date": "2026-05-07",
+      "days_until": 66,
+      "fiscal_quarter": null
+    },
+    "PATH": {
+      "report_date": "2026-03-11",
+      "days_until": 9,
+      "fiscal_quarter": null
+    },
+    "CAT": {
+      "report_date": "2026-04-30",
+      "days_until": 59,
+      "fiscal_quarter": null
+    },
+    "DE": {
+      "report_date": "2026-05-21",
+      "days_until": 80,
+      "fiscal_quarter": null
+    },
+    "HON": {
+      "report_date": "2026-04-28",
+      "days_until": 57,
+      "fiscal_quarter": null
+    },
+    "GE": {
+      "report_date": "2026-04-21",
+      "days_until": 50,
+      "fiscal_quarter": null
+    },
+    "RCL": {
+      "report_date": "2026-04-28",
+      "days_until": 58,
+      "fiscal_quarter": null
+    },
+    "CSCO": {
+      "report_date": "2026-05-13",
+      "days_until": 73,
+      "fiscal_quarter": null
+    },
+    "TEL": {
+      "report_date": "2026-04-22",
+      "days_until": 52,
+      "fiscal_quarter": null
+    }
+  }
+}

@@ -1,0 +1,38 @@
+# Kill-Switch Configuration
+# TUNED FOR $50K: Correlated loss protection scaled for institutional account
+# 1R = $200 at 0.4% equity (provides 7.5R budget within 3% daily loss limit)
+
+# Risk unit definition
+risk_unit:
+  type: equity_pct
+  value: 0.004              # 0.4% of equity = $200 per R unit at $50K
+
+# Per-cluster limits (grouped by profile)
+# Cluster key = profile name (e.g., "high_iv", "index_etf")
+cluster_limits:
+  level1_r: -2.0             # Throttle at -2R (-$400): stop new positions in cluster
+  level2_r: -3.5             # Freeze at -3.5R (-$700): stop all new trades in cluster
+  cooldown_hours: 12         # 12h freeze (half day, allows recovery next session)
+
+# Global limits (all clusters combined)
+global_limits:
+  freeze_r: -10.0            # RAISED (02/17): -10R to accommodate intentional stock liquidation losses
+  cooldown_hours: 4          # SHORTENED (02/17): 4h cooldown (was 24h) — recover faster after planned actions
+
+# What's still allowed during freeze
+allowed_during_freeze:
+  - close_position
+  - roll_position
+  - adjust_spread
+  - manage_existing
+
+# What's blocked during freeze
+blocked_during_freeze:
+  - new_entry
+  - add_to_position
+  - pyramid
+
+# Fail-closed behavior
+defaults:
+  missing_pnl_action: freeze    # If PnL data unavailable, assume worst
+  missing_equity_action: freeze # If equity data unavailable, block entries

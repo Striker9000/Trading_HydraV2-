@@ -1,0 +1,212 @@
+# Small Account Mode Configuration
+# ================================
+# Optimized for accounts with ~$1,100 balance
+# Focus: CryptoBot (no PDT restrictions) + conservative options
+#
+# Key principles:
+# - Smaller position sizes to preserve capital
+# - Tighter risk limits to prevent account blowup
+# - CryptoBot prioritized (no PDT rule, 24/7 trading)
+# - OptionsBot limited to 1 concurrent position
+# - MomentumBot disabled by default (PDT concern)
+
+# =========================================================================
+# RISK SETTINGS (Override settings.yaml)
+# =========================================================================
+risk:
+  # More conservative daily loss limit for small accounts
+  global_max_daily_loss_pct: 1.5  # $16.50 max loss per day
+  
+  # Small account equity threshold
+  min_equity_to_trade: 500  # Don't trade if equity drops below $500
+
+# =========================================================================
+# PORTFOLIO ALLOCATION
+# =========================================================================
+portfoliobot:
+  enabled: true
+  cash_reserve_pct: 40  # Keep 40% cash reserve for small accounts
+  buckets:
+    # Prioritize crypto (no PDT restrictions)
+    momentum_bucket_pct_of_daily_risk: 0   # Disabled - PDT risk
+    options_bucket_pct_of_daily_risk: 35   # Limited options exposure
+    crypto_bucket_pct_of_daily_risk: 65    # Primary trading vehicle
+  guardrails:
+    per_bot_min_pct_of_daily_risk: 5
+    per_bot_max_pct_of_daily_risk: 35  # Cap any single bot at 35%
+
+# =========================================================================
+# MOMENTUM BOTS - DISABLED FOR SMALL ACCOUNTS (PDT concerns)
+# =========================================================================
+momentum_bots:
+  - bot_id: mom_AAPL
+    enabled: false  # Disabled due to PDT restrictions
+    ticker: AAPL
+    session:
+      trade_start: "06:35"
+      trade_end: "09:30"
+      manage_until: "12:55"
+    risk:
+      max_trades_per_day: 1  # Very conservative if enabled
+      max_concurrent_positions: 1
+      trailing_stop:
+        enabled: true
+        mode: percent
+        value: 0.8
+        activation_profit_pct: 0.3
+        update_only_if_improves: true
+        epsilon_pct: 0.02
+        exit_order:
+          type: market
+    exits:
+      stop_loss_pct: 0.50
+      take_profit_pct: 1.00
+      time_stop_minutes: 25
+
+# =========================================================================
+# OPTIONS BOT - CONSERVATIVE SETTINGS FOR SMALL ACCOUNTS
+# =========================================================================
+optionsbot:
+  enabled: true
+  bot_id: opt_core
+  tickers: [SPY]  # Single ticker only - SPY most liquid
+  session:
+    trade_start: "06:30"
+    trade_end: "09:30"
+    manage_until: "13:00"
+  risk:
+    max_trades_per_day: 3  # Only 1 trade per day
+    max_concurrent_positions: 3  # Only 1 position at a time
+    max_position_size_usd: 100  # $100 max per trade (vs $500 standard)
+    profit_target_usd: 15  # Target $15 per trade (more realistic)
+    trailing_stop:
+      enabled: true
+      mode: percent
+      value: 2.0
+      activation_profit_pct: 0.15
+      update_only_if_improves: true
+      epsilon_pct: 0.05
+      exit_order:
+        type: market
+  strategies:
+    bull_put_spread:
+      enabled: true
+      min_credit: 0.30  # Lower credit threshold
+      max_credit: 1.50  # Lower max credit
+      profit_target: 0.50
+      max_dte: 30  # Shorter expiration
+    bear_call_spread:
+      enabled: true
+      min_credit: 0.30
+      max_credit: 1.50
+      profit_target: 0.50
+      max_dte: 30
+    iron_condor:
+      enabled: false  # Keep disabled - too complex for small account
+    straddle:
+      enabled: false  # Keep disabled
+  exits:
+    take_profit_pct: 50
+    stop_loss_pct: 200
+    time_stop_minutes: 180  # 3 hours max hold
+    flatten_before_close_minutes: 30
+  chain_rules:
+    dte_min: 7
+    dte_max: 30  # Shorter DTEs
+    delta_min: 0.10
+    delta_max: 0.50  # Lower delta for more safety
+    min_volume: 50
+    min_open_interest: 100
+
+# =========================================================================
+# CRYPTO BOT - PRIMARY TRADING VEHICLE FOR SMALL ACCOUNTS
+# =========================================================================
+# CryptoBot is ideal for small accounts because:
+# 1. No PDT restrictions (can day trade freely)
+# 2. 24/7 trading (more opportunities)
+# 3. Fractional trading (can trade with small amounts)
+# 4. No pattern day trader rules apply
+cryptobot:
+  enabled: true
+  bot_id: "crypto_core"
+  pairs: ["BTC/USD", "ETH/USD"]
+  session:
+    trade_start: "00:00"
+    trade_end: "23:59"
+    manage_until: "23:59"
+  execution:
+    order_type: limit
+    tif: gtc
+    use_notional: true
+    default_notional_usd: 25  # Smaller trades: $25 (vs $50 standard)
+    min_notional_usd: 10  # Alpaca minimum
+    max_spread_pct: 0.15  # Reject trades with spread > 0.15%
+    slippage_buffer_pct: 0.05  # 5 basis point slippage buffer
+  risk:
+    max_trades_per_day: 4  # 4 trades per day (2 per pair)
+    max_concurrent_positions: 2  # Max 2 positions
+    min_order_size: 15.0  # Above Alpaca's $10 minimum
+    hard_stop_loss_pct: 2.0  # 2% hard stop (production fallback)
+    trailing_stop:
+      enabled: true
+      mode: percent
+      value: 1.2  # Slightly tighter trailing stop (1.2% vs 1.5%)
+      activation_profit_pct: 0.3  # Activate earlier
+      update_only_if_improves: true
+      epsilon_pct: 0.05
+      exit_order:
+        type: market
+  exits:
+    stop_loss_pct: 0.60  # Tighter stop loss (0.6% vs 0.75%)
+    take_profit_pct: 1.20  # More conservative take profit
+    time_stop_minutes: 180  # 3 hours max hold (vs 4 hours)
+  signal:
+    mode: "production_multi_indicator"
+    require_rsi_confirmation: true
+    require_macd_confirmation: true
+    sma_period: 5
+    rsi_period: 14
+    rsi_oversold: 35
+    rsi_overbought: 65
+    macd_fast: 12
+    macd_slow: 26
+    macd_signal: 9
+
+# =========================================================================
+# EXIT BOT - SAFETY SETTINGS
+# =========================================================================
+exitbot:
+  enabled: true
+  cooloff_minutes: 390  # Full trading day cooloff
+  kill_conditions:
+    api_failure_halt: true
+    data_stale_halt: true
+    max_daily_loss_halt: true
+    anomaly_halt: true
+  default_trailing_stop:
+    enabled: true
+    mode: percent
+    value: 1.0
+    activation_profit_pct: 0.4
+    update_only_if_improves: true
+    epsilon_pct: 0.02
+    exit_order_type: market
+
+# =========================================================================
+# EXPECTED PERFORMANCE (Small Account Mode)
+# =========================================================================
+# With $1,100 account:
+#   Daily risk budget: ~$16.50 (1.5%)
+#   Crypto allocation: ~$10.75 (65%)
+#   Options allocation: ~$5.75 (35%)
+#   
+# Conservative targets:
+#   CryptoBot: 2-4 trades/day, ~$2-5 profit target per trade
+#   OptionsBot: 0-1 trades/day, ~$10-15 profit target
+#   
+# Monthly target: $50-100 (4-9% return) - REALISTIC
+# 
+# Risk management:
+#   - Max daily loss: $16.50 (1.5%)
+#   - Account protection: Trading stops if equity < $500
+#   - No PDT violations (crypto only or minimal stock trades)

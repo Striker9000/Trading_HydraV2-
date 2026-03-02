@@ -1,0 +1,34 @@
+metrics:
+  max_drawdown_pct: 2.5
+  num_trades: 79
+  profit_factor: 34.63
+  sharpe_ratio: !!python/object/apply:numpy._core.multiarray.scalar
+  - !!python/object/apply:numpy.dtype
+    args:
+    - f8
+    - false
+    - true
+    state: !!python/tuple
+    - 3
+    - <
+    - null
+    - null
+    - null
+    - -1
+    - -1
+    - 0
+  - !!binary |
+    PQrXo3A9G0A=
+  total_pnl: 257.41
+  win_rate: 0.962
+optimization_score: 1.076
+optimized_strategy: iron_condor
+parameters:
+  delta_target: 0.25
+  dte: 14
+  entry_lookback: 20
+  iv: 0.35
+  spread_width_pct: 2.0
+  stop_loss_pct: 100.0
+  take_profit_pct: 50.0
+symbol: SPY

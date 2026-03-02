@@ -1,0 +1,8 @@
+extends: bearish_bursts
+id: bearish_bursts_no_earnings
+name: Bearish Bursts (No Earnings)
+enabled: false  # DISABLED (02/11): Single-leg strategies losing money. Credit spreads only.
+
+earnings_policy:
+  mode: NEVER
+  blackout_days: 3

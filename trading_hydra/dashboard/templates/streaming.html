@@ -1,0 +1,1547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1920, initial-scale=1.0">
+    <title>Trading Hydra - Live Stream Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #0a0e1a 0%, #1a1f35 100%);
+            color: #ffffff;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .container {
+            padding: 2rem;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ============= HEADER / SCOREBOARD ============= */
+        .scoreboard {
+            background: linear-gradient(135deg, #1a2332 0%, #2d3748 100%);
+            border-radius: 20px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .scoreboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .live-indicator {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        .live-dot {
+            width: 20px;
+            height: 20px;
+            background: #ef4444;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+
+        .scoreboard-stats {
+            display: flex;
+            gap: 3rem;
+            margin-top: 1rem;
+            font-size: 2rem;
+        }
+
+        .stat {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+
+        .stat-value.positive { color: #10b981; }
+        .stat-value.negative { color: #ef4444; }
+        .stat-value.neutral { color: #ffffff; }
+
+        /* ============= MAIN CONTENT GRID ============= */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* ============= SPOTLIGHT ZONE ============= */
+        .spotlight {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 3px solid #3b82f6;
+            box-shadow: 0 0 40px rgba(59, 130, 246, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .spotlight::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(59, 130, 246, 0.1), transparent);
+            animation: spotlight-shimmer 3s infinite;
+        }
+
+        @keyframes spotlight-shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .spotlight-header {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .spotlight-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .setup-card {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .setup-symbol {
+            font-size: 3.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            color: #3b82f6;
+        }
+
+        .setup-prices {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .price-box {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .price-label {
+            font-size: 0.9rem;
+            color: #9ca3af;
+            margin-bottom: 0.5rem;
+        }
+
+        .price-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        .price-value.entry { color: #3b82f6; }
+        .price-value.target { color: #10b981; }
+        .price-value.stop { color: #ef4444; }
+
+        .setup-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1.5rem;
+            font-size: 1.2rem;
+        }
+
+        .confidence-bar {
+            background: rgba(255, 255, 255, 0.1);
+            height: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981, #3b82f6);
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 1rem;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .scanning-indicator {
+            text-align: center;
+            padding: 3rem;
+            font-size: 1.5rem;
+            color: #9ca3af;
+        }
+
+        .scanning-dots::after {
+            content: '...';
+            animation: dots 1.5s infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+
+        /* ============= LIVE POSITIONS ============= */
+        .live-positions {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            overflow-y: auto;
+        }
+
+        .section-header {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .position-card {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid #3b82f6;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .position-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 20px rgba(59, 130, 246, 0.3);
+        }
+
+        .position-card.winning {
+            border-left-color: #10b981;
+            background: linear-gradient(90deg, rgba(16, 185, 129, 0.1), rgba(0, 0, 0, 0.3));
+        }
+
+        .position-card.losing {
+            border-left-color: #ef4444;
+            background: linear-gradient(90deg, rgba(239, 68, 68, 0.1), rgba(0, 0, 0, 0.3));
+        }
+
+        .position-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .position-symbol {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .position-time {
+            color: #9ca3af;
+            font-size: 1rem;
+        }
+
+        .position-pnl {
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        .position-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            margin: 1rem 0;
+            font-size: 1.1rem;
+            color: #9ca3af;
+        }
+
+        .progress-bar {
+            background: rgba(255, 255, 255, 0.1);
+            height: 12px;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #10b981);
+            transition: width 0.5s ease;
+        }
+
+        .progress-label {
+            font-size: 0.9rem;
+            color: #9ca3af;
+            margin-top: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* ============= CELEBRATIONS / RECENT WINS ============= */
+        .celebrations {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .win-card {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.05));
+            border: 2px solid #10b981;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .win-symbol {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .win-pnl {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #10b981;
+        }
+
+        .win-details {
+            font-size: 1.2rem;
+            color: #9ca3af;
+        }
+
+        /* ============= BOT ROSTER ============= */
+        .bot-roster {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .bot-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        .bot-card {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .bot-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .bot-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .bot-stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .bot-stat {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        .bot-stat-value {
+            font-weight: bold;
+            font-size: 1.3rem;
+        }
+
+        /* ============= SETTINGS PANEL ============= */
+        .demo-btn {
+            position: fixed;
+            top: 2rem;
+            left: 2rem;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #f59e0b, #ef4444);
+            border: 2px solid #fbbf24;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(245, 158, 11, 0.5);
+            transition: transform 0.2s;
+            z-index: 1000;
+        }
+
+        .demo-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 30px rgba(245, 158, 11, 0.7);
+        }
+
+        .settings-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #3b82f6;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(59, 130, 246, 0.5);
+            transition: transform 0.2s;
+            z-index: 1000;
+        }
+
+        .settings-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .settings-panel {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 400px;
+            height: 100vh;
+            background: #1a2332;
+            box-shadow: -5px 0 30px rgba(0, 0, 0, 0.5);
+            padding: 2rem;
+            transition: right 0.3s ease;
+            z-index: 999;
+            overflow-y: auto;
+        }
+
+        .settings-panel.open {
+            right: 0;
+        }
+
+        .settings-header {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .settings-section {
+            margin-bottom: 2rem;
+        }
+
+        .settings-section h3 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: #3b82f6;
+        }
+
+        .setting-item {
+            margin-bottom: 1.5rem;
+        }
+
+        .setting-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #9ca3af;
+        }
+
+        .setting-control {
+            width: 100%;
+            padding: 0.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .volume-slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.2);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+        }
+
+        .test-sound-btn {
+            padding: 0.5rem 1rem;
+            background: #3b82f6;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        .test-sound-btn:hover {
+            background: #2563eb;
+        }
+
+        /* ============= CELEBRATION OVERLAY ============= */
+        .celebration-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #10b981;
+            animation: confetti-fall 3s linear;
+        }
+
+        @keyframes confetti-fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* ============= MONEY SHOWER ANIMATIONS ============= */
+        @keyframes money-fall {
+            0% {
+                transform: translateY(-50px) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0.3;
+            }
+        }
+
+        @keyframes money-burst {
+            0% {
+                transform: scale(0) rotate(0deg);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(2) rotate(180deg);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(0.5) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        @keyframes flash {
+            0% {
+                opacity: 0;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+            }
+        }
+
+        @keyframes profit-pop {
+            0% {
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 0;
+            }
+            20% {
+                transform: translate(-50%, -50%) scale(1.2);
+                opacity: 1;
+            }
+            80% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(0.8);
+                opacity: 0;
+            }
+        }
+
+        /* ============= RECENT WINS CARDS ============= */
+        .win-card {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.05));
+            border: 2px solid #10b981;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 2rem;
+            align-items: center;
+            animation: slideIn 0.5s ease;
+            transition: transform 0.2s;
+        }
+
+        .win-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 20px rgba(16, 185, 129, 0.3);
+        }
+
+        .win-symbol {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #10b981;
+        }
+
+        .win-details {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .win-main {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #10b981;
+        }
+
+        .win-meta {
+            font-size: 1rem;
+            color: #9ca3af;
+            display: flex;
+            gap: 2rem;
+        }
+
+        .win-time {
+            font-size: 1.2rem;
+            color: #9ca3af;
+        }
+
+        /* ============= BOT STAT CARDS ============= */
+        .bot-stat-card {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 1.5rem;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .bot-stat-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(59, 130, 246, 0.5);
+        }
+
+        .bot-icon {
+            font-size: 3rem;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .bot-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 1rem;
+            color: #ffffff;
+        }
+
+        .bot-stats-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .bot-stat-item {
+            text-align: center;
+        }
+
+        .bot-stat-label {
+            font-size: 0.9rem;
+            color: #9ca3af;
+            margin-bottom: 0.3rem;
+        }
+
+        .bot-stat-value {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        /* ============= SCROLLBAR ============= */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* ============= LIVE STATS / CHARTS ============= */
+        .trade-bubble {
+            position: absolute;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.05));
+            border: 2px solid #10b981;
+            border-radius: 15px;
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            animation: flowRight 15s linear;
+            box-shadow: 0 5px 20px rgba(16, 185, 129, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .trade-bubble.loss {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(239, 68, 68, 0.05));
+            border-color: #ef4444;
+            box-shadow: 0 5px 20px rgba(239, 68, 68, 0.3);
+        }
+
+        @keyframes flowRight {
+            0% {
+                left: -300px;
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            5% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            95% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            100% {
+                left: 100%;
+                opacity: 0;
+                transform: scale(0.8);
+            }
+        }
+
+        .trade-bubble-icon {
+            font-size: 2rem;
+        }
+
+        .trade-bubble-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        .trade-bubble-symbol {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        .trade-bubble-pnl {
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        .trade-bubble-time {
+            font-size: 0.85rem;
+            color: #9ca3af;
+        }
+
+        /* ============= PRE-MARKET SCAN ============= */
+        .scan-item {
+            background: rgba(0, 0, 0, 0.2);
+            border-left: 3px solid #3b82f6;
+            border-radius: 8px;
+            padding: 0.8rem 1rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: slideIn 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .scan-item.analyzing {
+            border-left-color: #f59e0b;
+            background: linear-gradient(90deg, rgba(245, 158, 11, 0.1), rgba(0, 0, 0, 0.2));
+        }
+
+        .scan-item.scored {
+            border-left-color: #10b981;
+        }
+
+        .scan-item.rejected {
+            border-left-color: #ef4444;
+            opacity: 0.5;
+        }
+
+        .scan-symbol {
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: #ffffff;
+            min-width: 80px;
+        }
+
+        .scan-status {
+            color: #9ca3af;
+            flex: 1;
+            padding: 0 1rem;
+        }
+
+        .scan-score {
+            font-weight: bold;
+            font-size: 1.1rem;
+            padding: 0.3rem 0.8rem;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .scan-score.high { color: #10b981; background: rgba(16, 185, 129, 0.2); }
+        .scan-score.medium { color: #f59e0b; background: rgba(245, 158, 11, 0.2); }
+        .scan-score.low { color: #ef4444; background: rgba(239, 68, 68, 0.2); }
+
+        .top-pick-card {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(0, 0, 0, 0.3));
+            border: 3px solid #10b981;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            animation: slideIn 0.5s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .top-pick-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(16, 185, 129, 0.1), transparent);
+            animation: spotlight-shimmer 3s infinite;
+        }
+
+        .top-pick-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .top-pick-rank {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #10b981;
+            text-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
+        }
+
+        .top-pick-symbol {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        .top-pick-score-badge {
+            font-size: 2rem;
+            font-weight: bold;
+            padding: 0.8rem 1.5rem;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            box-shadow: 0 5px 20px rgba(16, 185, 129, 0.4);
+        }
+
+        .top-pick-contract {
+            font-size: 1.3rem;
+            color: #9ca3af;
+            margin-bottom: 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .top-pick-levels {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .top-pick-reasoning {
+            background: rgba(0, 0, 0, 0.3);
+            border-left: 4px solid #3b82f6;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .reasoning-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #3b82f6;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .reasoning-points {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .reasoning-point {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.8rem;
+            font-size: 1.1rem;
+            line-height: 1.5;
+        }
+
+        .reasoning-icon {
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+
+        .reasoning-text {
+            color: #d1d5db;
+        }
+
+        .reasoning-highlight {
+            color: #10b981;
+            font-weight: bold;
+        }
+
+        /* ============= OPTIONS DETAIL CARDS ============= */
+        .option-card {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            border-left: 5px solid #3b82f6;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .option-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 20px rgba(59, 130, 246, 0.3);
+        }
+
+        .option-card.call {
+            border-left-color: #10b981;
+            background: linear-gradient(90deg, rgba(16, 185, 129, 0.1), rgba(0, 0, 0, 0.3));
+        }
+
+        .option-card.put {
+            border-left-color: #ef4444;
+            background: linear-gradient(90deg, rgba(239, 68, 68, 0.1), rgba(0, 0, 0, 0.3));
+        }
+
+        .option-header {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 2rem;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .option-symbol {
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+
+        .option-contract-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .option-contract-type {
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .option-contract-type.call { color: #10b981; }
+        .option-contract-type.put { color: #ef4444; }
+
+        .option-contract-details {
+            font-size: 1.2rem;
+            color: #9ca3af;
+        }
+
+        .option-pnl-badge {
+            font-size: 2rem;
+            font-weight: bold;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .option-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .option-stat-box {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .option-stat-label {
+            font-size: 0.9rem;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+
+        .option-stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        .option-stat-value.highlight {
+            color: #3b82f6;
+        }
+
+        .option-levels {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .option-level-box {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 10px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .option-level-box.entry {
+            border-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .option-level-box.target {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .option-level-box.stop {
+            border-color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .option-level-label {
+            font-size: 0.85rem;
+            color: #9ca3af;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+
+        .option-level-value {
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+
+        .option-level-box.entry .option-level-value { color: #3b82f6; }
+        .option-level-box.target .option-level-value { color: #10b981; }
+        .option-level-box.stop .option-level-value { color: #ef4444; }
+
+        .option-meta-info {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 2px solid rgba(255, 255, 255, 0.1);
+            font-size: 1.1rem;
+            color: #9ca3af;
+        }
+
+        .option-meta-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        .option-meta-label {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+        }
+
+        .option-meta-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        /* ============= VIEW TABS ============= */
+        .view-tabs {
+            position: absolute;
+            top: 2rem;
+            right: 8rem;
+            display: flex;
+            gap: 0.5rem;
+            z-index: 100;
+        }
+
+        .tab-btn {
+            padding: 0.8rem 1.5rem;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            color: #9ca3af;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(59, 130, 246, 0.5);
+            color: #ffffff;
+            transform: translateY(-2px);
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            border-color: #3b82f6;
+            color: #ffffff;
+            box-shadow: 0 5px 20px rgba(59, 130, 246, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- VIEW TABS -->
+        <div class="view-tabs">
+            <button class="tab-btn active" onclick="switchView('live')">
+                📺 LIVE VIEW
+            </button>
+            <button class="tab-btn" onclick="switchView('premarket')">
+                🌅 PRE-MARKET SCAN
+            </button>
+            <button class="tab-btn" onclick="switchView('charts')">
+                📈 LIVE STATS
+            </button>
+            <button class="tab-btn" onclick="switchView('options')">
+                📋 OPTIONS DETAILS
+            </button>
+            <button class="tab-btn" onclick="switchView('performance')">
+                📊 PERFORMANCE
+            </button>
+        </div>
+
+        <!-- SCOREBOARD -->
+        <div class="scoreboard">
+            <div class="scoreboard-header">
+                <div class="live-indicator">
+                    <div class="live-dot"></div>
+                    <span>TRADING HYDRA</span>
+                </div>
+                <div id="current-time" style="font-size: 1.5rem; color: #9ca3af;"></div>
+            </div>
+            <div class="scoreboard-stats">
+                <div class="stat">
+                    <div class="stat-label">Today</div>
+                    <div class="stat-value positive" id="today-pnl">+$0</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">Week</div>
+                    <div class="stat-value positive" id="week-pnl">+$0</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">Win Rate</div>
+                    <div class="stat-value neutral" id="win-rate">0%</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">Active</div>
+                    <div class="stat-value neutral" id="active-count">0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN GRID -->
+        <div class="main-grid">
+            <!-- SPOTLIGHT ZONE -->
+            <div class="spotlight">
+                <div class="spotlight-header">
+                    🎯 NEXT SETUP
+                </div>
+                <div class="spotlight-content" id="spotlight-content">
+                    <div class="scanning-indicator">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">🔍</div>
+                        <div>Scanning for opportunities<span class="scanning-dots"></span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LIVE POSITIONS -->
+            <div class="live-positions">
+                <div class="section-header">
+                    🏃 LIVE POSITIONS
+                </div>
+                <div id="positions-content">
+                    <div style="text-align: center; padding: 3rem; color: #9ca3af;">
+                        No active positions
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PRE-MARKET SCAN VIEW (hidden by default) -->
+        <div id="premarket-view" style="display: none; flex: 1; overflow-y: auto;">
+            <!-- MARKET OPEN COUNTDOWN -->
+            <div style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%); border-radius: 20px; padding: 1.5rem; border: 2px solid rgba(245, 158, 11, 0.5); margin-bottom: 2rem; text-align: center;">
+                <div style="font-size: 1rem; color: #9ca3af; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 0.5rem;">Market Opens In</div>
+                <div id="market-countdown" style="font-size: 3.5rem; font-weight: bold; color: #f59e0b;">--:--:--</div>
+                <div id="scan-status" style="font-size: 1.2rem; color: #3b82f6; margin-top: 1rem;">🔍 Initializing scanner...</div>
+            </div>
+
+            <!-- LIVE SCANNING FEED -->
+            <div style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%); border-radius: 20px; padding: 2rem; border: 2px solid rgba(59, 130, 246, 0.3); margin-bottom: 2rem;">
+                <div class="section-header">🔬 LIVE SCAN FEED</div>
+                <div id="scan-feed" style="max-height: 300px; overflow-y: auto;">
+                    <div style="text-align: center; padding: 2rem; color: #9ca3af;">Scanner will activate 30 minutes before market open...</div>
+                </div>
+            </div>
+
+            <!-- TOP 5 CANDIDATES -->
+            <div style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%); border-radius: 20px; padding: 2rem; border: 3px solid rgba(16, 185, 129, 0.5); box-shadow: 0 0 30px rgba(16, 185, 129, 0.2);">
+                <div class="section-header">🏆 TOP 5 MORNING PICKS</div>
+                <div style="font-size: 1rem; color: #9ca3af; margin-bottom: 2rem;">Final selections will populate 5-10 minutes before market open</div>
+                <div id="top-picks-content">
+                    <div style="text-align: center; padding: 3rem; color: #9ca3af;">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">⏰</div>
+                        <div style="font-size: 1.2rem;">Waiting for final candidates...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- LIVE STATS/CHARTS VIEW (hidden by default) -->
+        <div id="charts-view" style="display: none; flex: 1; overflow: hidden; display: flex; flex-direction: column; gap: 2rem;">
+            <!-- LIVE P&L CHART -->
+            <div style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%); border-radius: 20px; padding: 2rem; border: 2px solid rgba(59, 130, 246, 0.3); flex: 1; min-height: 400px; display: flex; flex-direction: column;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <div class="section-header" style="margin: 0;">📈 LIVE P&L CHART</div>
+                    <div style="display: flex; gap: 2rem; align-items: center;">
+                        <div style="text-align: right;">
+                            <div style="font-size: 0.9rem; color: #9ca3af; text-transform: uppercase;">Current Balance</div>
+                            <div id="chart-balance" style="font-size: 2rem; font-weight: bold; color: #10b981;">$90,164</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 0.9rem; color: #9ca3af; text-transform: uppercase;">Today's P&L</div>
+                            <div id="chart-pnl" style="font-size: 2rem; font-weight: bold; color: #10b981;">+$1,234</div>
+                        </div>
+                    </div>
+                </div>
+                <div style="flex: 1; position: relative;">
+                    <canvas id="pnl-chart" style="width: 100%; height: 100%;"></canvas>
+                </div>
+            </div>
+
+            <!-- LIVE TRADE TIMELINE -->
+            <div style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%); border-radius: 20px; padding: 2rem; border: 2px solid rgba(16, 185, 129, 0.3); height: 280px; overflow: hidden;">
+                <div class="section-header" style="margin-bottom: 1rem;">🎯 LIVE TRADE TIMELINE</div>
+                <div id="trade-timeline" style="height: 180px; position: relative; overflow: hidden;">
+                    <!-- Trade bubbles will flow across here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- OPTIONS DETAILS VIEW (hidden by default) -->
+        <div id="options-view" style="display: none; flex: 1; overflow-y: auto;">
+            <!-- UPCOMING OPTIONS SIGNALS -->
+            <div style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%); border-radius: 20px; padding: 2rem; border: 2px solid rgba(59, 130, 246, 0.3); margin-bottom: 2rem;">
+                <div class="section-header">🎯 UPCOMING OPTION TRADES</div>
+                <div id="upcoming-options-content">
+                    <div style="text-align: center; padding: 2rem; color: #9ca3af;">Scanning for option setups...</div>
+                </div>
+            </div>
+
+            <!-- ACTIVE OPTIONS POSITIONS -->
+            <div style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%); border-radius: 20px; padding: 2rem; border: 2px solid rgba(16, 185, 129, 0.3);">
+                <div class="section-header">📊 ACTIVE OPTION POSITIONS</div>
+                <div id="active-options-content">
+                    <div style="text-align: center; padding: 2rem; color: #9ca3af;">No active option positions</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PERFORMANCE VIEW (hidden by default) -->
+        <div id="performance-view" style="display: none; margin-top: 2rem;">
+            <!-- RECENT WINS -->
+            <div style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%); border-radius: 20px; padding: 2rem; border: 2px solid rgba(16, 185, 129, 0.3); margin-bottom: 2rem;">
+                <div class="section-header">🎊 RECENT WINS (Today)</div>
+                <div id="recent-wins-content">
+                    <div style="text-align: center; padding: 2rem; color: #9ca3af;">No wins yet today...first one coming up! 🎯</div>
+                </div>
+            </div>
+            <!-- BOT LEADERBOARD -->
+            <div style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%); border-radius: 20px; padding: 2rem; border: 2px solid rgba(59, 130, 246, 0.3);">
+                <div class="section-header">🤖 BOT LEADERBOARD (Today)</div>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;">
+                    <div class="bot-stat-card">
+                        <div class="bot-icon">👑</div>
+                        <div class="bot-name">HailMary</div>
+                        <div class="bot-stats-grid">
+                            <div class="bot-stat-item"><div class="bot-stat-label">Win Rate</div><div class="bot-stat-value">58%</div></div>
+                            <div class="bot-stat-item"><div class="bot-stat-label">Today P&L</div><div class="bot-stat-value positive">+$0</div></div>
+                            <div class="bot-stat-item"><div class="bot-stat-label">Trades</div><div class="bot-stat-value">0</div></div>
+                        </div>
+                    </div>
+                    <div class="bot-stat-card">
+                        <div class="bot-icon">💪</div>
+                        <div class="bot-name">TwentyMin</div>
+                        <div class="bot-stats-grid">
+                            <div class="bot-stat-item"><div class="bot-stat-label">Win Rate</div><div class="bot-stat-value">55%</div></div>
+                            <div class="bot-stat-item"><div class="bot-stat-label">Today P&L</div><div class="bot-stat-value positive">+$0</div></div>
+                            <div class="bot-stat-item"><div class="bot-stat-label">Trades</div><div class="bot-stat-value">0</div></div>
+                        </div>
+                    </div>
+                    <div class="bot-stat-card">
+                        <div class="bot-icon">🎯</div>
+                        <div class="bot-name">Options</div>
+                        <div class="bot-stats-grid">
+                            <div class="bot-stat-item"><div class="bot-stat-label">Win Rate</div><div class="bot-stat-value">62%</div></div>
+                            <div class="bot-stat-item"><div class="bot-stat-label">Today P&L</div><div class="bot-stat-value positive">+$0</div></div>
+                            <div class="bot-stat-item"><div class="bot-stat-label">Trades</div><div class="bot-stat-value">0</div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DEMO BUTTON (Top left corner) -->
+    <button class="demo-btn" onclick="runDemo()">🎬 DEMO</button>
+
+    <!-- SETTINGS BUTTON -->
+    <button class="settings-btn" onclick="toggleSettings()">⚙️</button>
+
+    <!-- SETTINGS PANEL -->
+    <div class="settings-panel" id="settings-panel">
+        <div class="settings-header">
+            <span>Settings</span>
+            <button class="close-btn" onclick="toggleSettings()">✕</button>
+        </div>
+
+        <div class="settings-section">
+            <h3>🔊 Sound Effects</h3>
+
+            <div class="setting-item">
+                <label class="setting-label">Master Volume</label>
+                <input type="range" min="0" max="100" value="70" class="volume-slider" id="master-volume">
+                <div style="color: #9ca3af; margin-top: 0.5rem; text-align: center;" id="master-volume-label">70%</div>
+            </div>
+
+            <div class="setting-item">
+                <label class="setting-label">New Signal Sound</label>
+                <select class="setting-control" id="signal-sound">
+                    <option value="chime">Chime</option>
+                    <option value="bell">Bell</option>
+                    <option value="ding">Ding</option>
+                    <option value="none">None</option>
+                </select>
+                <button class="test-sound-btn" onclick="testSound('signal')">Test</button>
+            </div>
+
+            <div class="setting-item">
+                <label class="setting-label">Entry Sound</label>
+                <select class="setting-control" id="entry-sound">
+                    <option value="click">Click</option>
+                    <option value="pop">Pop</option>
+                    <option value="whoosh">Whoosh</option>
+                    <option value="none">None</option>
+                </select>
+                <button class="test-sound-btn" onclick="testSound('entry')">Test</button>
+            </div>
+
+            <div class="setting-item">
+                <label class="setting-label">Profit Target Sound</label>
+                <select class="setting-control" id="profit-sound">
+                    <option value="kaching">Ka-Ching</option>
+                    <option value="success">Success</option>
+                    <option value="coins">Coins</option>
+                    <option value="none">None</option>
+                </select>
+                <button class="test-sound-btn" onclick="testSound('profit')">Test</button>
+            </div>
+
+            <div class="setting-item">
+                <label class="setting-label">Stop Loss Sound</label>
+                <select class="setting-control" id="stoploss-sound">
+                    <option value="buzz">Buzz</option>
+                    <option value="error">Error</option>
+                    <option value="thud">Thud</option>
+                    <option value="none">None</option>
+                </select>
+                <button class="test-sound-btn" onclick="testSound('stoploss')">Test</button>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <h3>🎵 Background Music</h3>
+
+            <div class="setting-item">
+                <label class="setting-label">Music Volume</label>
+                <input type="range" min="0" max="100" value="30" class="volume-slider" id="music-volume">
+                <div style="color: #9ca3af; margin-top: 0.5rem; text-align: center;" id="music-volume-label">30%</div>
+            </div>
+
+            <div class="setting-item">
+                <label class="setting-label">Music URL (YouTube/Spotify)</label>
+                <input type="text" class="setting-control" id="music-url" placeholder="Paste music URL here">
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <h3>🎨 Display</h3>
+
+            <div class="setting-item">
+                <label class="setting-label">
+                    <input type="checkbox" id="show-demo-button" checked> Show DEMO button
+                </label>
+                <div style="font-size: 0.85rem; color: #9ca3af; margin-top: 0.3rem;">
+                    Hide for investor presentations / live streams
+                </div>
+            </div>
+
+            <div class="setting-item">
+                <label class="setting-label">
+                    <input type="checkbox" id="show-celebrations" checked> Show celebration animations
+                </label>
+            </div>
+
+            <div class="setting-item">
+                <label class="setting-label">
+                    <input type="checkbox" id="show-confetti" checked> Show confetti on big wins
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- CELEBRATION OVERLAY -->
+    <div class="celebration-overlay" id="celebration-overlay"></div>
+
+    <!-- AUDIO ELEMENTS (Hidden) -->
+    <audio id="audio-signal" preload="auto"></audio>
+    <audio id="audio-entry" preload="auto"></audio>
+    <audio id="audio-profit" preload="auto"></audio>
+    <audio id="audio-stoploss" preload="auto"></audio>
+
+    <script src="/static/streaming.js"></script>
+</body>
+</html>

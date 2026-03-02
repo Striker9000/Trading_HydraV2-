@@ -1,0 +1,75 @@
+id: bullish_bursts
+name: Bullish Bursts
+family: momentum_reversal
+direction: bullish
+enabled: true
+
+scan:
+  cadence_minutes: 30
+  start_time_local: "07:00"
+  exchanges: ["DOW30", "NASDAQ100", "SP500", "ALL"]
+
+universe_filters:
+  min_price: 5.0
+  min_avg_daily_volume: 500000     # LOOSENED: from 1M to 500K for more opportunities
+  max_spread: 0.25                 # LOOSENED: from 0.15 to 0.25
+  avoid_earnings_days: true
+
+earnings_policy:
+  mode: NEVER
+  blackout_days: 3
+
+signal_rules:
+  - id: price_above_ema10_today
+    type: price_vs_ema
+    period: 10
+    lookback_days: 0
+    op: ">"
+
+  - id: price_below_ema10_yesterday
+    type: price_vs_ema
+    period: 10
+    lookback_days: 1
+    op: "<"
+
+  - id: price_above_sma200
+    type: price_vs_sma
+    period: 200
+    op: ">"
+
+  - id: price_above_sma50
+    type: price_vs_sma
+    period: 50
+    op: ">"
+
+  - id: rsi20_below_70
+    type: rsi_threshold
+    period: 20
+    op: "<"
+    value: 70
+
+backtest_gate:
+  min_win_rate_1y: 0.50
+  min_win_rate_3y: 0.50
+  min_total_wins_3y: 2
+  min_total_return_1y: 0.15
+
+options_plan:
+  structure: long_call
+  target_delta: 0.40
+  delta_tolerance: 0.08
+  dte_target: 14
+  dte_min: 12
+  dte_max: 16
+  strike_selection: closest_delta
+
+risk_plan:
+  stop_loss_pct: 30.0   # Options need wide stops (30% for bursts)
+  take_profit_pct: 40.0  # Quick profit target for burst strategy
+  max_contracts: 1
+  time_stop_minutes: 390
+
+kill_switch:
+  rolling_trades: 20
+  max_drawdown: 500.0
+  cooloff_minutes: 60

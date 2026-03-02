@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}Logs - Trading Hydra{% endblock %}
+
+{% block content %}
+<h1 class="mb-2">Log Viewer</h1>
+
+<div class="card mb-2">
+    <div class="grid grid-4">
+        <div>
+            <label style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary);">Level Filter</label>
+            <select id="level-filter" onchange="loadLogs()">
+                <option value="">All Levels</option>
+                <option value="info">Info</option>
+                <option value="warn">Warning</option>
+                <option value="error">Error</option>
+            </select>
+        </div>
+        <div>
+            <label style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary);">Search</label>
+            <input type="text" id="search-filter" placeholder="Search logs..." onkeyup="debounceSearch()">
+        </div>
+        <div>
+            <label style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary);">Limit</label>
+            <select id="limit-filter" onchange="loadLogs()">
+                <option value="50">50 entries</option>
+                <option value="100" selected>100 entries</option>
+                <option value="200">200 entries</option>
+                <option value="500">500 entries</option>
+            </select>
+        </div>
+        <div style="display: flex; align-items: flex-end;">
+            <button class="btn btn-secondary" onclick="loadLogs()" style="width: 100%;">Refresh</button>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div id="log-container" style="max-height: 600px; overflow-y: auto; font-family: monospace; font-size: 0.85rem;">
+        <div style="text-align: center; color: var(--text-secondary); padding: 2rem;">Loading logs...</div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    let searchTimeout;
+    
+    function debounceSearch() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(loadLogs, 300);
+    }
+    
+    async function loadLogs() {
+        const level = document.getElementById('level-filter').value;
+        const search = document.getElementById('search-filter').value;
+        const limit = document.getElementById('limit-filter').value;
+        
+        const params = new URLSearchParams();
+        if (level) params.append('level', level);
+        if (search) params.append('search', search);
+        params.append('limit', limit);
+        
+        try {
+            const data = await fetchJSON('/api/logs?' + params.toString());
+            
+            const container = document.getElementById('log-container');
+            
+            if (!data.success || !data.logs || data.logs.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: var(--text-secondary); padding: 2rem;">No logs found</div>';
+                return;
+            }
+            
+            container.innerHTML = data.logs.map(log => {
+                const level = (log.level || 'info').toLowerCase();
+                const levelColor = level === 'error' ? 'var(--accent-red)' : 
+                                   level === 'warn' ? 'var(--accent-yellow)' : 
+                                   'var(--text-secondary)';
+                
+                const timestamp = log.timestamp || '';
+                const event = log.event || log.message || JSON.stringify(log);
+                const details = log.data ? JSON.stringify(log.data) : '';
+                
+                return `
+                    <div style="padding: 0.5rem; border-bottom: 1px solid var(--border-color);">
+                        <span style="color: var(--text-secondary); min-width: 180px; display: inline-block;">${timestamp}</span>
+                        <span style="color: ${levelColor}; min-width: 60px; display: inline-block; text-transform: uppercase;">[${level}]</span>
+                        <span style="color: var(--accent-blue);">${event}</span>
+                        ${details ? `<div style="color: var(--text-secondary); margin-left: 240px; font-size: 0.8rem;">${details}</div>` : ''}
+                    </div>
+                `;
+            }).join('');
+            
+        } catch (e) {
+            document.getElementById('log-container').innerHTML = 
+                `<div style="text-align: center; color: var(--accent-red); padding: 2rem;">Error loading logs: ${e.message}</div>`;
+        }
+    }
+    
+    loadLogs();
+    setInterval(loadLogs, 10000);
+</script>
+{% endblock %}

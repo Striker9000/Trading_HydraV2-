@@ -1,0 +1,316 @@
+system:
+  timezone: America/Los_Angeles
+  log_path: ./logs/app.jsonl
+  state_db_path: ./state/trading_state.db
+
+market_hours:
+  market_open: "06:30"        # PST (9:30 AM EST)
+  market_close: "13:00"       # PST (4:00 PM EST)
+  pre_market_start: "01:00"   # PST (4:00 AM EST)
+  after_hours_end: "17:00"    # PST (8:00 PM EST)
+  pre_market_intel_start: "06:00"   # PST - pre-market intelligence gathering
+  pre_market_intel_end: "06:30"     # PST - ends at market open
+
+runner:
+  loop_interval_seconds: 5
+
+# Console output settings
+console:
+  mode: full          # Options: full, event, quiet
+                       # full: Full dashboard every loop (noisy, good for debugging)
+                       # event: Heartbeat + event blocks (recommended for production)
+                       # quiet: Minimal one-line summary only
+  inplace: false       # If true, clear screen each loop (dashboard mode)
+
+safety:
+  fail_closed: true
+  allow_budget_fallback: false
+  global_cooldown_minutes: 390
+
+risk:
+  global_max_daily_loss_pct: 2.0  # Increased for meaningful budgets
+  max_orders_per_minute: 10
+
+development:
+  enable_mock_data: false
+  mock_market_hours: false
+
+dev:
+  use_mock_data: false
+
+trading:
+  # Manual override - forces GLOBAL_TRADING_HALT when true
+  # This is a config-driven emergency brake, never auto-clears
+  global_halt: false
+  allow_live: true  # Set to true to enable live trading (REAL MONEY)
+
+health:
+  max_price_staleness_seconds: 15
+  max_api_failures_in_window: 5
+  max_connection_failures_in_window: 3  # Connection/timeout failures before halt
+  api_failure_window_seconds: 60
+
+# API call optimization settings
+caching:
+  quote_ttl_seconds: 15            # SAFETY: Aligned with max_price_staleness_seconds (was 200)
+  account_ttl_seconds: 60          # Cache account data for 60 seconds
+  market_closed_poll_seconds: 60   # Poll every 60 seconds when markets closed (vs 5 sec normally)
+
+# Machine Learning settings
+ml:
+  enabled: true                    # Enable ML signal scoring
+  min_probability: 0.70            # LOWERED: from 0.85 to allow more trades
+  fallback_on_unavailable: true    # Use rule-based fallback if model unavailable
+  log_all_scores: true             # Log ML scores for all trade candidates
+  
+  # Bot-specific thresholds (override global min_probability)
+  # LOWERED: Reduced thresholds to allow momentum filters to decide
+  options_threshold: 0.60          # Options: lowered from 0.80
+  crypto_threshold: 0.85           # Crypto: lowered from 0.85
+  momentum_threshold: 0.85         # Momentum: lowered from 0.85
+  
+  # Adaptive threshold settings
+  adaptive:
+    enabled: true                  # Enable regime-based threshold adjustment
+    low_vix_bonus: 0.03            # Lower threshold by 3% when VIX < 15
+    high_vix_penalty: 0.05         # Raise threshold by 5% when VIX > 30
+    earnings_bonus: 0.02           # Lower threshold during earnings season
+
+# Account-Level ML Analytics
+account_analytics:
+  enabled: true                    # Master switch for account-level ML features
+  
+  risk_adjustment:
+    enabled: true                  # Dynamic risk adjustment based on account health
+    min_multiplier: 0.25           # Minimum risk multiplier (defensive)
+    max_multiplier: 1.5            # Maximum risk multiplier (aggressive)
+    override: true                 # Apply ML risk multiplier to bot budgets
+  
+  bot_allocation:
+    enabled: true                  # ML-based bot allocation weights
+    use_ml_weights: true           # Use predicted weights instead of fixed config
+  
+  regime_sizing:
+    enabled: true                  # Regime-based position sizing
+    override_rule_based: true      # Use ML sizing instead of hardcoded rules
+  
+  drawdown_prediction:
+    enabled: true                  # Predict upcoming drawdown periods
+    halt_threshold: 0.8            # Probability above which to halt trading
+    reduce_threshold: 0.5          # Probability above which to reduce position sizes
+  
+  anomaly_detection:
+    enabled: true                  # Detect unusual account behavior
+    halt_on_anomaly: false         # Auto-halt on detected anomalies
+    sensitivity: 0.1               # Contamination parameter for Isolation Forest
+
+# Institutional Position Sizing (BlackRock-style)
+institutional_sizing:
+  enabled: true                    # Enable dynamic position sizing
+  base_risk_pct: 1.0               # INCREASED: Risk 1% of equity per trade (was 0.5%)
+  max_single_position_pct: 5.0     # INCREASED: Max 5% of NAV per position (was 3%)
+  kelly_fraction: 0.35             # INCREASED: Use 35% of Kelly criterion (was 25%)
+  min_notional: 25.0               # Minimum trade size in USD
+  max_notional: 1000.0             # Maximum trade size cap
+  # For ~$44k account: 1% = ~$440 per trade, max 5% = ~$2,200 per position
+
+# Correlation Management
+correlation_management:
+  enabled: true                    # Enable correlation-based trade blocking
+  max_pairwise_correlation: 0.7    # Block trades with correlation > this
+  max_sector_exposure_pct: 20.0    # Maximum exposure per sector
+  max_single_asset_pct: 10.0       # Maximum single asset exposure
+
+# Performance Targets
+performance_targets:
+  sharpe_ratio: 1.5                # Target Sharpe ratio
+  win_rate: 0.55                   # Target win rate (55%)
+  profit_factor: 1.5               # Target profit factor
+  max_drawdown_monthly_pct: 10.0   # Maximum acceptable monthly drawdown
+  
+# Premarket Universe Selection
+# Runs pre-open to select the day's tradeable universe
+premarket:
+  enabled: true
+  top_n: 5                      # Select top N symbols for trading
+  min_score: 0.35               # Minimum opportunity score (0-1 normalized)
+  fail_closed: true             # If selection fails/empty, disable trading
+  output_file: logs/premarket_selection.json
+  weights:
+    gap: 0.40                   # Gap magnitude weight
+    vol_surge: 0.25             # Volume surge weight
+    iv: 0.20                    # Implied volatility percentile weight
+    catalyst: 0.15              # Catalyst/event weight
+
+# Smart Execution
+smart_execution:
+  enabled: true                    # Enable smart order execution
+  use_limit_orders: true           # Prefer limit orders over market
+  twap_threshold_usd: 1000         # Use TWAP for orders above this size
+  slippage_buffer_pct: 0.1         # Buffer added to limit prices
+  max_spread_pct: 0.5              # Maximum acceptable bid-ask spread
+
+# =============================================================================
+# INSTITUTIONAL RISK HARDENING (January 2026)
+# =============================================================================
+
+# Dynamic Budget Manager - Equity/Drawdown Scaled Budgets
+dynamic_budget:
+  enabled: true                    # Enable dynamic budget scaling
+  daily_budget_pct: 2.0            # Base: 2% of equity per day
+  max_position_pct: 1.5            # Max 1.5% of equity per position
+  min_daily_budget_usd: 50.0       # Floor
+  max_daily_budget_usd: 5000.0     # Ceiling
+  dd_threshold_reduce: 0.05        # Start reducing at 5% drawdown
+  dd_threshold_halt: 0.15          # Full reduction at 15% drawdown
+  dd_min_multiplier: 0.5           # Never below 50% allocation
+  performance_scaling_enabled: false  # Enable hot-bot boost (disabled by default)
+  perf_max_boost: 1.5              # Max 1.5x for high-performing bots
+
+# Correlation Guard - Multi-Loss Detection
+correlation_guard:
+  enabled: true                    # Enable correlation guard
+  window_minutes: 15               # Look for losses within 15 minutes
+  trigger_count: 2                 # 2 losses = risk reduction
+  halt_count: 3                    # 3 losses = halt
+  reduce_multiplier: 0.5           # Reduce to 50% on trigger
+  cooldown_minutes: 60             # Cooldown before resuming
+
+# Vol-of-Vol Monitor - VIX Rate-of-Change Detection
+vol_of_vol:
+  enabled: true                    # Enable VIX ROC monitoring
+  roc_spiking_threshold: 10.0      # 10% VIX increase in 1 hour = spiking
+  roc_crisis_threshold: 15.0       # 15% = crisis
+  vix_crisis_min: 30.0             # VIX level for crisis regime
+
+# News Risk Gate - Unified Sentiment Gate
+news_risk_gate:
+  enabled: true                    # Enable unified news gate
+  severe_threshold: -0.85          # Force exit threshold
+  negative_threshold: -0.70        # Skip entry threshold
+  cautious_threshold: -0.40        # Reduce size threshold
+  min_confidence_exit: 0.60        # Min confidence for exit action
+  min_confidence_entry: 0.50       # Min confidence for entry filter
+
+# PnL Distribution Monitor - Fat-Tail Detection
+pnl_monitor:
+  enabled: true                    # Enable fat-tail detection
+  fat_tail_k: 3.0                  # Loss > 3x median = fat tail
+  min_samples: 10                  # Need 10 trades for statistics
+  halt_fat_tail_count: 2           # 2 fat tails = halt
+  halt_cooldown_minutes: 120       # 2 hour cooldown
+
+# Adversarial Execution Layer - Slippage/Fill Simulation
+# DISABLED by default for live safety
+adversarial_execution:
+  enabled: false                   # DISABLED by default
+  mode: hostile                   # Options: disabled, simulation, hostile
+  spread_explosion_prob: 0.05      # 5% chance of spread widening
+  quote_lag_prob: 0.10             # 10% chance of quote lag
+  partial_fill_prob: 0.08          # 8% chance of partial fill
+  slippage_prob: 0.15              # 15% chance of slippage
+  cancel_fail_prob: 0.03           # 3% chance of cancel failure
+
+# =============================================================================
+# UNIFIED RISK ORCHESTRATOR INTEGRATION
+# =============================================================================
+# Single point of control for all risk gates and intelligence modules.
+# ALL modules default to settings in their individual sections above.
+# This section controls which modules are consulted by the orchestrator.
+
+risk_integration:
+  enabled: true                    # Master switch for risk integration
+  dry_run: false                   # Log but don't enforce (for testing)
+  
+  budget_manager:
+    enabled: true                  # Uses dynamic_budget config above
+    
+  correlation_guard:
+    enabled: true                  # Uses correlation_guard config above
+    
+  vol_of_vol:
+    enabled: true                  # Uses vol_of_vol config above
+    
+  pnl_monitor:
+    enabled: true                  # Uses pnl_monitor config above
+    
+  # Intelligence modules (use config from bots.yaml intelligence section)
+  news_gate:
+    enabled: false                 # DISABLED - news gate for entries/exits
+    
+  macro_intel:
+    enabled: false                 # DISABLED - macro regime modifier
+    
+  smart_money:
+    enabled: false                 # DISABLED - smart money universe boost
+
+# =============================================================================
+# POLICY GATE - UNIFIED PRE-TRADE VALIDATION
+# =============================================================================
+# Single mandatory checkpoint that ALL orders must pass.
+# Consolidates: risk integration, liquidity filter, slippage, Greek limits, ML governance.
+# Fail-closed: any error = order blocked.
+policy_gate:
+  enabled: true                    # Master switch for policy gate
+  dry_run: false                   # Log but don't enforce (for testing)
+  slippage_budget_pct: 0.5         # Max acceptable average slippage %
+  min_ml_confidence: 0.4           # Min ML signal confidence
+  require_ml_signal: false         # If true, block orders without ML signal
+
+# =============================================================================
+# ORDER STATE MACHINE
+# =============================================================================
+# Deterministic order lifecycle tracking with reconciliation.
+# Ensures every order reaches a terminal state.
+order_state_machine:
+  enabled: true
+  max_pending_age_minutes: 30      # Stale pending orders get cancelled
+  max_unknown_age_minutes: 60      # Unknown state orders get cleaned up
+  reconcile_interval_seconds: 60   # How often to run reconciliation
+
+# =============================================================================
+# ML MODEL GOVERNANCE
+# =============================================================================
+# Auto-disable ML models when edge decay detected.
+# Prevents degraded models from continuing to trade.
+ml_governance:
+  enabled: true
+  min_sharpe_threshold: 0.3        # Disable if 30-day Sharpe drops below
+  degraded_sharpe_threshold: 0.5   # Mark as degraded above this
+  decay_ratio_threshold: 0.5       # (7d/30d) ratio below = decay
+  consecutive_degraded_days_limit: 3  # Days of degradation before disable
+  require_human_reenable: true     # Disabled models need human approval
+
+# =============================================================================
+# CIRCUIT BREAKER CONFIGURATION
+# =============================================================================
+# Graceful degradation for external services.
+circuit_breakers:
+  enabled: true
+  alpaca_market_data:
+    failure_threshold: 5
+    timeout_seconds: 10.0
+    recovery_timeout_seconds: 60.0
+  alpaca_trading:
+    failure_threshold: 3
+    timeout_seconds: 15.0
+    recovery_timeout_seconds: 30.0
+  openai_sentiment:
+    failure_threshold: 5
+    timeout_seconds: 10.0
+    recovery_timeout_seconds: 120.0
+  news_api:
+    failure_threshold: 5
+    timeout_seconds: 10.0
+    recovery_timeout_seconds: 120.0
+
+# =============================================================================
+# ML CONFIG TUNER
+# =============================================================================
+# Auto-optimize bot parameters based on trade performance.
+ml_config_tuner:
+  enabled: true
+  min_samples: 20                  # Min trades for analysis
+  min_confidence: 0.6              # Min confidence for recommendations
+  auto_apply: false                # If true, auto-apply high-confidence recs
+  auto_apply_min_confidence: 0.85  # Only auto-apply above this confidence

@@ -1,0 +1,114 @@
+suggestion_intake:
+  routes:
+    twenty_minute:
+      description: "Gap play via TwentyMinuteBot - intraday momentum bursts"
+      asset_types: ["equity", "options"]
+      default_horizon: "1d"
+      entry_triggers: ["gap_up", "gap_down", "orb_break", "premarket_high_break"]
+      greeks:
+        delta_min: 0.40
+        delta_max: 0.70
+        theta_max_pct: -3.0
+        gamma_min: 0.01
+      options_dte_range: [1, 5]
+      
+    zero_dte:
+      description: "0DTE options via OptionsBot0DTE"
+      asset_types: ["options"]
+      default_horizon: "0d"
+      entry_triggers: ["vwap_reclaim", "vwap_lose", "orb_break"]
+      greeks:
+        delta_min: 0.30
+        delta_max: 0.60
+        theta_max_pct: -10.0
+        gamma_min: 0.05
+      options_dte_range: [0, 0]
+      
+    swing:
+      description: "Multi-day equity swing via MomentumBot"
+      asset_types: ["equity"]
+      default_horizon: "5d"
+      entry_triggers: ["sma_crossover", "support_bounce", "resistance_break"]
+      greeks: null
+      options_dte_range: null
+      
+    crypto:
+      description: "24/7 crypto via CryptoBot"
+      asset_types: ["crypto"]
+      default_horizon: "1d"
+      entry_triggers: ["vwap_reclaim", "vwap_lose", "support_bounce"]
+      greeks: null
+      options_dte_range: null
+
+  options:
+    spread_limits:
+      max_spread_dollars: 0.05
+      min_spread_dollars: 0.02
+      max_spread_pct: 5.0
+    liquidity:
+      min_volume: 100
+      min_open_interest: 500
+    default_greeks:
+      delta_min: 0.30
+      delta_max: 0.70
+      theta_max_pct: -5.0
+      gamma_min: 0.01
+      vega_max: 0.50
+
+  risk:
+    max_loss_per_trade_pct: 1.0
+    max_loss_per_trade_usd: 100.0
+    max_position_size_pct: 5.0
+    max_daily_loss_pct: 3.0
+    choppy_regime_vwap_crosses: 5
+    choppy_regime_window_minutes: 30
+
+  entry_triggers:
+    vwap_reclaim:
+      description: "Price crosses above VWAP after being below"
+      confirmation_bars: 2
+    vwap_lose:
+      description: "Price crosses below VWAP after being above"
+      confirmation_bars: 2
+    orb_break:
+      description: "Break of opening range (first 5-15 min high/low)"
+      orb_minutes: 15
+    gap_up:
+      description: "Gap up overnight, buy on pullback to VWAP"
+      min_gap_pct: 1.0
+    gap_down:
+      description: "Gap down overnight, short on rally to VWAP"
+      min_gap_pct: 1.0
+    premarket_high_break:
+      description: "Break above pre-market high"
+      confirmation_volume_mult: 1.5
+    support_bounce:
+      description: "Bounce off key support level"
+      buffer_pct: 0.2
+    resistance_break:
+      description: "Break above key resistance"
+      buffer_pct: 0.2
+    sma_crossover:
+      description: "Short SMA crosses above long SMA"
+      short_period: 9
+      long_period: 21
+
+  exits:
+    stop_loss_atr_mult: 1.5
+    trailing_stop_activation_pct: 1.5
+    trailing_stop_pct: 0.5
+    reversal_sense_pct: 1.5
+    take_profit:
+      tp1_pct: 1.0
+      tp1_size_pct: 33
+      tp2_pct: 2.0
+      tp2_size_pct: 33
+      tp3_pct: 3.0
+      tp3_size_pct: 34
+
+  time_windows:
+    premarket_start: "04:00"
+    market_open: "06:30"
+    market_close: "13:00"
+    after_hours_end: "16:00"
+    timezone: "America/Los_Angeles"

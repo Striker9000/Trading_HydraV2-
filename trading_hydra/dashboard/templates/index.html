@@ -1,0 +1,406 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Trading Hydra{% endblock %}
+
+{% block content %}
+<div class="flex flex-between flex-center mb-2">
+    <h1>Dashboard</h1>
+    <div class="flex gap-2">
+        <span id="last-update" style="color: var(--text-secondary); font-size: 0.9rem;">Last update: --</span>
+        <button id="halt-btn" class="btn btn-danger" onclick="toggleHalt()">
+            <span id="halt-text">HALT TRADING</span>
+        </button>
+    </div>
+</div>
+
+<div class="grid grid-4 mb-2">
+    <div class="card">
+        <div class="card-title">Equity</div>
+        <div class="card-value neutral" id="equity">$--</div>
+    </div>
+    <div class="card">
+        <div class="card-title">Day P&L</div>
+        <div class="card-value" id="day-pnl">$--</div>
+        <div class="mt-1" id="day-pnl-pct" style="font-size: 0.9rem;">--%</div>
+    </div>
+    <div class="card">
+        <div class="card-title">Positions</div>
+        <div class="card-value neutral" id="position-count">--</div>
+    </div>
+    <div class="card">
+        <div class="card-title">Status</div>
+        <div class="card-value" id="status">
+            <span class="status-dot" id="status-dot"></span>
+            <span id="status-text">--</span>
+        </div>
+    </div>
+</div>
+
+<div class="grid grid-2">
+    <div class="card">
+        <div class="flex flex-between flex-center mb-2">
+            <h2>Positions</h2>
+            <button class="btn btn-danger btn-small" onclick="liquidateAll()">Liquidate All</button>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Symbol</th>
+                    <th>Side</th>
+                    <th>Qty</th>
+                    <th>P&L</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="positions-table">
+                <tr><td colspan="5" style="text-align: center; color: var(--text-secondary);">Loading...</td></tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <div class="card">
+        <h2 class="mb-2">Bots</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Bot</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="bots-table">
+                <tr><td colspan="4" style="text-align: center; color: var(--text-secondary);">Loading...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="card mt-2">
+    <h2 class="mb-2">Decision Preview</h2>
+    <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.9rem;">
+        Real-time view of trading signals, blockers, and exit proximity
+    </p>
+    <div id="decisions-container">
+        <div style="text-align: center; color: var(--text-secondary);">Loading decisions...</div>
+    </div>
+</div>
+
+<div class="card mt-2">
+    <h2 class="mb-2">Manual Trade</h2>
+    <div class="grid grid-4">
+        <div>
+            <label style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary);">Symbol</label>
+            <input type="text" id="trade-symbol" placeholder="AAPL" style="text-transform: uppercase;">
+        </div>
+        <div>
+            <label style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary);">Side</label>
+            <select id="trade-side">
+                <option value="buy">Buy</option>
+                <option value="sell">Sell</option>
+            </select>
+        </div>
+        <div>
+            <label style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary);">Amount ($)</label>
+            <input type="number" id="trade-notional" placeholder="100" min="1">
+        </div>
+        <div style="display: flex; align-items: flex-end;">
+            <button class="btn btn-primary" onclick="executeTrade()" style="width: 100%;">Execute Trade</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    let isHalted = false;
+    
+    async function updateStatus() {
+        try {
+            const data = await fetchJSON('/api/status');
+            
+            if (data.success) {
+                document.getElementById('equity').textContent = formatCurrency(data.equity);
+                
+                const pnlEl = document.getElementById('day-pnl');
+                const pnlPctEl = document.getElementById('day-pnl-pct');
+                pnlEl.textContent = formatCurrency(data.day_pnl);
+                pnlPctEl.textContent = formatPercent(data.day_pnl_pct);
+                pnlEl.className = 'card-value ' + (data.day_pnl >= 0 ? 'positive' : 'negative');
+                pnlPctEl.className = data.day_pnl >= 0 ? 'positive' : 'negative';
+                
+                document.getElementById('position-count').textContent = data.position_count;
+                
+                isHalted = data.is_halted;
+                const statusDot = document.getElementById('status-dot');
+                const statusText = document.getElementById('status-text');
+                const haltBtn = document.getElementById('halt-btn');
+                const haltText = document.getElementById('halt-text');
+                
+                if (data.is_halted) {
+                    statusDot.className = 'status-dot status-inactive';
+                    statusText.textContent = 'HALTED';
+                    haltBtn.className = 'btn btn-success';
+                    haltText.textContent = 'RESUME TRADING';
+                } else {
+                    statusDot.className = 'status-dot status-active';
+                    statusText.textContent = 'RUNNING';
+                    haltBtn.className = 'btn btn-danger';
+                    haltText.textContent = 'HALT TRADING';
+                }
+                
+                updatePositionsTable(data.positions);
+                
+                document.getElementById('last-update').textContent = 
+                    'Last update: ' + new Date().toLocaleTimeString();
+            }
+        } catch (e) {
+            console.error('Status update failed:', e);
+        }
+    }
+    
+    function updatePositionsTable(positions) {
+        const tbody = document.getElementById('positions-table');
+        
+        if (!positions || positions.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-secondary);">No open positions</td></tr>';
+            return;
+        }
+        
+        tbody.innerHTML = positions.map(p => `
+            <tr>
+                <td><strong>${p.symbol}</strong></td>
+                <td><span class="badge ${p.side === 'long' ? 'badge-success' : 'badge-danger'}">${p.side.toUpperCase()}</span></td>
+                <td>${p.qty}</td>
+                <td class="${p.unrealized_pl >= 0 ? 'positive' : 'negative'}">
+                    ${formatCurrency(p.unrealized_pl)} (${formatPercent(p.unrealized_plpc)})
+                </td>
+                <td>
+                    <button class="btn btn-secondary btn-small" onclick="closePosition('${p.symbol}', '${p.side}', ${Math.abs(p.qty)})">Close</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+    
+    async function updateBots() {
+        try {
+            const data = await fetchJSON('/api/bots');
+            
+            if (data.success) {
+                const tbody = document.getElementById('bots-table');
+                tbody.innerHTML = data.bots.map(b => `
+                    <tr>
+                        <td><strong>${b.bot_id}</strong></td>
+                        <td>${b.type}</td>
+                        <td>
+                            <span class="badge ${b.enabled ? 'badge-success' : 'badge-danger'}">
+                                ${b.enabled ? 'ENABLED' : 'DISABLED'}
+                            </span>
+                        </td>
+                        <td>
+                            <button class="btn btn-secondary btn-small" onclick="toggleBot('${b.bot_id}')">
+                                ${b.enabled ? 'Disable' : 'Enable'}
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        } catch (e) {
+            console.error('Bots update failed:', e);
+        }
+    }
+    
+    async function toggleHalt() {
+        try {
+            await fetchJSON('/api/halt', {
+                method: 'POST',
+                body: JSON.stringify({ action: 'toggle' })
+            });
+            updateStatus();
+        } catch (e) {
+            alert('Failed to toggle halt: ' + e.message);
+        }
+    }
+    
+    async function toggleBot(botId) {
+        try {
+            await fetchJSON(`/api/bot/${botId}/toggle`, { method: 'POST' });
+            updateBots();
+        } catch (e) {
+            alert('Failed to toggle bot: ' + e.message);
+        }
+    }
+    
+    async function executeTrade() {
+        const symbol = document.getElementById('trade-symbol').value.toUpperCase();
+        const side = document.getElementById('trade-side').value;
+        const notional = parseFloat(document.getElementById('trade-notional').value);
+        
+        if (!symbol) {
+            alert('Please enter a symbol');
+            return;
+        }
+        
+        if (!notional || notional <= 0) {
+            alert('Please enter a valid amount');
+            return;
+        }
+        
+        try {
+            const result = await fetchJSON('/api/trade', {
+                method: 'POST',
+                body: JSON.stringify({ symbol, side, notional })
+            });
+            
+            if (result.success) {
+                alert(`Order placed: ${side.toUpperCase()} $${notional} of ${symbol}`);
+                document.getElementById('trade-symbol').value = '';
+                document.getElementById('trade-notional').value = '';
+                updateStatus();
+            } else {
+                alert('Trade failed: ' + result.error);
+            }
+        } catch (e) {
+            alert('Trade failed: ' + e.message);
+        }
+    }
+    
+    async function closePosition(symbol, side, qty) {
+        if (!confirm(`Close ${qty} shares of ${symbol}?`)) return;
+        
+        const closeSide = side === 'long' ? 'sell' : 'buy';
+        
+        try {
+            const result = await fetchJSON('/api/trade', {
+                method: 'POST',
+                body: JSON.stringify({ symbol, side: closeSide, qty })
+            });
+            
+            if (result.success) {
+                alert(`Closed position in ${symbol}`);
+                updateStatus();
+            } else {
+                alert('Close failed: ' + result.error);
+            }
+        } catch (e) {
+            alert('Close failed: ' + e.message);
+        }
+    }
+    
+    async function liquidateAll() {
+        if (!confirm('LIQUIDATE ALL POSITIONS?\n\nThis will close all open positions at market price.')) return;
+        
+        try {
+            const result = await fetchJSON('/api/liquidate', { method: 'POST' });
+            
+            if (result.success) {
+                alert(`Liquidated ${result.closed} positions`);
+                updateStatus();
+            } else {
+                alert('Liquidation failed: ' + result.error);
+            }
+        } catch (e) {
+            alert('Liquidation failed: ' + e.message);
+        }
+    }
+    
+    async function updateDecisions() {
+        try {
+            const data = await fetchJSON('/api/decisions');
+            const container = document.getElementById('decisions-container');
+            
+            if (!data.success || !data.bots || Object.keys(data.bots).length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: var(--text-secondary);">No decision data available yet</div>';
+                return;
+            }
+            
+            let html = '<div class="grid grid-3" style="gap: 1rem;">';
+            
+            for (const [botId, bot] of Object.entries(data.bots)) {
+                const enabledBadge = bot.enabled 
+                    ? '<span class="badge badge-success">ON</span>' 
+                    : '<span class="badge badge-danger">OFF</span>';
+                
+                html += `
+                <div style="background: var(--bg-input); padding: 1rem; border-radius: 8px;">
+                    <div class="flex flex-between flex-center mb-1">
+                        <strong>${botId}</strong>
+                        ${enabledBadge}
+                    </div>
+                    <div style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.5rem;">${bot.bot_type}</div>
+                `;
+                
+                if (bot.signals && bot.signals.length > 0) {
+                    html += '<div style="margin-bottom: 0.5rem;"><strong style="font-size: 0.8rem;">Signals:</strong>';
+                    for (const sig of bot.signals) {
+                        const sigColor = sig.signal === 'buy' ? 'var(--accent-green)' 
+                            : sig.signal === 'sell' ? 'var(--accent-red)' 
+                            : 'var(--text-secondary)';
+                        html += `
+                        <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-top: 0.25rem;">
+                            <span>${sig.symbol}</span>
+                            <span style="color: ${sigColor}; font-weight: bold;">${sig.signal.toUpperCase()}</span>
+                        </div>`;
+                        if (sig.reason) {
+                            html += `<div style="font-size: 0.75rem; color: var(--text-secondary);">${sig.reason}</div>`;
+                        }
+                    }
+                    html += '</div>';
+                }
+                
+                if (bot.blockers && bot.blockers.length > 0) {
+                    html += '<div style="margin-bottom: 0.5rem;"><strong style="font-size: 0.8rem; color: var(--accent-yellow);">Blockers:</strong>';
+                    for (const blocker of bot.blockers) {
+                        html += `
+                        <div style="font-size: 0.8rem; color: var(--accent-yellow); margin-top: 0.25rem;">
+                            ${blocker.blocker_type}: ${blocker.description}
+                        </div>`;
+                    }
+                    html += '</div>';
+                }
+                
+                if (bot.exit_proximity && bot.exit_proximity.length > 0) {
+                    html += '<div><strong style="font-size: 0.8rem;">Exit Proximity:</strong>';
+                    for (const exit of bot.exit_proximity) {
+                        const pnlColor = exit.unrealized_pnl_pct >= 0 ? 'var(--accent-green)' : 'var(--accent-red)';
+                        html += `
+                        <div style="font-size: 0.85rem; margin-top: 0.25rem;">
+                            <span>${exit.symbol}</span>
+                            <span style="color: ${pnlColor}; margin-left: 0.5rem;">${exit.unrealized_pnl_pct.toFixed(2)}%</span>
+                        </div>`;
+                        if (exit.trailing_stop_pct_away !== null) {
+                            html += `<div style="font-size: 0.75rem; color: var(--text-secondary);">Trailing stop: ${exit.trailing_stop_pct_away.toFixed(2)}% away</div>`;
+                        }
+                        if (exit.time_remaining_minutes !== null) {
+                            html += `<div style="font-size: 0.75rem; color: var(--text-secondary);">Time left: ${exit.time_remaining_minutes}m</div>`;
+                        }
+                    }
+                    html += '</div>';
+                }
+                
+                if ((!bot.signals || bot.signals.length === 0) && 
+                    (!bot.blockers || bot.blockers.length === 0) && 
+                    (!bot.exit_proximity || bot.exit_proximity.length === 0)) {
+                    html += '<div style="font-size: 0.85rem; color: var(--text-secondary);">No active decisions</div>';
+                }
+                
+                html += '</div>';
+            }
+            
+            html += '</div>';
+            container.innerHTML = html;
+            
+        } catch (e) {
+            console.error('Decisions update failed:', e);
+        }
+    }
+    
+    updateStatus();
+    updateBots();
+    updateDecisions();
+    
+    setInterval(updateStatus, 5000);
+    setInterval(updateBots, 30000);
+    setInterval(updateDecisions, 5000);
+</script>
+{% endblock %}

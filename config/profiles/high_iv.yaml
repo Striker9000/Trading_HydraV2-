@@ -1,0 +1,22 @@
+# High-IV / Momentum Equities Profile
+# NVDA, TSLA, COIN, AMD, SMCI
+# Premium harvesting with restraint - this profile kills accounts if sized wrong
+
+delta_target: 0.18
+delta_min: 0.15
+delta_max: 0.22
+
+dte_min: 21
+dte_max: 35
+
+max_position_pct: 0.06
+max_total_exposure: 0.25
+max_open_positions: 3
+max_new_trades_per_day: 1
+
+min_open_interest: 500
+max_bid_ask_pct: 0.15
+iv_rank_min: 40
+iv_rank_max: 100
+
+avoid_earnings_days: 10

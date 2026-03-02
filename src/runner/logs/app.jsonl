@@ -1,0 +1,99 @@
+{"ts": "2026-01-01T04:29:11.433393Z", "event": "safety_check_paper_mode", "safe": true}
+{"ts": "2026-01-01T04:29:11.433688Z", "event": "safety_lock_passed", "safe": true, "mode": "paper", "errors": [], "warnings": []}
+{"ts": "2026-01-01T04:29:11.437347Z", "event": "error", "message": "State get error: no such table: state", "key": "halt.expires_at"}
+{"ts": "2026-01-01T04:29:11.437585Z", "event": "error", "message": "State get error: no such table: state", "key": "GLOBAL_TRADING_HALT"}
+{"ts": "2026-01-01T04:29:11.437755Z", "event": "error", "message": "State get error: no such table: state", "key": "GLOBAL_TRADING_HALT"}
+{"ts": "2026-01-01T04:29:11.437882Z", "event": "error", "message": "State get error: no such table: state", "key": "halt.reason"}
+{"ts": "2026-01-01T04:29:11.438003Z", "event": "error", "message": "State get error: no such table: state", "key": "halt.halted_at"}
+{"ts": "2026-01-01T04:29:11.438122Z", "event": "error", "message": "State get error: no such table: state", "key": "halt.expires_at"}
+{"ts": "2026-01-01T04:29:11.438326Z", "event": "runner_start", "pid": 20268}
+{"ts": "2026-01-01T04:29:11.438437Z", "event": "runner_config", "loop_interval_seconds": 5}
+{"ts": "2026-01-01T04:29:11.439001Z", "event": "orchestrator_init"}
+{"ts": "2026-01-01T04:29:11.439127Z", "event": "state_store_init", "path": "./state/trading_state.db"}
+{"ts": "2026-01-01T04:29:11.466792Z", "event": "state_store_ready", "path": "./state/trading_state.db"}
+{"ts": "2026-01-01T04:29:11.467033Z", "event": "orchestrator_ready"}
+{"ts": "2026-01-01T04:29:11.467137Z", "event": "runner_loop_starting", "interval": 5}
+{"ts": "2026-01-01T04:29:11.467317Z", "event": "runner_loop_iteration", "loop_count": 1, "timestamp": "2026-01-01T04:29:11.467312Z"}
+{"ts": "2026-01-01T04:29:11.467418Z", "event": "loop_start", "timestamp": "2026-01-01T04:29:11.467413Z"}
+{"ts": "2026-01-01T04:29:11.467503Z", "event": "step_1_init"}
+{"ts": "2026-01-01T04:29:11.467593Z", "event": "alpaca_get_account"}
+{"ts": "2026-01-01T04:29:11.562783Z", "event": "alpaca_account", "equity": 44180.47, "cash": -22895.64, "status": "ACTIVE", "validated": true}
+{"ts": "2026-01-01T04:29:11.597685Z", "event": "step_1_day_start_reset", "date": "2025-12-31", "day_start_equity": 44180.47, "current_equity": 44180.47, "reason": "new_day_or_invalid_value"}
+{"ts": "2026-01-01T04:29:11.598205Z", "event": "step_1_ok", "equity": 44180.47, "day_start_equity": 44180.47}
+{"ts": "2026-01-01T04:29:11.598595Z", "event": "step_2_exitbot"}
+{"ts": "2026-01-01T04:29:11.598778Z", "event": "exitbot_start", "equity": 44180.47, "day_start": 44180.47}
+{"ts": "2026-01-01T04:29:11.611312Z", "event": "exitbot_ok", "equity": 44180.47, "pnl": 0.0, "max_loss": 883.61}
+{"ts": "2026-01-01T04:29:11.611488Z", "event": "step_3_portfoliobot"}
+{"ts": "2026-01-01T04:29:11.611561Z", "event": "portfoliobot_start", "equity": 44180.47}
+{"ts": "2026-01-01T04:29:11.950256Z", "event": "portfoliobot_budgets", "equity": 44180.47, "day_start_equity": 44180.47, "daily_risk": 883.61, "mom_bucket": 220.9, "opt_bucket": 441.8, "cry_bucket": 220.9, "mom_each": 220.9, "enabled_bots": ["mom_AAPL", "opt_core", "crypto_core"]}
+{"ts": "2026-01-01T04:29:11.950912Z", "event": "step_4_execution", "enabled_bots": ["mom_AAPL", "opt_core", "crypto_core"]}
+{"ts": "2026-01-01T04:29:11.951252Z", "event": "execution_start", "enabled_bots": ["mom_AAPL", "opt_core", "crypto_core"], "equity": 44180.47}
+{"ts": "2026-01-01T04:29:11.951704Z", "event": "execution_bot_preflight_ok", "bot_id": "mom_AAPL", "max_daily_loss": 220.9, "halted": false}
+{"ts": "2026-01-01T04:29:11.952103Z", "event": "alpaca_get_positions"}
+{"ts": "2026-01-01T04:29:12.042281Z", "event": "alpaca_positions", "count": 4, "symbols": ["AAPL", "META", "QQQ", "SPY"], "total_value": 67076.108571, "validated": true}
+{"ts": "2026-01-01T04:29:12.042716Z", "event": "momentum_bot_start", "ticker": "AAPL", "max_daily_loss": 220.9, "existing_positions": 1}
+{"ts": "2026-01-01T04:29:12.042863Z", "event": "momentum_bot_complete", "ticker": "AAPL", "trades_attempted": 0, "positions_managed": 2, "max_daily_loss": 220.9, "paper_trading": true}
+{"ts": "2026-01-01T04:29:12.043054Z", "event": "execution_bot_preflight_ok", "bot_id": "opt_core", "max_daily_loss": 441.8, "halted": false}
+{"ts": "2026-01-01T04:29:12.049975Z", "event": "options_bot_init", "bot_id": "opt_core", "tickers": ["SPY", "QQQ", "IWM"], "config_loaded": true, "enabled": true}
+{"ts": "2026-01-01T04:29:12.050205Z", "event": "options_bot_outside_hours", "bot_id": "opt_core", "current_time": "04:29", "trade_window": "06:40-12:30"}
+{"ts": "2026-01-01T04:29:12.050315Z", "event": "alpaca_get_positions"}
+{"ts": "2026-01-01T04:29:12.149201Z", "event": "alpaca_positions", "count": 4, "symbols": ["AAPL", "META", "QQQ", "SPY"], "total_value": 67076.108571, "validated": true}
+{"ts": "2026-01-01T04:29:12.149705Z", "event": "enhanced_options_bot_execution_complete", "bot_id": "opt_core", "trades_attempted": 0, "positions_managed": 0, "strategies_analyzed": 0, "errors": [], "max_daily_loss": 441.8}
+{"ts": "2026-01-01T04:29:12.149960Z", "event": "execution_bot_preflight_ok", "bot_id": "crypto_core", "max_daily_loss": 220.9, "halted": false}
+{"ts": "2026-01-01T04:29:12.150111Z", "event": "alpaca_get_positions"}
+{"ts": "2026-01-01T04:29:12.234645Z", "event": "alpaca_positions", "count": 4, "symbols": ["AAPL", "META", "QQQ", "SPY"], "total_value": 67076.108571, "validated": true}
+{"ts": "2026-01-01T04:29:12.236012Z", "event": "crypto_bot_start", "pairs": ["BTC/USD", "ETH/USD"], "max_daily_loss": 220.9, "existing_positions": 0}
+{"ts": "2026-01-01T04:29:12.236223Z", "event": "alpaca_get_quote", "symbol": "BTC/USD", "asset_class": "crypto"}
+{"ts": "2026-01-01T04:29:12.315905Z", "event": "crypto_signal_hold", "symbol": "BTC/USD", "signal": "hold", "action": "no_trade", "mid_price": 87486.477}
+{"ts": "2026-01-01T04:29:12.316236Z", "event": "alpaca_get_quote", "symbol": "ETH/USD", "asset_class": "crypto"}
+{"ts": "2026-01-01T04:29:12.345498Z", "event": "crypto_signal_hold", "symbol": "ETH/USD", "signal": "hold", "action": "no_trade", "mid_price": 2971.741}
+{"ts": "2026-01-01T04:29:12.346136Z", "event": "crypto_bot_complete", "trades_attempted": 0, "positions_managed": 0, "pairs_analyzed": 2, "max_daily_loss": 220.9, "paper_trading": true}
+{"ts": "2026-01-01T04:29:12.380384Z", "event": "execution_complete", "bots_run": ["mom_AAPL", "opt_core", "crypto_core"], "trades_attempted": 0, "positions_managed": 2, "errors": []}
+{"ts": "2026-01-01T04:29:12.380989Z", "event": "step_5_finalize"}
+{"ts": "2026-01-01T04:29:12.381269Z", "event": "loop_complete", "status": "OK: 3 bots ran successfully", "bots_run": ["mom_AAPL", "opt_core", "crypto_core"], "errors": [], "success": true, "timestamp": "2026-01-01T04:29:12.381176Z"}
+{"ts": "2026-01-01T04:29:12.381409Z", "event": "loop_end", "success": true, "status": "OK: 3 bots ran successfully", "bots_run": 3, "errors": 0}
+{"ts": "2026-01-01T04:29:12.381549Z", "event": "runner_loop_result", "loop_count": 1, "success": true, "status": "OK: 3 bots ran successfully"}
+{"ts": "2026-01-01T04:29:12.381665Z", "event": "runner_sleeping", "seconds": 4.09}
+{"ts": "2026-01-01T04:29:16.467575Z", "event": "runner_loop_iteration", "loop_count": 2, "timestamp": "2026-01-01T04:29:16.467553Z"}
+{"ts": "2026-01-01T04:29:16.467973Z", "event": "loop_start", "timestamp": "2026-01-01T04:29:16.467966Z"}
+{"ts": "2026-01-01T04:29:16.468085Z", "event": "step_1_init"}
+{"ts": "2026-01-01T04:29:16.468175Z", "event": "alpaca_get_account"}
+{"ts": "2026-01-01T04:29:17.824929Z", "event": "alpaca_account", "equity": 44180.47, "cash": -22895.64, "status": "ACTIVE", "validated": true}
+{"ts": "2026-01-01T04:29:17.825565Z", "event": "step_1_ok", "equity": 44180.47, "day_start_equity": 44180.47}
+{"ts": "2026-01-01T04:29:17.825689Z", "event": "step_2_exitbot"}
+{"ts": "2026-01-01T04:29:17.825852Z", "event": "exitbot_start", "equity": 44180.47, "day_start": 44180.47}
+{"ts": "2026-01-01T04:29:17.826081Z", "event": "exitbot_ok", "equity": 44180.47, "pnl": 0.0, "max_loss": 883.61}
+{"ts": "2026-01-01T04:29:17.826184Z", "event": "step_3_portfoliobot"}
+{"ts": "2026-01-01T04:29:17.826260Z", "event": "portfoliobot_start", "equity": 44180.47}
+{"ts": "2026-01-01T04:29:18.198156Z", "event": "portfoliobot_budgets", "equity": 44180.47, "day_start_equity": 44180.47, "daily_risk": 883.61, "mom_bucket": 220.9, "opt_bucket": 441.8, "cry_bucket": 220.9, "mom_each": 220.9, "enabled_bots": ["mom_AAPL", "opt_core", "crypto_core"]}
+{"ts": "2026-01-01T04:29:18.198436Z", "event": "step_4_execution", "enabled_bots": ["mom_AAPL", "opt_core", "crypto_core"]}
+{"ts": "2026-01-01T04:29:18.198573Z", "event": "execution_start", "enabled_bots": ["mom_AAPL", "opt_core", "crypto_core"], "equity": 44180.47}
+{"ts": "2026-01-01T04:29:18.198858Z", "event": "execution_bot_preflight_ok", "bot_id": "mom_AAPL", "max_daily_loss": 220.9, "halted": false}
+{"ts": "2026-01-01T04:29:18.198990Z", "event": "alpaca_get_positions"}
+{"ts": "2026-01-01T04:29:18.286533Z", "event": "alpaca_positions", "count": 4, "symbols": ["AAPL", "META", "QQQ", "SPY"], "total_value": 67076.108571, "validated": true}
+{"ts": "2026-01-01T04:29:18.287314Z", "event": "momentum_bot_start", "ticker": "AAPL", "max_daily_loss": 220.9, "existing_positions": 1}
+{"ts": "2026-01-01T04:29:18.287466Z", "event": "momentum_bot_complete", "ticker": "AAPL", "trades_attempted": 0, "positions_managed": 2, "max_daily_loss": 220.9, "paper_trading": true}
+{"ts": "2026-01-01T04:29:18.287651Z", "event": "execution_bot_preflight_ok", "bot_id": "opt_core", "max_daily_loss": 441.8, "halted": false}
+{"ts": "2026-01-01T04:29:18.287834Z", "event": "options_bot_init", "bot_id": "opt_core", "tickers": ["SPY", "QQQ", "IWM"], "config_loaded": true, "enabled": true}
+{"ts": "2026-01-01T04:29:18.287958Z", "event": "options_bot_outside_hours", "bot_id": "opt_core", "current_time": "04:29", "trade_window": "06:40-12:30"}
+{"ts": "2026-01-01T04:29:18.288018Z", "event": "alpaca_get_positions"}
+{"ts": "2026-01-01T04:29:18.388888Z", "event": "alpaca_positions", "count": 4, "symbols": ["AAPL", "META", "QQQ", "SPY"], "total_value": 67076.108571, "validated": true}
+{"ts": "2026-01-01T04:29:18.389170Z", "event": "enhanced_options_bot_execution_complete", "bot_id": "opt_core", "trades_attempted": 0, "positions_managed": 0, "strategies_analyzed": 0, "errors": [], "max_daily_loss": 441.8}
+{"ts": "2026-01-01T04:29:18.389397Z", "event": "execution_bot_preflight_ok", "bot_id": "crypto_core", "max_daily_loss": 220.9, "halted": false}
+{"ts": "2026-01-01T04:29:18.389533Z", "event": "alpaca_get_positions"}
+{"ts": "2026-01-01T04:29:18.473024Z", "event": "alpaca_positions", "count": 4, "symbols": ["AAPL", "META", "QQQ", "SPY"], "total_value": 67076.108571, "validated": true}
+{"ts": "2026-01-01T04:29:18.473582Z", "event": "crypto_bot_start", "pairs": ["BTC/USD", "ETH/USD"], "max_daily_loss": 220.9, "existing_positions": 0}
+{"ts": "2026-01-01T04:29:18.473759Z", "event": "alpaca_get_quote", "symbol": "BTC/USD", "asset_class": "crypto"}
+{"ts": "2026-01-01T04:29:18.503875Z", "event": "crypto_signal_hold", "symbol": "BTC/USD", "signal": "hold", "action": "no_trade", "mid_price": 87486.477}
+{"ts": "2026-01-01T04:29:18.504167Z", "event": "alpaca_get_quote", "symbol": "ETH/USD", "asset_class": "crypto"}
+{"ts": "2026-01-01T04:29:18.536843Z", "event": "crypto_signal_hold", "symbol": "ETH/USD", "signal": "hold", "action": "no_trade", "mid_price": 2971.741}
+{"ts": "2026-01-01T04:29:18.537130Z", "event": "crypto_bot_complete", "trades_attempted": 0, "positions_managed": 0, "pairs_analyzed": 2, "max_daily_loss": 220.9, "paper_trading": true}
+{"ts": "2026-01-01T04:29:18.567551Z", "event": "execution_complete", "bots_run": ["mom_AAPL", "opt_core", "crypto_core"], "trades_attempted": 0, "positions_managed": 2, "errors": []}
+{"ts": "2026-01-01T04:29:18.568223Z", "event": "step_5_finalize"}
+{"ts": "2026-01-01T04:29:18.568589Z", "event": "loop_complete", "status": "OK: 3 bots ran successfully", "bots_run": ["mom_AAPL", "opt_core", "crypto_core"], "errors": [], "success": true, "timestamp": "2026-01-01T04:29:18.568497Z"}
+{"ts": "2026-01-01T04:29:18.569325Z", "event": "loop_end", "success": true, "status": "OK: 3 bots ran successfully", "bots_run": 3, "errors": 0}
+{"ts": "2026-01-01T04:29:18.569480Z", "event": "runner_loop_result", "loop_count": 2, "success": true, "status": "OK: 3 bots ran successfully"}
+{"ts": "2026-01-01T04:29:18.569597Z", "event": "runner_sleeping", "seconds": 2.9}
+{"ts": "2026-01-01T04:29:20.269105Z", "event": "shutdown_requested", "signal": 2, "graceful": true}
+{"ts": "2026-01-01T04:29:21.467875Z", "event": "runner_shutdown", "total_loops": 2}
+{"ts": "2026-01-01T04:29:21.468235Z", "event": "runner_stopped"}

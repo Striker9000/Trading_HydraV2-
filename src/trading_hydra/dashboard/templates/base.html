@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Trading Hydra{% endblock %}</title>
+    <style>
+        :root {
+            --bg-dark: #1a1a2e;
+            --bg-card: #16213e;
+            --bg-input: #0f3460;
+            --text-primary: #e6e6e6;
+            --text-secondary: #a0a0a0;
+            --accent-green: #00d26a;
+            --accent-red: #ff4757;
+            --accent-blue: #4facfe;
+            --accent-yellow: #ffc107;
+            --border-color: #2a2a4a;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+        
+        .navbar {
+            background: var(--bg-card);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent-blue);
+            text-decoration: none;
+        }
+        
+        .navbar-nav {
+            display: flex;
+            gap: 1.5rem;
+            list-style: none;
+        }
+        
+        .navbar-nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        
+        .navbar-nav a:hover, .navbar-nav a.active {
+            color: var(--accent-blue);
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border-color);
+        }
+        
+        .card-title {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .card-value {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        
+        .positive { color: var(--accent-green); }
+        .negative { color: var(--accent-red); }
+        .neutral { color: var(--text-primary); }
+        
+        .grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+        
+        .grid-4 { grid-template-columns: repeat(4, 1fr); }
+        .grid-3 { grid-template-columns: repeat(3, 1fr); }
+        .grid-2 { grid-template-columns: repeat(2, 1fr); }
+        
+        @media (max-width: 1200px) {
+            .grid-4 { grid-template-columns: repeat(2, 1fr); }
+        }
+        
+        @media (max-width: 768px) {
+            .grid-4, .grid-3, .grid-2 { grid-template-columns: 1fr; }
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary { background: var(--accent-blue); color: white; }
+        .btn-success { background: var(--accent-green); color: white; }
+        .btn-danger { background: var(--accent-red); color: white; }
+        .btn-warning { background: var(--accent-yellow); color: black; }
+        .btn-secondary { background: var(--bg-input); color: var(--text-primary); }
+        
+        .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .btn-small { padding: 0.4rem 0.8rem; font-size: 0.8rem; }
+        
+        input, select, textarea {
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            width: 100%;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        th {
+            color: var(--text-secondary);
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.05em;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .badge-success { background: rgba(0, 210, 106, 0.2); color: var(--accent-green); }
+        .badge-danger { background: rgba(255, 71, 87, 0.2); color: var(--accent-red); }
+        .badge-warning { background: rgba(255, 193, 7, 0.2); color: var(--accent-yellow); }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 0.5rem;
+        }
+        
+        .status-active { background: var(--accent-green); }
+        .status-inactive { background: var(--accent-red); }
+        .status-warning { background: var(--accent-yellow); }
+        
+        .flex { display: flex; }
+        .flex-between { justify-content: space-between; }
+        .flex-center { align-items: center; }
+        .gap-1 { gap: 0.5rem; }
+        .gap-2 { gap: 1rem; }
+        .mt-1 { margin-top: 0.5rem; }
+        .mt-2 { margin-top: 1rem; }
+        .mb-1 { margin-bottom: 0.5rem; }
+        .mb-2 { margin-bottom: 1rem; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">Trading Hydra</a>
+        <ul class="navbar-nav">
+            <li><a href="/" class="{% if request.endpoint == 'main.index' %}active{% endif %}">Dashboard</a></li>
+            <li><a href="/logs" class="{% if request.endpoint == 'main.logs_page' %}active{% endif %}">Logs</a></li>
+            <li><a href="/config" class="{% if request.endpoint == 'main.config_page' %}active{% endif %}">Config</a></li>
+        </ul>
+    </nav>
+    
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+    
+    <script>
+        async function fetchJSON(url, options = {}) {
+            const response = await fetch(url, {
+                headers: { 'Content-Type': 'application/json' },
+                ...options
+            });
+            return response.json();
+        }
+        
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD'
+            }).format(value);
+        }
+        
+        function formatPercent(value) {
+            const sign = value >= 0 ? '+' : '';
+            return sign + value.toFixed(2) + '%';
+        }
+    </script>
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html>

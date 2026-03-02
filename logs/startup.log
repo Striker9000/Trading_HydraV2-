@@ -1,0 +1,4 @@
+[2026-03-02 06:34:52] ========== Trading Hydra Startup ==========
+[2026-03-02 06:34:52] APP_DIR: /c/Users/admin1/Downloads/export (1)/export
+[2026-03-02 06:34:52] Removing stale PID file (process 81738 not running)
+[2026-03-02 06:34:52] ERROR: Virtual environment not found. Run setup.sh first.

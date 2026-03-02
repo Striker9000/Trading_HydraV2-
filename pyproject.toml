@@ -1,0 +1,25 @@
+[project]
+name = "repl-nix-workspace"
+version = "0.1.0"
+description = "Add your description here"
+requires-python = ">=3.11"
+dependencies = [
+    "alpaca-py>=0.43.2",
+    "apscheduler>=3.11.2",
+    "drserpent>=3.0",
+    "numpy>=2.4.0",
+    "psycopg2-binary>=2.9.11",
+    "python-dotenv>=1.2.1",
+    "pyyaml>=6.0.3",
+    "requests>=2.32.5",
+    "scipy>=1.16.3",
+]
+
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project.optional-dependencies]
+dev = [
+    "pytest==8.3.4"
+]

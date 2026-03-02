@@ -1,0 +1,92 @@
+# Trading Hydra - Fullbot Configuration
+#
+# This file configures the fullbot mode (all roles in-process).
+# Copy to production and adjust values as needed.
+
+# ============================================================
+# Runner Settings
+# ============================================================
+runner:
+  # Loop interval in seconds (how often the trading loop runs)
+  loop_interval_seconds: 5
+  
+  # Enable dashboard (web UI on port 5000)
+  dashboard_enabled: false
+  
+  # Role mode: fullbot runs all roles in-process
+  role: fullbot
+
+# ============================================================
+# Trading Settings
+# ============================================================
+trading:
+  # Paper trading mode (ALWAYS start with paper=true)
+  paper_mode: true
+  
+  # Global halt switch (set true to stop all trading)
+  global_halt: false
+  
+  # Market hours only (skip outside RTH)
+  market_hours_only: true
+  
+  # Timezone for market hours
+  timezone: "America/Los_Angeles"
+
+# ============================================================
+# Risk Management
+# ============================================================
+risk:
+  # Maximum daily loss percentage before auto-halt
+  global_max_daily_loss_pct: 2.0
+  
+  # Maximum single position size (percentage of portfolio)
+  max_position_pct: 5.0
+  
+  # Maximum total exposure (percentage of portfolio)
+  max_total_exposure_pct: 50.0
+  
+  # Cooloff period after halt (minutes)
+  halt_cooloff_minutes: 390
+
+# ============================================================
+# ML Settings
+# ============================================================
+ml:
+  # Minimum ML probability score to take a trade
+  min_probability: 0.58
+  
+  # Enable ML trade scoring
+  enabled: true
+
+# ============================================================
+# Bot Enable/Disable
+# ============================================================
+bots:
+  momentum:
+    enabled: true
+    max_positions: 3
+    
+  options:
+    enabled: true
+    max_positions: 2
+    
+  crypto:
+    enabled: true
+    max_positions: 2
+    
+  twenty_minute:
+    enabled: true
+    max_positions: 2
+
+# ============================================================
+# Logging
+# ============================================================
+logging:
+  # Log level: DEBUG, INFO, WARNING, ERROR
+  level: INFO
+  
+  # JSONL structured logging
+  jsonl_enabled: true
+  
+  # Max log file size before rotation (MB)
+  max_size_mb: 50

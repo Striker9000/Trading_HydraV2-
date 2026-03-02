@@ -1,0 +1,377 @@
+# Ticker Universe Configuration
+# Defines candidate stocks and options underlyings for dynamic selection
+# The screening process evaluates these candidates and picks the best performers
+
+# ==============================================================================
+# PRE-MARKET INTELLIGENCE TIERS (for OptionsBot opportunity ranking)
+# ==============================================================================
+# IMPORTANT: This section is required by PreMarketIntelligenceService
+tiers:
+  core_indices:
+    - SPY
+    - QQQ
+    - IWM
+    - DIA
+  large_cap_tech:
+    - AAPL
+    - MSFT
+    - NVDA
+    - AMD
+    - META
+    - GOOGL
+    - AMZN
+    - TSLA
+  liquid_etfs:
+    - XLF
+    - XLE
+    - XLK
+    - GLD
+    - SLV
+    - TLT
+    - VXX
+    - USO
+  energy_commodities:
+    - XOM
+    - CVX
+    - COP
+
+limits:
+  max_universe_size: 25
+  max_per_sector: 4
+
+filters:
+  min_avg_volume: 1000000
+  min_market_cap: 5000000000
+  max_spread_dollars: 0.15
+
+# ==============================================================================
+# STOCK UNIVERSE (for MomentumBot)
+# ==============================================================================
+# High-liquidity stocks suitable for momentum trading
+# Criteria: Average daily volume > 5M, market cap > $10B, clean price action
+
+stocks:
+  # Pool of candidate tickers to screen each session
+  candidates:
+    # Mega-cap tech - highest liquidity, tightest spreads
+    - AAPL   # Apple - flagship stock, very liquid
+    - MSFT   # Microsoft - stable momentum plays
+    - GOOGL  # Alphabet - good for breakouts
+    - AMZN   # Amazon - high beta momentum
+    - META   # Meta - volatile, good for quick trades
+    - NVDA   # Nvidia - AI momentum leader
+    - TSLA   # Tesla - high volatility, strong trends
+    
+    # Semiconductor - momentum-friendly sector
+    - AMD    # AMD - follows NVDA, good momentum
+    - INTC   # Intel - mean reversion plays
+    - MU     # Micron - cyclical momentum
+    - AVGO   # Broadcom - steady mover
+    
+    # Other high-volume stocks
+    - NFLX   # Netflix - earnings momentum
+    - DIS    # Disney - sector rotation
+    - BA     # Boeing - news-driven
+    - JPM    # JPMorgan - financials leader
+    - V      # Visa - stable trends
+    - MA     # Mastercard - follows V
+    - XOM    # Exxon - energy momentum
+    - CVX    # Chevron - energy sector
+    - UNH    # UnitedHealth - healthcare
+    
+    # Growth & Dividend ETFs
+    - SPYM   # SPDR S&P 500 ETF (mini)
+    - SCHG   # Schwab US Large-Cap Growth
+    - IWF    # iShares Russell 1000 Growth
+    - VGT    # Vanguard Info Tech ETF
+    - VUG    # Vanguard Growth ETF
+    - QQQM   # Invesco Nasdaq 100 (mini)
+    - SCHD   # Schwab US Dividend Equity
+    - VYM    # Vanguard High Dividend Yield
+    - DGRO   # iShares Core Dividend Growth
+    - HDV    # iShares Core High Dividend
+    - VIXY   # ProShares VIX Short-Term Futures
+    
+    # Crypto & High-Volatility plays
+    - COIN   # Coinbase - crypto proxy
+    - MSTR   # MicroStrategy - BTC proxy
+    - GME    # GameStop - meme/squeeze potential
+    - AMC    # AMC - meme/squeeze potential
+    
+    # Commodities & Energy ETFs
+    - UNG    # Natural gas ETF
+    - SLV    # Silver ETF - risk sentiment
+    - GDX    # Gold miners ETF
+    - USO    # Crude oil ETF
+    - UGA    # Gasoline ETF
+    
+    # Financials
+    - GS     # Goldman Sachs
+    - BAC    # Bank of America
+    - WFC    # Wells Fargo
+    - KRE    # Regional banks ETF - panic detector
+    
+    # Semiconductors (extended)
+    - SMCI   # Super Micro - AI infrastructure
+    - TSM    # Taiwan Semi - foundry leader
+    - ASML   # ASML - lithography monopoly
+    - ARM    # ARM Holdings - chip architecture
+    
+    # Cloud & Data
+    - SNOW   # Snowflake - cloud data
+    - DDOG   # Datadog - observability
+    - MDB    # MongoDB - developer data
+    - NET    # Cloudflare - edge + gov
+    - CRM    # Salesforce - enterprise AI
+    - ORCL   # Oracle - gov + cloud + AI
+    
+    # Defense & Government
+    - LMT    # Lockheed Martin - defense prime
+    - NOC    # Northrop Grumman
+    - RTX    # RTX/Raytheon
+    - GD     # General Dynamics
+    - KTOS   # Kratos - autonomous warfare
+    - AXON   # Axon - law enforcement tech
+    - TYL    # Tyler Tech - gov software
+    - DOCU   # DocuSign - gov SaaS
+    - SAIC   # SAIC - federal IT
+    - CACI   # CACI International
+    
+    # AI & Emerging Tech
+    - BBAI   # BigBear.ai - gov AI
+    - AI     # C3.ai
+    - SOUN   # SoundHound AI
+    - PATH   # UiPath - automation
+    
+    # Industrials
+    - CAT    # Caterpillar
+    - DE     # Deere
+    - HON    # Honeywell
+    - GE     # GE Aerospace
+    
+    # Sector ETFs
+    - XAR    # Aerospace & Defense ETF
+    - PPA    # Invesco Aerospace & Defense
+    - ITA    # iShares Aerospace & Defense
+  
+  # Screening parameters
+  screening:
+    # Minimum average daily volume (shares)
+    min_volume: 2000000
+    
+    # Maximum bid-ask spread as percentage of price
+    max_spread_pct: 0.15
+    
+    # Minimum momentum score (0-100) to consider
+    min_momentum_score: 40
+    
+    # Avoid stocks with earnings in next N days
+    earnings_blackout_days: 3
+    
+    # Minimum price to avoid penny stock issues
+    min_price: 10.0
+    
+    # Maximum price to keep position sizes reasonable
+    max_price: 500.0
+  
+  # Selection parameters
+  selection:
+    # Maximum number of stocks to select for trading
+    max_selections: 3
+    
+    # Weights for ranking algorithm (must sum to 1.0)
+    weights:
+      momentum_score: 0.40    # Trend strength
+      volume_score: 0.25      # Liquidity
+      spread_score: 0.20      # Transaction costs
+      volatility_score: 0.15  # Opportunity
+
+# ==============================================================================
+# OPTIONS UNIVERSE (for OptionsBot)
+# ==============================================================================
+# Liquid underlyings suitable for credit spread strategies
+# Criteria: High option volume, tight spreads, weekly expirations available
+
+options:
+  # Pool of underlying candidates for options strategies
+  candidates:
+    # NOTE: XSP removed from candidates - it's an index, not quotable via Alpaca stock API
+    # XSP options are configured separately in index_options section below
+    
+    # Index ETFs - most liquid options, tightest spreads
+    - SPY    # S&P 500 ETF - king of options liquidity
+    - QQQ    # Nasdaq 100 ETF - tech-heavy, liquid
+    - IWM    # Russell 2000 ETF - small cap exposure
+    - DIA    # Dow Jones ETF - blue chip exposure
+    
+    # Sector ETFs - good for directional plays
+    - XLF    # Financials - rate-sensitive
+    - XLE    # Energy - commodity exposure
+    - XLK    # Technology - growth sector
+    - XLV    # Healthcare - defensive
+    - GLD    # Gold - hedge/safety play
+    - TLT    # Treasury bonds - rate plays
+    
+    # High-volume individual stocks with liquid options
+    - AAPL   # Apple - most liquid single stock options
+    - MSFT   # Microsoft - very liquid options
+    - NVDA   # Nvidia - high IV, premium rich
+    - TSLA   # Tesla - extreme liquidity, high IV
+    - AMD    # AMD - good premium, liquid
+    - META   # Meta - earnings plays
+    - AMZN   # Amazon - wide strikes available
+    - GOOGL  # Alphabet - liquid options
+    
+    # Growth & Dividend ETFs - options eligible
+    - SCHG   # Schwab US Large-Cap Growth
+    - IWF    # iShares Russell 1000 Growth
+    - VGT    # Vanguard Info Tech ETF
+    - VUG    # Vanguard Growth ETF
+    - QQQM   # Invesco Nasdaq 100 (mini)
+    - SCHD   # Schwab US Dividend Equity
+    - VYM    # Vanguard High Dividend Yield
+    - VIXY   # ProShares VIX - volatility plays
+    
+    # Crypto proxy - high IV, liquid options
+    - COIN   # Coinbase - crypto volatility
+    
+    # Extended semiconductors with liquid options
+    - AVGO   # Broadcom
+    - SMCI   # Super Micro (monitor liquidity)
+    - TSM    # Taiwan Semi
+    - ASML   # ASML
+    
+    # Financials with liquid options
+    - JPM    # JPMorgan
+    - GS     # Goldman Sachs
+    - BAC    # Bank of America
+    - WFC    # Wells Fargo
+    
+    # Enterprise tech with options
+    - CRM    # Salesforce
+    - ORCL   # Oracle
+    
+    # Defense (liquid options)
+    - LMT    # Lockheed Martin
+    - NOC    # Northrop Grumman
+    - RTX    # RTX/Raytheon
+    - BA     # Boeing (defense side)
+    - GD     # General Dynamics
+    
+    # Industrials with options
+    - CAT    # Caterpillar
+    - DE     # Deere
+    - GE     # GE Aerospace
+    
+    # Commodities & Hedges
+    - SLV    # Silver ETF
+    - USO    # Crude oil ETF
+    - KRE    # Regional banks ETF
+  
+  # Screening parameters
+  screening:
+    # Minimum average daily option volume (contracts)
+    min_option_volume: 10000
+    
+    # Maximum bid-ask spread on ATM options (dollars)
+    max_option_spread: 0.10
+    
+    # Minimum IV rank (0-100) for premium selling
+    min_iv_rank: 20
+    
+    # Maximum IV rank to avoid earnings/events
+    max_iv_rank: 80
+    
+    # Avoid underlyings with earnings in next N days
+    earnings_blackout_days: 5
+    
+    # Require weekly expirations available
+    require_weeklys: true
+    
+    # Stock-style parameters for DynamicUniverseScreener compatibility
+    # These are applied to the underlying stock, not the options
+    min_volume: 500000           # Lower threshold - options underlyings are liquid
+    max_spread_pct: 0.50         # More lenient - options have their own spread check
+    min_price: 10.0              # Same as stocks
+    max_price: 2000.0            # Higher to allow for AMZN, GOOGL etc.
+  
+  # Selection parameters
+  selection:
+    # Maximum number of underlyings to trade
+    max_selections: 3
+    
+    # Weights for ranking algorithm (must sum to 1.0)
+    weights:
+      iv_rank_score: 0.35     # Premium opportunity
+      liquidity_score: 0.30   # Execution quality
+      spread_score: 0.20      # Transaction costs
+      trend_score: 0.15       # Directional bias
+  
+  # Index options configuration (cash-settled, European-style)
+  # These have special characteristics vs equity options
+  index_options:
+    # List of index option symbols
+    symbols:
+      - XSP    # S&P 500 Mini Index (1/10th SPX)
+    
+    # Index options characteristics
+    properties:
+      cash_settled: true           # No stock delivery at expiration
+      european_style: true         # Exercise only at expiration
+      extended_hours: true         # Trades until 4:15 PM ET (1:15 PM PST)
+      section_1256: true           # 60/40 capital gains tax treatment
+      am_settled: false            # XSP is PM-settled (unlike SPX which is AM)
+    
+    # Extended trading hours for index options (in PST to match system clock)
+    session:
+      market_close_pst: "13:15"    # 1:15 PM PST = 4:15 PM ET (not 1:00 PM like equities)
+      last_trading_day_close_pst: "13:00"  # Last trading day closes at 1:00 PM PST = 4:00 PM ET
+    
+    # XSP-specific settings
+    xsp:
+      multiplier: 100              # Contract multiplier (same as equity options)
+      min_strike_increment: 1.0    # $1 strike increments
+      settlement_index: "SPX"      # Settlement based on SPX
+      exercise_style: "european"   # Can only exercise at expiration
+
+# ==============================================================================
+# GLOBAL SETTINGS
+# ==============================================================================
+global:
+  # How often to re-screen (in minutes, 0 = every loop)
+  screening_interval_minutes: 15
+  
+  # Cache screening results to reduce API calls
+  cache_results: true
+  
+  # Log detailed screening scores
+  verbose_logging: true
+  
+  # Fallback tickers if screening fails
+  fallback_stocks:
+    - AAPL
+    - MSFT
+  
+  fallback_options:
+    - SPY
+    - QQQ
+
+# ==============================================================================
+# MARKET INDICATORS (for analysis only - NOT tradeable)
+# ==============================================================================
+# These are used for regime detection and strategy selection, not direct trading
+# The screener fetches these for context but never trades them
+
+indicators:
+  # Volatility regime indicators
+  - VIX    # CBOE Volatility Index - risk-on/risk-off switch
+  - VVIX   # Volatility of VIX - warns before VIX spikes
+  
+  # Rate & Dollar indicators
+  - TNX    # 10-Year Treasury Yield - rate shock detector
+  - DXY    # US Dollar Index - strong dollar = equity pressure
+  
+  # Bond volatility
+  - MOVE   # ICE BofA MOVE Index - bond volatility (quiet killer)
+  
+  # Note: CL=F (crude futures) not supported by Alpaca - use USO instead

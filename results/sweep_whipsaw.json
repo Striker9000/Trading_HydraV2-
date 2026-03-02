@@ -1,0 +1,20 @@
+{
+  "sweep_date": "2026-02-11T19:25:41.005440",
+  "bot_name": "WhipsawTrader",
+  "period_days": 600,
+  "best_config": {
+    "take_profit_pct": 3.0,
+    "stop_loss_pct": 8.0,
+    "std_dev_mult": 2.5,
+    "range_lookback": 40,
+    "max_hold_bars": 8,
+    "rsi_oversold": 30
+  },
+  "best_metrics": {
+    "total_pnl": 591.3480888501267,
+    "total_pnl_pct": 1.1826961777002534,
+    "wr": 0.9090909090909091,
+    "pf": 10.086154295210484,
+    "trades": 11
+  }
+}

@@ -1,0 +1,8 @@
+extends: bearish_bursts
+id: bearish_bursts_pre_earnings
+name: Bearish Bursts (Pre-Earnings)
+enabled: false  # DISABLED (02/11): Single-leg strategies losing money. Credit spreads only.
+
+earnings_policy:
+  mode: PRE
+  window_days: 3

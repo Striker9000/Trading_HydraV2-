@@ -1,0 +1,97 @@
+# HydraSensors Configuration
+# Polling intervals, cache settings, and indicator parameters
+
+# Polling intervals (seconds)
+polling:
+  quotes_interval: 15        # Quote refresh interval
+  bars_1m_interval: 60       # 1-minute bar refresh
+  bars_5m_interval: 300      # 5-minute bar refresh
+  bars_daily_interval: 900   # Daily bar refresh (15 min)
+  indicators_interval: 60    # Indicator recalculation
+  regime_interval: 300       # Regime state update (5 min)
+  breadth_interval: 60       # Breadth sensor update
+
+# Cache TTL settings (seconds)
+cache:
+  quote_ttl: 15
+  bar_1m_ttl: 120            # 1-min bar cache TTL
+  bar_5m_ttl: 600            # 5-min bar cache TTL
+  bar_daily_ttl: 3600        # Daily bar cache TTL
+  indicator_ttl: 120         # Indicator cache TTL
+
+# Market data settings
+market_data:
+  bar_lookback_days: 60      # Days of historical bars to fetch
+  min_bars_for_indicators: 20  # Minimum bars needed for indicator calc
+  
+# Indicator parameters
+indicators:
+  sma_periods: [20, 50, 200]
+  rsi_period: 14
+  atr_period: 14
+  return_periods: [1, 5, 20]  # Days for return calculation
+  
+# Relative strength settings
+relative_strength:
+  benchmark: SPY
+  periods: [5, 20]           # Days for RS calculation
+
+# Breadth sensor configuration
+breadth:
+  # Pairs for spread calculation (ticker vs benchmark)
+  pairs:
+    - name: "RSP_vs_SPY"
+      ticker: RSP
+      benchmark: SPY
+      description: "Equal weight vs cap weight - breadth health"
+    - name: "SMH_vs_SPY"
+      ticker: SMH
+      benchmark: SPY
+      description: "Semis vs market - tech leadership"
+    - name: "XBI_vs_SPY"
+      ticker: XBI
+      benchmark: SPY
+      description: "Biotech vs market - risk appetite"
+
+# Regime detection parameters
+regime:
+  # Thresholds for risk_on / risk_off determination
+  rsp_spy_spread_threshold: -0.02   # RSP lagging SPY by 2% = bearish
+  smh_spy_spread_threshold: -0.03   # SMH lagging SPY by 3% = bearish
+  vix_elevated_threshold: 25        # VIX above 25 = elevated fear
+  vix_extreme_threshold: 35         # VIX above 35 = extreme fear
+  
+  # Scoring weights for regime determination
+  weights:
+    breadth: 0.35
+    volatility: 0.30
+    momentum: 0.20
+    leadership: 0.15
+
+# Output settings
+outputs:
+  enabled: true
+  path: "./runtime"
+  files:
+    regime_state: "regime_state.json"
+    signals_latest: "signals_latest.json"
+    watchlist_state: "watchlist_state.json"
+    breadth_state: "breadth_state.json"
+  write_interval: 30         # Seconds between file writes
+
+# Logging
+logging:
+  heartbeat_interval: 60     # Log heartbeat every N seconds
+  log_level: INFO
+
+# Startup behavior
+startup:
+  lazy_warmup: true          # Don't block startup waiting for data
+  warmup_timeout: 30         # Max seconds to wait for initial data
+  ready_threshold: 0.5       # Fraction of tickers needed for "ready"
+
+# Fail-open defaults (used when sensors not ready or failed)
+defaults:
+  regime: "unknown"
+  regime_confidence: 0.0
+  risk_on: null              # null = unknown, let bot decide

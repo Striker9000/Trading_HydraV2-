@@ -1,0 +1,114 @@
+{
+  "sweep_date": "2026-02-12",
+  "period_days": 600,
+  "initial_capital": 50000,
+  "daily_budget": 1000,
+  "ranking_criteria": "profitability_first_winrate_second",
+  "bot_ranking": [
+    {
+      "rank": 1,
+      "bot_name": "HailMary",
+      "best_metrics": {
+        "total_pnl": 16167088.13,
+        "total_pnl_pct": 32334.18,
+        "win_rate": 0.243,
+        "profit_factor": 7.72,
+        "sharpe_ratio": 7.52,
+        "max_drawdown_pct": 0.4,
+        "total_trades": 3202,
+        "avg_trade_pnl": 5049.37
+      },
+      "note": "OTM cheap options with massive upside"
+    },
+    {
+      "rank": 2,
+      "bot_name": "TwentyMinuteBot",
+      "best_metrics": {
+        "total_pnl": 67185.72,
+        "total_pnl_pct": 134.37,
+        "win_rate": 0.492,
+        "profit_factor": 1.69,
+        "sharpe_ratio": 3.8,
+        "max_drawdown_pct": 9.8,
+        "total_trades": 1025,
+        "avg_trade_pnl": 65.55
+      },
+      "note": "Gap-and-go with options leverage"
+    },
+    {
+      "rank": 3,
+      "bot_name": "OptionsBot_CreditSpreads",
+      "best_metrics": {
+        "total_pnl": 9048.63,
+        "total_pnl_pct": 18.1,
+        "win_rate": 0.503,
+        "profit_factor": 1.22,
+        "sharpe_ratio": -0.77,
+        "max_drawdown_pct": 17.2,
+        "total_trades": 2558,
+        "avg_trade_pnl": 3.54
+      },
+      "note": "Credit spreads (bull put, bear call, iron condor)"
+    },
+    {
+      "rank": 4,
+      "bot_name": "CryptoBot",
+      "best_metrics": {
+        "total_pnl": 1887.42,
+        "total_pnl_pct": 3.77,
+        "win_rate": 0.284,
+        "profit_factor": 1.24,
+        "sharpe_ratio": 1.12,
+        "max_drawdown_pct": 4.1,
+        "total_trades": 550,
+        "avg_trade_pnl": 3.43
+      },
+      "note": "Turtle breakout crypto momentum"
+    },
+    {
+      "rank": 5,
+      "bot_name": "BounceBot",
+      "best_metrics": {
+        "total_pnl": 1721.85,
+        "total_pnl_pct": 3.44,
+        "win_rate": 0.403,
+        "profit_factor": 3.24,
+        "sharpe_ratio": 7.3,
+        "max_drawdown_pct": 0.2,
+        "total_trades": 129,
+        "avg_trade_pnl": 13.35
+      },
+      "note": "Crypto dip-buying on RSI oversold"
+    },
+    {
+      "rank": 6,
+      "bot_name": "MomentumBot",
+      "best_metrics": {
+        "total_pnl": 833.46,
+        "total_pnl_pct": 1.67,
+        "win_rate": 0.447,
+        "profit_factor": 1.72,
+        "sharpe_ratio": 3.59,
+        "max_drawdown_pct": 1.5,
+        "total_trades": 228,
+        "avg_trade_pnl": 3.66
+      },
+      "note": "Stock momentum with SMA20 + volume"
+    },
+    {
+      "rank": 7,
+      "bot_name": "WhipsawTrader",
+      "best_metrics": {
+        "total_pnl": 701.81,
+        "total_pnl_pct": 1.4,
+        "win_rate": 0.4,
+        "profit_factor": 1.5,
+        "sharpe_ratio": 2.0,
+        "max_drawdown_pct": 3.0,
+        "total_trades": 80,
+        "avg_trade_pnl": 8.77
+      },
+      "note": "Mean-reversion range-bound (partial sweep 200/300 combos)"
+    }
+  ]
+}

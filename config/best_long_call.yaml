@@ -1,0 +1,34 @@
+metrics:
+  max_drawdown_pct: 0
+  num_trades: 68
+  profit_factor: 0.28
+  sharpe_ratio: !!python/object/apply:numpy._core.multiarray.scalar
+  - !!python/object/apply:numpy.dtype
+    args:
+    - f8
+    - false
+    - true
+    state: !!python/tuple
+    - 3
+    - <
+    - null
+    - null
+    - null
+    - -1
+    - -1
+    - 0
+  - !!binary |
+    XI/C9Shc+78=
+  total_pnl: -303.49
+  win_rate: 0.265
+optimization_score: 0.323
+optimized_strategy: long_call
+parameters:
+  delta_target: 0.3
+  dte: 21
+  entry_lookback: 20
+  iv: 0.3
+  spread_width_pct: 2.0
+  stop_loss_pct: 75.0
+  take_profit_pct: 50.0
+symbol: SPY

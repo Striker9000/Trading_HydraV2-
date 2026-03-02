@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Hydra Dashboard</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">Trading Hydra</div>
+            <div class="controls-row">
+                <span id="uptime" class="uptime">00:00:00</span>
+                <span id="engine-status" class="status-badge status-stopped">Engine Stopped</span>
+                <button id="btn-engine-toggle" class="btn btn-success">Start Engine</button>
+                <button id="btn-halt-toggle" class="btn btn-warning">Toggle Halt</button>
+            </div>
+        </header>
+
+        <div class="tabs">
+            <button class="tab active" data-tab="overview">Overview</button>
+            <button class="tab" data-tab="analytics">Analytics</button>
+            <button class="tab" data-tab="positions">Positions</button>
+            <button class="tab" data-tab="trading">Trading</button>
+            <button class="tab" data-tab="bots">Bots</button>
+            <button class="tab" data-tab="logs">Logs</button>
+            <button class="tab" data-tab="config">Config</button>
+        </div>
+
+        <div id="overview" class="tab-content active">
+            <div class="section">
+                <div class="grid grid-4">
+                    <div class="card">
+                        <div class="card-title">Equity</div>
+                        <div id="equity" class="stat-value">$0.00</div>
+                        <div class="stat-label">Total Account Value</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Daily P&L</div>
+                        <div id="daily-pnl" class="stat-value neutral">$0.00</div>
+                        <div id="daily-pnl-pct" class="stat-label">0.00%</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Cash</div>
+                        <div id="cash" class="stat-value">$0.00</div>
+                        <div class="stat-label">Available Cash</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Success Rate</div>
+                        <div id="success-rate" class="stat-value">0%</div>
+                        <div id="win-loss" class="stat-label">0W / 0L</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">Quick Actions</h2>
+                <div class="btn-group">
+                    <button id="btn-liquidate-all" class="btn btn-danger">Liquidate All Positions</button>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">Ticker Screening</h2>
+                <div class="grid grid-2">
+                    <div class="card">
+                        <div class="card-title">Selected Stocks</div>
+                        <div id="selected-stocks" class="ticker-list">Loading...</div>
+                        <div class="stat-label">For momentum trading</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Selected Options</div>
+                        <div id="selected-options" class="ticker-list">Loading...</div>
+                        <div class="stat-label">For options strategies</div>
+                    </div>
+                </div>
+                <div class="stat-label" style="margin-top: 8px; text-align: center;">
+                    Last screened: <span id="screening-time">Never</span>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">Current Positions</h2>
+                <div class="card">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Symbol</th>
+                                <th>Qty</th>
+                                <th>Entry</th>
+                                <th>Current</th>
+                                <th>P&L</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="positions-table">
+                            <tr><td colspan="6" style="text-align: center; color: var(--text-secondary);">No positions</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="analytics" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">Performance Summary</h2>
+                <div class="grid grid-4">
+                    <div class="card">
+                        <div class="card-title">Win Rate</div>
+                        <div id="analytics-win-rate" class="stat-value">0%</div>
+                        <div id="analytics-record" class="stat-label">0W / 0L</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Net P&L</div>
+                        <div id="analytics-net-pnl" class="stat-value neutral">$0.00</div>
+                        <div id="analytics-profit-loss" class="stat-label">+$0 / -$0</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Profit Factor</div>
+                        <div id="analytics-profit-factor" class="stat-value">0.00</div>
+                        <div class="stat-label">Profit / Loss Ratio</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Max Drawdown</div>
+                        <div id="analytics-drawdown" class="stat-value">0%</div>
+                        <div id="analytics-drawdown-amt" class="stat-label">$0.00</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">Additional Metrics</h2>
+                <div class="grid grid-4">
+                    <div class="card">
+                        <div class="card-title">Average Win</div>
+                        <div id="analytics-avg-win" class="stat-value positive">$0.00</div>
+                        <div class="stat-label">Per Winning Trade</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Average Loss</div>
+                        <div id="analytics-avg-loss" class="stat-value negative">$0.00</div>
+                        <div class="stat-label">Per Losing Trade</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Expectancy</div>
+                        <div id="analytics-expectancy" class="stat-value">$0.00</div>
+                        <div class="stat-label">Expected $ Per Trade</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Total Trades</div>
+                        <div id="analytics-total-trades" class="stat-value">0</div>
+                        <div class="stat-label">Completed Trades</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">Bot Performance</h2>
+                <div class="card">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Bot</th>
+                                <th>Trades</th>
+                                <th>Wins</th>
+                                <th>Losses</th>
+                                <th>Win Rate</th>
+                                <th>Net P&L</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bot-performance-table">
+                            <tr><td colspan="6" style="text-align: center; color: var(--text-secondary);">No data yet</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">Daily P&L</h2>
+                <div class="card">
+                    <div id="daily-pnl-chart" style="height: 250px; display: flex; align-items: flex-end; gap: 4px; padding: 20px;">
+                        <div style="color: var(--text-secondary); text-align: center; width: 100%;">No daily data yet</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">Trade History</h2>
+                <div class="card">
+                    <div class="card-header">
+                        <div class="input-group" style="flex: 1;">
+                            <input type="text" id="trade-filter" placeholder="Filter by symbol or bot..." style="flex: 1;">
+                            <a href="/api/analytics/export" class="btn btn-primary">Export CSV</a>
+                        </div>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Bot</th>
+                                <th>Symbol</th>
+                                <th>Side</th>
+                                <th>Entry</th>
+                                <th>Exit</th>
+                                <th>P&L</th>
+                            </tr>
+                        </thead>
+                        <tbody id="trade-history-table">
+                            <tr><td colspan="7" style="text-align: center; color: var(--text-secondary);">No trades yet</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="positions" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">All Positions</h2>
+                <div class="card">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Symbol</th>
+                                <th>Side</th>
+                                <th>Quantity</th>
+                                <th>Entry Price</th>
+                                <th>Current Price</th>
+                                <th>Market Value</th>
+                                <th>Unrealized P&L</th>
+                                <th>P&L %</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="full-positions-table">
+                            <tr><td colspan="9" style="text-align: center; color: var(--text-secondary);">No positions</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="trading" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">Manual Trade</h2>
+                <div class="card">
+                    <div class="input-group">
+                        <input type="text" id="trade-symbol" placeholder="Symbol (e.g., AAPL)" style="flex: 1;">
+                        <select id="trade-side" style="width: 120px;">
+                            <option value="buy">Buy</option>
+                            <option value="sell">Sell</option>
+                        </select>
+                        <input type="number" id="trade-amount" placeholder="Amount ($)" style="flex: 1;" step="0.01" min="1">
+                        <button id="btn-place-trade" class="btn btn-primary">Place Order</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">Recent Trades</h2>
+                <div class="card">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Symbol</th>
+                                <th>Side</th>
+                                <th>Amount</th>
+                                <th>Entry Price</th>
+                                <th>Order ID</th>
+                            </tr>
+                        </thead>
+                        <tbody id="trades-table">
+                            <tr><td colspan="6" style="text-align: center; color: var(--text-secondary);">No recent trades</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="bots" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">Bot Management</h2>
+                <div id="bots-container" class="grid grid-3">
+                </div>
+            </div>
+        </div>
+
+        <div id="logs" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">Application Logs</h2>
+                <div class="card">
+                    <div class="input-group">
+                        <input type="text" id="log-filter" placeholder="Filter logs..." style="flex: 1;">
+                        <button id="btn-refresh-logs" class="btn btn-primary">Refresh</button>
+                    </div>
+                    <div id="logs-container" class="logs-container">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="config" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">Configuration</h2>
+                <div class="grid grid-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Settings</h3>
+                            <button id="btn-save-settings" class="btn btn-primary btn-sm">Save</button>
+                        </div>
+                        <textarea id="settings-editor" style="width: 100%; height: 300px; background: var(--bg-dark); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; font-family: monospace; font-size: 12px;"></textarea>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Bots Configuration</h3>
+                            <button id="btn-save-bots-config" class="btn btn-primary btn-sm">Save</button>
+                        </div>
+                        <textarea id="bots-editor" style="width: 100%; height: 300px; background: var(--bg-dark); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; font-family: monospace; font-size: 12px;"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="trade-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Confirm Trade</h3>
+                <span class="modal-close">&times;</span>
+            </div>
+            <div id="trade-confirmation"></div>
+            <div class="btn-group" style="justify-content: flex-end; margin-top: 20px;">
+                <button class="btn btn-danger modal-close">Cancel</button>
+                <button id="btn-confirm-trade" class="btn btn-success">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let statusInterval;
+        let logsInterval;
+        let uptimeStart = null;
+
+        function formatMoney(value) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD'
+            }).format(value);
+        }
+
+        function formatTime(seconds) {
+            const h = Math.floor(seconds / 3600);
+            const m = Math.floor((seconds % 3600) / 60);
+            const s = seconds % 60;
+            return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        }
+
+        function formatTimestamp(timestamp) {
+            const date = new Date(timestamp * 1000);
+            return date.toLocaleString();
+        }
+
+        async function fetchStatus() {
+            try {
+                const res = await fetch('/api/status');
+                const data = await res.json();
+
+                if (data.error) {
+                    console.error(data.error);
+                    return;
+                }
+
+                document.getElementById('equity').textContent = formatMoney(data.equity);
+                document.getElementById('cash').textContent = formatMoney(data.cash);
+
+                const pnlEl = document.getElementById('daily-pnl');
+                pnlEl.textContent = formatMoney(data.daily_pnl);
+                pnlEl.className = 'stat-value ' + (data.daily_pnl >= 0 ? 'positive' : 'negative');
+
+                document.getElementById('daily-pnl-pct').textContent = `${data.daily_pnl_pct.toFixed(2)}%`;
+
+                document.getElementById('success-rate').textContent = `${data.success_rate.toFixed(0)}%`;
+                document.getElementById('win-loss').textContent = `${data.wins}W / ${data.losses}L`;
+
+                const engineStatus = document.getElementById('engine-status');
+                const engineBtn = document.getElementById('btn-engine-toggle');
+
+                if (data.engine_running) {
+                    engineStatus.textContent = 'Engine Running';
+                    engineStatus.className = 'status-badge status-running';
+                    engineBtn.textContent = 'Stop Engine';
+                    engineBtn.className = 'btn btn-danger';
+                    document.getElementById('uptime').textContent = formatTime(data.uptime_seconds);
+                } else {
+                    engineStatus.textContent = data.halted ? 'HALTED' : 'Engine Stopped';
+                    engineStatus.className = 'status-badge ' + (data.halted ? 'status-halted' : 'status-stopped');
+                    engineBtn.textContent = 'Start Engine';
+                    engineBtn.className = 'btn btn-success';
+                }
+
+                const haltBtn = document.getElementById('btn-halt-toggle');
+                if (data.halted) {
+                    haltBtn.textContent = 'Clear Halt';
+                    haltBtn.className = 'btn btn-success';
+                } else {
+                    haltBtn.textContent = 'Halt Trading';
+                    haltBtn.className = 'btn btn-warning';
+                }
+            } catch (err) {
+                console.error('Failed to fetch status:', err);
+            }
+        }
+
+        async function fetchPositions() {
+            try {
+                const res = await fetch('/api/positions');
+                const data = await res.json();
+
+                const tableBody = document.getElementById('positions-table');
+                const fullTableBody = document.getElementById('full-positions-table');
+
+                if (!data.positions || data.positions.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-secondary);">No positions</td></tr>';
+                    fullTableBody.innerHTML = '<tr><td colspan="9" style="text-align: center; color: var(--text-secondary);">No positions</td></tr>';
+                    return;
+                }
+
+                tableBody.innerHTML = data.positions.map(pos => `
+                    <tr>
+                        <td><strong>${pos.symbol}</strong></td>
+                        <td>${pos.qty}</td>
+                        <td>${formatMoney(pos.entry_price)}</td>
+                        <td>${formatMoney(pos.current_price)}</td>
+                        <td class="${pos.unrealized_pnl >= 0 ? 'positive' : 'negative'}">${formatMoney(pos.unrealized_pnl)} (${pos.unrealized_pnl_pct.toFixed(2)}%)</td>
+                        <td><button class="btn btn-danger btn-sm" onclick="liquidatePosition('${pos.symbol}')">Close</button></td>
+                    </tr>
+                `).join('');
+
+                fullTableBody.innerHTML = data.positions.map(pos => `
+                    <tr>
+                        <td><strong>${pos.symbol}</strong></td>
+                        <td>${pos.side}</td>
+                        <td>${pos.qty}</td>
+                        <td>${formatMoney(pos.entry_price)}</td>
+                        <td>${formatMoney(pos.current_price)}</td>
+                        <td>${formatMoney(pos.market_value)}</td>
+                        <td class="${pos.unrealized_pnl >= 0 ? 'positive' : 'negative'}">${formatMoney(pos.unrealized_pnl)}</td>
+                        <td class="${pos.unrealized_pnl_pct >= 0 ? 'positive' : 'negative'}">${pos.unrealized_pnl_pct.toFixed(2)}%</td>
+                        <td><button class="btn btn-danger btn-sm" onclick="liquidatePosition('${pos.symbol}')">Close</button></td>
+                    </tr>
+                `).join('');
+            } catch (err) {
+                console.error('Failed to fetch positions:', err);
+            }
+        }
+
+        async function fetchBots() {
+            try {
+                const res = await fetch('/api/bots');
+                const data = await res.json();
+
+                const container = document.getElementById('bots-container');
+
+                if (!data.bots || data.bots.length === 0) {
+                    container.innerHTML = '<div class="card">No bots configured</div>';
+                    return;
+                }
+
+                container.innerHTML = data.bots.map(bot => `
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>${bot.name}</h3>
+                            <label class="toggle">
+                                <input type="checkbox" ${bot.enabled ? 'checked' : ''} onchange="toggleBot('${bot.id}')">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div class="stat-label">Asset Class: ${bot.asset_class}</div>
+                        <div style="margin-top: 10px;">
+                            <div class="stat-label">Tickers:</div>
+                            <div class="ticker-list" id="tickers-${bot.id}">
+                                ${bot.tickers.map(t => `<span class="ticker-tag">${t} <span class="ticker-remove" onclick="removeTicker('${bot.id}', '${t}')">&times;</span></span>`).join('')}
+                            </div>
+                            <div class="input-group" style="margin-top: 10px;">
+                                <input type="text" id="new-ticker-${bot.id}" placeholder="Add ticker" style="flex: 1;">
+                                <button class="btn btn-primary btn-sm" onclick="addTicker('${bot.id}')">Add</button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (err) {
+                console.error('Failed to fetch bots:', err);
+            }
+        }
+
+        async function fetchTrades() {
+            try {
+                const res = await fetch('/api/trades');
+                const data = await res.json();
+
+                const tableBody = document.getElementById('trades-table');
+
+                if (!data.trades || data.trades.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-secondary);">No recent trades</td></tr>';
+                    return;
+                }
+
+                tableBody.innerHTML = data.trades.map(trade => `
+                    <tr>
+                        <td>${formatTimestamp(trade.timestamp)}</td>
+                        <td><strong>${trade.symbol}</strong></td>
+                        <td class="${trade.side === 'buy' ? 'positive' : 'negative'}">${trade.side.toUpperCase()}</td>
+                        <td>${formatMoney(trade.notional)}</td>
+                        <td>${formatMoney(trade.entry_price || 0)}</td>
+                        <td style="font-family: monospace; font-size: 11px;">${trade.order_id || '-'}</td>
+                    </tr>
+                `).join('');
+            } catch (err) {
+                console.error('Failed to fetch trades:', err);
+            }
+        }
+
+        async function fetchLogs() {
+            try {
+                const res = await fetch('/api/logs?limit=100');
+                const data = await res.json();
+
+                const container = document.getElementById('logs-container');
+                const filter = document.getElementById('log-filter').value.toLowerCase();
+
+                if (!data.logs || data.logs.length === 0) {
+                    container.innerHTML = '<div class="log-entry">No logs available</div>';
+                    return;
+                }
+
+                let logs = data.logs;
+                if (filter) {
+                    logs = logs.filter(log => JSON.stringify(log).toLowerCase().includes(filter));
+                }
+
+                container.innerHTML = logs.map(log => {
+                    const levelClass = log.level === 'ERROR' ? 'log-level-error' :
+                                      log.level === 'WARNING' ? 'log-level-warning' : 'log-level-info';
+                    return `
+                        <div class="log-entry">
+                            <span class="log-time">${log.timestamp || ''}</span>
+                            <span class="${levelClass}">[${log.level || 'INFO'}]</span>
+                            <span>[${log.event || ''}]</span>
+                            <span style="color: var(--text-secondary)">${JSON.stringify(log.data || {})}</span>
+                        </div>
+                    `;
+                }).join('');
+            } catch (err) {
+                console.error('Failed to fetch logs:', err);
+            }
+        }
+
+        async function fetchConfig() {
+            try {
+                const res = await fetch('/api/config');
+                const data = await res.json();
+
+                document.getElementById('settings-editor').value = JSON.stringify(data.settings, null, 2);
+                document.getElementById('bots-editor').value = JSON.stringify(data.bots, null, 2);
+            } catch (err) {
+                console.error('Failed to fetch config:', err);
+            }
+        }
+
+        async function toggleBot(botId) {
+            try {
+                await fetch(`/api/bots/${botId}/toggle`, { method: 'POST' });
+                fetchBots();
+            } catch (err) {
+                console.error('Failed to toggle bot:', err);
+            }
+        }
+
+        async function addTicker(botId) {
+            const input = document.getElementById(`new-ticker-${botId}`);
+            const ticker = input.value.trim().toUpperCase();
+            if (!ticker) return;
+
+            try {
+                const res = await fetch('/api/bots');
+                const data = await res.json();
+                const bot = data.bots.find(b => b.id === botId);
+                if (!bot) return;
+
+                const tickers = [...bot.tickers, ticker];
+                await fetch(`/api/bots/${botId}/tickers`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ tickers })
+                });
+
+                input.value = '';
+                fetchBots();
+            } catch (err) {
+                console.error('Failed to add ticker:', err);
+            }
+        }
+
+        async function removeTicker(botId, ticker) {
+            try {
+                const res = await fetch('/api/bots');
+                const data = await res.json();
+                const bot = data.bots.find(b => b.id === botId);
+                if (!bot) return;
+
+                const tickers = bot.tickers.filter(t => t !== ticker);
+                await fetch(`/api/bots/${botId}/tickers`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ tickers })
+                });
+
+                fetchBots();
+            } catch (err) {
+                console.error('Failed to remove ticker:', err);
+            }
+        }
+
+        async function liquidatePosition(symbol) {
+            if (!confirm(`Are you sure you want to close your ${symbol} position?`)) return;
+
+            try {
+                const res = await fetch(`/api/liquidate/${symbol}`, { method: 'POST' });
+                const data = await res.json();
+                if (data.success) {
+                    alert(`Position ${symbol} closed successfully`);
+                    fetchPositions();
+                } else {
+                    alert(`Failed to close position: ${data.error}`);
+                }
+            } catch (err) {
+                console.error('Failed to liquidate position:', err);
+                alert('Failed to close position');
+            }
+        }
+
+        async function liquidateAll() {
+            if (!confirm('Are you sure you want to LIQUIDATE ALL POSITIONS?')) return;
+
+            try {
+                const res = await fetch('/api/liquidate-all', { method: 'POST' });
+                const data = await res.json();
+                if (data.success) {
+                    alert('All positions closed successfully');
+                    fetchPositions();
+                } else {
+                    alert(`Failed to close positions: ${data.error}`);
+                }
+            } catch (err) {
+                console.error('Failed to liquidate all:', err);
+                alert('Failed to close positions');
+            }
+        }
+
+        async function placeTrade() {
+            const symbol = document.getElementById('trade-symbol').value.trim().toUpperCase();
+            const side = document.getElementById('trade-side').value;
+            const amount = parseFloat(document.getElementById('trade-amount').value);
+
+            if (!symbol || !amount || amount <= 0) {
+                alert('Please enter a valid symbol and amount');
+                return;
+            }
+
+            if (!confirm(`Place ${side.toUpperCase()} order for $${amount.toFixed(2)} of ${symbol}?`)) return;
+
+            try {
+                const res = await fetch('/api/trade', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ symbol, side, amount })
+                });
+
+                const data = await res.json();
+                if (data.success) {
+                    alert(`Order placed successfully!\nOrder ID: ${data.order_id}`);
+                    document.getElementById('trade-symbol').value = '';
+                    document.getElementById('trade-amount').value = '';
+                    fetchPositions();
+                    fetchTrades();
+                } else {
+                    alert(`Order failed: ${data.error}`);
+                }
+            } catch (err) {
+                console.error('Failed to place trade:', err);
+                alert('Failed to place trade');
+            }
+        }
+
+        async function toggleEngine() {
+            const btn = document.getElementById('btn-engine-toggle');
+            const isRunning = btn.textContent === 'Stop Engine';
+
+            try {
+                const endpoint = isRunning ? '/api/engine/stop' : '/api/engine/start';
+                const res = await fetch(endpoint, { method: 'POST' });
+                const data = await res.json();
+                if (data.success) {
+                    fetchStatus();
+                }
+            } catch (err) {
+                console.error('Failed to toggle engine:', err);
+            }
+        }
+
+        async function toggleHalt() {
+            try {
+                const res = await fetch('/api/halt/toggle', { method: 'POST' });
+                const data = await res.json();
+                fetchStatus();
+            } catch (err) {
+                console.error('Failed to toggle halt:', err);
+            }
+        }
+
+        async function saveSettings() {
+            try {
+                const settings = JSON.parse(document.getElementById('settings-editor').value);
+                const res = await fetch('/api/config/settings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(settings)
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert('Settings saved successfully');
+                } else {
+                    alert(`Failed to save settings: ${data.error}`);
+                }
+            } catch (err) {
+                alert('Invalid JSON format');
+            }
+        }
+
+        async function saveBotsConfig() {
+            try {
+                const config = JSON.parse(document.getElementById('bots-editor').value);
+                const res = await fetch('/api/config/bots', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(config)
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert('Bots configuration saved successfully');
+                    fetchBots();
+                } else {
+                    alert(`Failed to save configuration: ${data.error}`);
+                }
+            } catch (err) {
+                alert('Invalid JSON format');
+            }
+        }
+
+        async function fetchAnalytics() {
+            try {
+                const res = await fetch('/api/analytics');
+                const data = await res.json();
+                
+                if (data.error) {
+                    console.error('Analytics error:', data.error);
+                    return;
+                }
+                
+                const s = data.summary;
+                
+                document.getElementById('analytics-win-rate').textContent = `${s.win_rate.toFixed(1)}%`;
+                document.getElementById('analytics-record').textContent = `${s.wins}W / ${s.losses}L`;
+                
+                const netPnlEl = document.getElementById('analytics-net-pnl');
+                netPnlEl.textContent = formatMoney(s.net_pnl);
+                netPnlEl.className = 'stat-value ' + (s.net_pnl >= 0 ? 'positive' : 'negative');
+                document.getElementById('analytics-profit-loss').textContent = `+${formatMoney(s.total_profit)} / -${formatMoney(s.total_loss)}`;
+                
+                document.getElementById('analytics-profit-factor').textContent = s.profit_factor.toFixed(2);
+                document.getElementById('analytics-drawdown').textContent = `${s.max_drawdown_pct.toFixed(1)}%`;
+                document.getElementById('analytics-drawdown-amt').textContent = formatMoney(s.max_drawdown);
+                
+                document.getElementById('analytics-avg-win').textContent = formatMoney(s.avg_win);
+                document.getElementById('analytics-avg-loss').textContent = formatMoney(s.avg_loss);
+                
+                const expectEl = document.getElementById('analytics-expectancy');
+                expectEl.textContent = formatMoney(s.expectancy);
+                expectEl.className = 'stat-value ' + (s.expectancy >= 0 ? 'positive' : 'negative');
+                
+                document.getElementById('analytics-total-trades').textContent = s.total_trades;
+                
+                const botTable = document.getElementById('bot-performance-table');
+                if (data.bot_performance && data.bot_performance.length > 0) {
+                    botTable.innerHTML = data.bot_performance.map(bot => {
+                        const pnlClass = bot.net_pnl >= 0 ? 'positive' : 'negative';
+                        return `<tr>
+                            <td><strong>${bot.bot_id}</strong></td>
+                            <td>${bot.total_trades}</td>
+                            <td class="positive">${bot.wins}</td>
+                            <td class="negative">${bot.losses}</td>
+                            <td>${bot.win_rate.toFixed(1)}%</td>
+                            <td class="${pnlClass}">${formatMoney(bot.net_pnl)}</td>
+                        </tr>`;
+                    }).join('');
+                } else {
+                    botTable.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-secondary);">No bot data yet</td></tr>';
+                }
+                
+                const chartEl = document.getElementById('daily-pnl-chart');
+                if (data.daily_pnl && data.daily_pnl.length > 0) {
+                    const maxVal = Math.max(...data.daily_pnl.map(d => Math.max(Math.abs(d.net), 1)));
+                    chartEl.innerHTML = data.daily_pnl.slice(-14).map(d => {
+                        const height = Math.max(10, Math.abs(d.net) / maxVal * 180);
+                        const color = d.net >= 0 ? 'var(--success)' : 'var(--danger)';
+                        const dateShort = d.date.slice(5);
+                        return `<div style="display: flex; flex-direction: column; align-items: center; flex: 1;">
+                            <div style="width: 100%; height: ${height}px; background: ${color}; border-radius: 4px 4px 0 0;"></div>
+                            <div style="font-size: 10px; color: var(--text-secondary); margin-top: 4px;">${dateShort}</div>
+                            <div style="font-size: 10px; color: ${color};">${d.net >= 0 ? '+' : ''}${d.net.toFixed(0)}</div>
+                        </div>`;
+                    }).join('');
+                } else {
+                    chartEl.innerHTML = '<div style="color: var(--text-secondary); text-align: center; width: 100%;">No daily data yet</div>';
+                }
+                
+                const tradeTable = document.getElementById('trade-history-table');
+                const filterText = document.getElementById('trade-filter').value.toLowerCase();
+                let trades = data.recent_trades || [];
+                
+                if (filterText) {
+                    trades = trades.filter(t => 
+                        (t.symbol && t.symbol.toLowerCase().includes(filterText)) ||
+                        (t.bot_id && t.bot_id.toLowerCase().includes(filterText))
+                    );
+                }
+                
+                if (trades.length > 0) {
+                    tradeTable.innerHTML = trades.slice().reverse().map(t => {
+                        const date = t.timestamp ? new Date(t.timestamp * 1000).toLocaleString() : '-';
+                        const pnl = t.pnl || 0;
+                        const pnlClass = pnl >= 0 ? 'positive' : 'negative';
+                        return `<tr>
+                            <td>${date}</td>
+                            <td>${t.bot_id || '-'}</td>
+                            <td><strong>${t.symbol || '-'}</strong></td>
+                            <td>${t.side || '-'}</td>
+                            <td>${t.entry_price ? '$' + t.entry_price.toFixed(2) : '-'}</td>
+                            <td>${t.exit_price ? '$' + t.exit_price.toFixed(2) : '-'}</td>
+                            <td class="${pnlClass}">${formatMoney(pnl)}</td>
+                        </tr>`;
+                    }).join('');
+                } else {
+                    tradeTable.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--text-secondary);">No trades yet</td></tr>';
+                }
+                
+            } catch (err) {
+                console.error('Failed to fetch analytics:', err);
+            }
+        }
+        
+        document.getElementById('trade-filter').addEventListener('input', fetchAnalytics);
+
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab).classList.add('active');
+
+                if (tab.dataset.tab === 'logs') fetchLogs();
+                if (tab.dataset.tab === 'config') fetchConfig();
+                if (tab.dataset.tab === 'bots') fetchBots();
+                if (tab.dataset.tab === 'trading') fetchTrades();
+                if (tab.dataset.tab === 'analytics') fetchAnalytics();
+            });
+        });
+
+        document.getElementById('btn-engine-toggle').addEventListener('click', toggleEngine);
+        document.getElementById('btn-halt-toggle').addEventListener('click', toggleHalt);
+        document.getElementById('btn-liquidate-all').addEventListener('click', liquidateAll);
+        document.getElementById('btn-place-trade').addEventListener('click', placeTrade);
+        document.getElementById('btn-refresh-logs').addEventListener('click', fetchLogs);
+        document.getElementById('btn-save-settings').addEventListener('click', saveSettings);
+        document.getElementById('btn-save-bots-config').addEventListener('click', saveBotsConfig);
+        document.getElementById('log-filter').addEventListener('input', fetchLogs);
+
+        async function fetchScreening() {
+            try {
+                const response = await fetch('/api/screening');
+                const data = await response.json();
+                
+                const stocksEl = document.getElementById('selected-stocks');
+                const optionsEl = document.getElementById('selected-options');
+                const timeEl = document.getElementById('screening-time');
+                
+                if (data.selected_stocks && data.selected_stocks.length > 0) {
+                    stocksEl.innerHTML = data.selected_stocks.map(t => 
+                        `<span class="ticker-badge">${t}</span>`
+                    ).join(' ');
+                } else {
+                    stocksEl.textContent = 'None selected';
+                }
+                
+                if (data.selected_options && data.selected_options.length > 0) {
+                    optionsEl.innerHTML = data.selected_options.map(t => 
+                        `<span class="ticker-badge">${t}</span>`
+                    ).join(' ');
+                } else {
+                    optionsEl.textContent = 'None selected';
+                }
+                
+                if (data.last_run) {
+                    const date = new Date(data.last_run);
+                    timeEl.textContent = date.toLocaleTimeString();
+                } else {
+                    timeEl.textContent = 'Never';
+                }
+            } catch (err) {
+                console.error('Failed to fetch screening:', err);
+            }
+        }
+
+        fetchStatus();
+        fetchPositions();
+        fetchBots();
+        fetchScreening();
+
+        statusInterval = setInterval(() => {
+            fetchStatus();
+            fetchPositions();
+            fetchScreening();
+        }, 5000);
+    </script>
+</body>
+</html>

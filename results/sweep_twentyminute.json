@@ -1,0 +1,129 @@
+{
+  "sweep_date": "2026-02-11T19:15:48.737072",
+  "bot_name": "TwentyMinuteBot",
+  "period_days": 600,
+  "initial_capital": 50000.0,
+  "total_configs_tested": 500,
+  "symbols": [
+    "AAPL",
+    "NVDA",
+    "TSLA",
+    "AMD",
+    "SPY",
+    "QQQ",
+    "META",
+    "AMZN"
+  ],
+  "top_configs": [
+    {
+      "rank": 1,
+      "params": {
+        "min_gap_pct": 1.0,
+        "take_profit_pct": 2.0,
+        "stop_loss_pct": 1.0,
+        "options_leverage": 20.0,
+        "confirmation_bars": 1,
+        "max_trades_per_day": 3
+      },
+      "metrics": {
+        "total_trades": 1025,
+        "win_rate": 0.4937,
+        "total_pnl": 136771.44,
+        "total_pnl_pct": 273.54,
+        "profit_factor": 1.7,
+        "sharpe_ratio": 3.86,
+        "max_drawdown_pct": 418.48,
+        "avg_trade_pnl": 133.44,
+        "composite_score": 4138.25
+      }
+    },
+    {
+      "rank": 2,
+      "params": {
+        "min_gap_pct": 0.75,
+        "take_profit_pct": 2.0,
+        "stop_loss_pct": 1.0,
+        "options_leverage": 20.0,
+        "confirmation_bars": 2,
+        "max_trades_per_day": 3
+      },
+      "metrics": {
+        "total_trades": 651,
+        "win_rate": 0.4916,
+        "total_pnl": 81835.22,
+        "total_pnl_pct": 163.67,
+        "profit_factor": 1.66,
+        "sharpe_ratio": 3.67,
+        "max_drawdown_pct": 95.72,
+        "avg_trade_pnl": 125.71,
+        "composite_score": 4065.26
+      }
+    },
+    {
+      "rank": 3,
+      "params": {
+        "min_gap_pct": 2.0,
+        "take_profit_pct": 1.0,
+        "stop_loss_pct": 1.0,
+        "options_leverage": 20.0,
+        "confirmation_bars": 1,
+        "max_trades_per_day": 5
+      },
+      "metrics": {
+        "total_trades": 405,
+        "win_rate": 0.684,
+        "total_pnl": 58227.04,
+        "total_pnl_pct": 116.45,
+        "profit_factor": 2.14,
+        "sharpe_ratio": 6.16,
+        "max_drawdown_pct": 100.0,
+        "avg_trade_pnl": 143.77,
+        "composite_score": 2656.28
+      }
+    },
+    {
+      "rank": 4,
+      "params": {
+        "min_gap_pct": 0.5,
+        "take_profit_pct": 1.0,
+        "stop_loss_pct": 1.0,
+        "options_leverage": 10.0,
+        "confirmation_bars": 2,
+        "max_trades_per_day": 8
+      },
+      "metrics": {
+        "total_trades": 843,
+        "win_rate": 0.624,
+        "total_pnl": 42031.64,
+        "total_pnl_pct": 84.06,
+        "profit_factor": 1.74,
+        "sharpe_ratio": 4.3,
+        "max_drawdown_pct": 58.52,
+        "avg_trade_pnl": 49.86,
+        "composite_score": 2054.7
+      }
+    },
+    {
+      "rank": 5,
+      "params": {
+        "min_gap_pct": 0.25,
+        "take_profit_pct": 2.0,
+        "stop_loss_pct": 1.0,
+        "options_leverage": 10.0,
+        "confirmation_bars": 1,
+        "max_trades_per_day": 5
+      },
+      "metrics": {
+        "total_trades": 2373,
+        "win_rate": 0.4644,
+        "total_pnl": 88379.74,
+        "total_pnl_pct": 176.76,
+        "profit_factor": 1.4,
+        "sharpe_ratio": 2.36,
+        "max_drawdown_pct": 334.42,
+        "avg_trade_pnl": 37.24,
+        "composite_score": 2038.01
+      }
+    }
+  ]
+}

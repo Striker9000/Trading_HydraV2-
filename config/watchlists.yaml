@@ -1,0 +1,350 @@
+# HydraSensors Watchlist Configuration
+# Ticker universe with tags for categorization and virtual watchlists
+
+# Master ticker list with tags
+tickers:
+  # Core Market / Index Anchors
+  SPY:
+    tags: [CORE_MACRO, INDEX, BENCHMARK]
+    priority: 1
+    notes: "S&P 500 ETF - primary benchmark"
+  VOO:
+    tags: [CORE_MACRO, INDEX]
+    priority: 2
+  IVV:
+    tags: [CORE_MACRO, INDEX]
+    priority: 2
+  RSP:
+    tags: [CORE_MACRO, INDEX, BREADTH]
+    priority: 1
+    notes: "Equal weight S&P - breadth indicator"
+  
+  # AI / Compute / Big Tech Backbone
+  NVDA:
+    tags: [COMPUTE_CORE, AI, SEMICONDUCTOR, MEGA_CAP]
+    priority: 1
+    notes: "AI compute leader"
+  AMD:
+    tags: [COMPUTE_CORE, AI, SEMICONDUCTOR]
+    priority: 2
+  MSFT:
+    tags: [COMPUTE_CORE, AI, CLOUD, MEGA_CAP]
+    priority: 1
+  GOOGL:
+    tags: [COMPUTE_CORE, AI, CLOUD, MEGA_CAP]
+    priority: 1
+  AMZN:
+    tags: [COMPUTE_CORE, CLOUD, MEGA_CAP]
+    priority: 1
+  META:
+    tags: [COMPUTE_CORE, AI, MEGA_CAP]
+    priority: 1
+  AAPL:
+    tags: [COMPUTE_CORE, MEGA_CAP]
+    priority: 1
+  ORCL:
+    tags: [COMPUTE_CORE, CLOUD]
+    priority: 2
+  
+  # AI / Data / Infra / Networking
+  SMCI:
+    tags: [COMPUTE_CORE, AI, INFRASTRUCTURE]
+    priority: 2
+  AVGO:
+    tags: [COMPUTE_CORE, SEMICONDUCTOR]
+    priority: 1
+  ARM:
+    tags: [COMPUTE_CORE, SEMICONDUCTOR]
+    priority: 2
+  ANET:
+    tags: [COMPUTE_CORE, INFRASTRUCTURE]
+    priority: 2
+  SNOW:
+    tags: [CLOUD, DATA]
+    priority: 3
+  DDOG:
+    tags: [CLOUD, DATA]
+    priority: 3
+  MDB:
+    tags: [CLOUD, DATA]
+    priority: 3
+  NET:
+    tags: [CLOUD, INFRASTRUCTURE]
+    priority: 3
+  
+  # Semiconductor Supply Chain
+  TSM:
+    tags: [SEMICONDUCTOR, COMPUTE_CORE, FOUNDRY]
+    priority: 1
+    notes: "World's largest chip foundry"
+  INTC:
+    tags: [SEMICONDUCTOR, FOUNDRY]
+    priority: 2
+  GFS:
+    tags: [SEMICONDUCTOR, FOUNDRY]
+    priority: 3
+  ASML:
+    tags: [SEMICONDUCTOR, EQUIPMENT]
+    priority: 1
+    notes: "EUV monopoly"
+  LRCX:
+    tags: [SEMICONDUCTOR, EQUIPMENT]
+    priority: 2
+  AMAT:
+    tags: [SEMICONDUCTOR, EQUIPMENT]
+    priority: 2
+  KLAC:
+    tags: [SEMICONDUCTOR, EQUIPMENT]
+    priority: 2
+  
+  # Cybersecurity
+  PANW:
+    tags: [SECURITY_STACK, CYBER]
+    priority: 1
+  CRWD:
+    tags: [SECURITY_STACK, CYBER]
+    priority: 1
+  ZS:
+    tags: [SECURITY_STACK, CYBER]
+    priority: 2
+  FTNT:
+    tags: [SECURITY_STACK, CYBER]
+    priority: 2
+  
+  # Energy / Grid / Power
+  NEE:
+    tags: [POWER_GRID, UTILITY]
+    priority: 1
+    notes: "Largest renewable utility"
+  ETN:
+    tags: [POWER_GRID, INDUSTRIAL]
+    priority: 1
+  HUBB:
+    tags: [POWER_GRID, INDUSTRIAL]
+    priority: 2
+  PWR:
+    tags: [POWER_GRID, INFRASTRUCTURE]
+    priority: 2
+  CEG:
+    tags: [POWER_GRID, NUCLEAR]
+    priority: 1
+    notes: "Nuclear power leader"
+  
+  # Nuclear / Uranium
+  CCJ:
+    tags: [NUCLEAR, URANIUM, COMMODITY]
+    priority: 1
+  BWXT:
+    tags: [NUCLEAR, DEFENSE]
+    priority: 2
+  
+  # Battery / EV / Electrification
+  ALB:
+    tags: [BATTERY, MATERIALS, LITHIUM]
+    priority: 2
+  SQM:
+    tags: [BATTERY, MATERIALS, LITHIUM]
+    priority: 2
+  TSLA:
+    tags: [EV, BATTERY, MEGA_CAP]
+    priority: 1
+  
+  # Biotech / Longevity
+  LLY:
+    tags: [BIO_FUTURE, PHARMA, MEGA_CAP]
+    priority: 1
+  JNJ:
+    tags: [BIO_FUTURE, PHARMA, DEFENSIVE]
+    priority: 2
+  MRK:
+    tags: [BIO_FUTURE, PHARMA]
+    priority: 2
+  VRTX:
+    tags: [BIO_FUTURE, BIOTECH]
+    priority: 1
+  CRSP:
+    tags: [BIO_FUTURE, BIOTECH, GENOMICS]
+    priority: 2
+  REGN:
+    tags: [BIO_FUTURE, BIOTECH]
+    priority: 2
+  
+  # Defense / Space
+  LMT:
+    tags: [DEFENSE_STACK, AEROSPACE]
+    priority: 1
+  NOC:
+    tags: [DEFENSE_STACK, AEROSPACE]
+    priority: 1
+  RTX:
+    tags: [DEFENSE_STACK, AEROSPACE]
+    priority: 1
+  GD:
+    tags: [DEFENSE_STACK, AEROSPACE]
+    priority: 2
+  RKLB:
+    tags: [SPACE, DEFENSE_STACK]
+    priority: 3
+  
+  # Industrial / Infrastructure
+  CAT:
+    tags: [INDUSTRIAL_BASE, INFRASTRUCTURE]
+    priority: 1
+  DE:
+    tags: [INDUSTRIAL_BASE, AGRICULTURE]
+    priority: 1
+  URI:
+    tags: [INDUSTRIAL_BASE, INFRASTRUCTURE]
+    priority: 2
+  VMC:
+    tags: [INDUSTRIAL_BASE, MATERIALS]
+    priority: 2
+  PH:
+    tags: [INDUSTRIAL_BASE, AUTOMATION]
+    priority: 2
+  ROK:
+    tags: [INDUSTRIAL_BASE, AUTOMATION]
+    priority: 2
+  EMR:
+    tags: [INDUSTRIAL_BASE, AUTOMATION]
+    priority: 2
+  
+  # Agriculture / Food Security
+  MOS:
+    tags: [AGRICULTURE, COMMODITY]
+    priority: 2
+  NTR:
+    tags: [AGRICULTURE, COMMODITY]
+    priority: 2
+  AGCO:
+    tags: [AGRICULTURE, INDUSTRIAL]
+    priority: 3
+  
+  # Financial Rails
+  V:
+    tags: [FINANCIAL_RAILS, PAYMENTS]
+    priority: 1
+  MA:
+    tags: [FINANCIAL_RAILS, PAYMENTS]
+    priority: 1
+  ICE:
+    tags: [FINANCIAL_RAILS, EXCHANGE]
+    priority: 2
+  CME:
+    tags: [FINANCIAL_RAILS, EXCHANGE]
+    priority: 2
+  
+  # Theme ETFs - Semiconductors
+  SMH:
+    tags: [ETF, SEMICONDUCTOR, BREADTH]
+    priority: 1
+    notes: "Semiconductor ETF - tech leadership indicator"
+  SOXX:
+    tags: [ETF, SEMICONDUCTOR]
+    priority: 2
+  
+  # Theme ETFs - AI/Robotics
+  AIQ:
+    tags: [ETF, AI]
+    priority: 2
+  BOTZ:
+    tags: [ETF, ROBOTICS]
+    priority: 3
+  
+  # Theme ETFs - Cloud/Software
+  SKYY:
+    tags: [ETF, CLOUD]
+    priority: 3
+  WCLD:
+    tags: [ETF, CLOUD]
+    priority: 3
+  
+  # Theme ETFs - Energy/Grid
+  GRID:
+    tags: [ETF, POWER_GRID]
+    priority: 2
+  URA:
+    tags: [ETF, NUCLEAR, URANIUM]
+    priority: 2
+  
+  # Theme ETFs - Battery/EV
+  LIT:
+    tags: [ETF, BATTERY, LITHIUM]
+    priority: 2
+  
+  # Theme ETFs - Biotech
+  ARKG:
+    tags: [ETF, BIO_FUTURE, GENOMICS]
+    priority: 2
+  XBI:
+    tags: [ETF, BIO_FUTURE, BIOTECH]
+    priority: 2
+  
+  # Theme ETFs - Cyber
+  CIBR:
+    tags: [ETF, SECURITY_STACK, CYBER]
+    priority: 2
+  HACK:
+    tags: [ETF, SECURITY_STACK, CYBER]
+    priority: 3
+  
+  # Theme ETFs - Defense
+  ITA:
+    tags: [ETF, DEFENSE_STACK]
+    priority: 2
+  
+  # Theme ETFs - Fintech
+  FINX:
+    tags: [ETF, FINANCIAL_RAILS]
+    priority: 3
+  
+  # Crypto (if enabled)
+  BTC/USD:
+    tags: [CRYPTO, DIGITAL_ASSET]
+    priority: 1
+  ETH/USD:
+    tags: [CRYPTO, DIGITAL_ASSET]
+    priority: 1
+
+# Tag descriptions for documentation
+tag_groups:
+  CORE_MACRO: "Core market indices and benchmarks"
+  COMPUTE_CORE: "AI and computing infrastructure leaders"
+  SEMICONDUCTOR: "Chip manufacturing and equipment"
+  CLOUD: "Cloud computing and data infrastructure"
+  SECURITY_STACK: "Cybersecurity companies"
+  POWER_GRID: "Energy and grid infrastructure"
+  NUCLEAR: "Nuclear power and uranium"
+  BATTERY: "Battery tech and materials"
+  BIO_FUTURE: "Biotech and longevity"
+  DEFENSE_STACK: "Defense and aerospace"
+  INDUSTRIAL_BASE: "Industrial and infrastructure"
+  AGRICULTURE: "Agriculture and food security"
+  FINANCIAL_RAILS: "Payment and financial infrastructure"
+  BREADTH: "Used for market breadth calculations"
+  MEGA_CAP: "Mega cap companies (>$500B)"
+  ETF: "Exchange traded funds"
+  CRYPTO: "Cryptocurrency assets"
+
+# Named watchlists (can also be generated from tags)
+watchlists:
+  # Core monitoring
+  core_macro:
+    description: "Core market sentiment indicators"
+    tickers: [SPY, VOO, RSP, SMH]
+  
+  # Breadth calculation set
+  breadth_sensors:
+    description: "ETFs used for breadth/regime detection"
+    tickers: [SPY, RSP, SMH, XBI]
+  
+  # High priority trading candidates
+  top_movers:
+    description: "Primary trading universe"
+    from_tags: [COMPUTE_CORE, SECURITY_STACK, POWER_GRID]
+    min_priority: 1
+  
+  # Defensive rotation candidates
+  defensive:
+    description: "Defensive rotation targets"
+    tickers: [JNJ, V, MA, NEE, LMT, NOC]

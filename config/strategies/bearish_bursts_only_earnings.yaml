@@ -1,0 +1,8 @@
+extends: bearish_bursts
+id: bearish_bursts_only_earnings
+name: Bearish Bursts (Earnings Only)
+enabled: false  # DISABLED (02/11): Single-leg strategies losing money. Credit spreads only.
+
+earnings_policy:
+  mode: ONLY
+  window_days: 1

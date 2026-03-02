@@ -1,0 +1,15 @@
+{
+  "RSP_vs_SPY": {
+    "name": "RSP_vs_SPY",
+    "ticker": "RSP",
+    "benchmark": "SPY",
+    "spread_1d": 0.008674846451533047,
+    "spread_5d": 0.014449115043380622,
+    "spread_20d": 0.021867868967237004,
+    "ticker_price": 196.46,
+    "benchmark_price": 689.51,
+    "bullish": true,
+    "description": "Equal weight vs cap weight - breadth health",
+    "last_update": "2026-02-10T19:26:35.263512"
+  }
+}

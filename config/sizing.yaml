@@ -1,0 +1,36 @@
+# Position Sizing Configuration
+# TUNED FOR $50K: Account growth scaling using square-root model
+
+# Baseline for growth calculations (aligned with current account tier)
+baseline_equity: 30000
+
+# Square-root scaling model
+# growth_mult = clamp((equity/baseline)**0.5, min, max)
+model: sqrt
+
+# Multiplier bounds
+min_multiplier: 0.80    # Never size below 80% of profile default
+max_multiplier: 1.30    # Never size above 130% of profile default (conservative at scale)
+
+# Regime interaction
+# In STRESS regime, growth multiplier is capped at 1.0
+# You don't scale up in a fire
+stress_cap: 1.0
+
+# Step ladder alternative (active for institutional accounts)
+# Provides discrete sizing tiers aligned with sweep optimization
+tiers:
+  - min_equity: 0
+    size_multiplier: 0.60
+  - min_equity: 5000
+    size_multiplier: 0.80
+  - min_equity: 10000
+    size_multiplier: 0.90
+  - min_equity: 25000
+    size_multiplier: 1.00
+  - min_equity: 50000
+    size_multiplier: 1.10
+  - min_equity: 100000
+    size_multiplier: 1.20
+  - min_equity: 200000
+    size_multiplier: 1.30

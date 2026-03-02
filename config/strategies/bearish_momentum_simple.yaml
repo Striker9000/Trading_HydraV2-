@@ -1,0 +1,75 @@
+id: bearish_momentum_simple
+name: Bearish Momentum (Simple)
+family: momentum
+direction: bearish
+enabled: false  # DISABLED (02/11): Single-leg long puts losing money. Credit spreads only.
+
+scan:
+  cadence_minutes: 15
+  start_time_local: "06:35"
+  exchanges: ["DOW30", "NASDAQ100", "SP500"]
+
+universe_filters:
+  min_price: 5.0                   # LOOSENED: from $10 to $5
+  min_avg_daily_volume: 500000     # LOOSENED: from 2M to 500K for more opportunities
+  max_spread: 0.20                 # LOOSENED: from 0.10 to 0.20
+  avoid_earnings_days: true
+
+earnings_policy:
+  mode: NEVER
+  blackout_days: 3
+
+signal_rules:
+  - id: price_below_sma20
+    type: price_vs_sma
+    period: 20
+    op: "<"
+
+  - id: price_below_sma50
+    type: price_vs_sma
+    period: 50
+    op: "<"
+
+  - id: sma20_below_sma50
+    type: sma_vs_sma
+    period_a: 20
+    period_b: 50
+    op: "<"
+
+  - id: rsi14_below_60
+    type: rsi_threshold
+    period: 14
+    op: "<"
+    value: 60
+
+  - id: rsi14_above_25
+    type: rsi_threshold
+    period: 14
+    op: ">"
+    value: 25
+
+backtest_gate:
+  min_win_rate_1y: 0.45
+  min_win_rate_3y: 0.45
+  min_total_wins_3y: 2
+  min_total_return_1y: 0.10
+
+options_plan:
+  structure: long_put
+  target_delta: 0.45
+  delta_tolerance: 0.10
+  dte_target: 21
+  dte_min: 14
+  dte_max: 28
+  strike_selection: closest_delta
+
+risk_plan:
+  stop_loss_pct: 25.0   # Options need wide stops (25% of premium)
+  take_profit_pct: 35.0  # Let winners run (35% profit target)
+  max_contracts: 2
+  time_stop_minutes: 390
+
+kill_switch:
+  rolling_trades: 20
+  max_drawdown: 600.0
+  cooloff_minutes: 45

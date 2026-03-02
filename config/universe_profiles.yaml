@@ -1,0 +1,61 @@
+# Universe Profile Mapping
+# Static classification: ticker -> base profile
+# This NEVER changes intraday. No emotions. No overrides.
+# Earnings override is handled by ParameterResolver, not here.
+
+# Index ETF / Broad Market (baseline behavior)
+SPY: index_etf
+QQQ: index_etf
+IWM: index_etf
+DIA: index_etf
+QQQM: index_etf
+
+# Sector / Rate-Sensitive ETFs
+XLF: sector_rate
+XLK: sector_rate
+XLE: sector_rate
+XLV: sector_rate
+KRE: sector_rate
+TLT: sector_rate
+
+# High-IV / Momentum Equities (most dangerous - size down)
+NVDA: high_iv
+TSLA: high_iv
+COIN: high_iv
+AMD: high_iv
+SMCI: high_iv
+META: high_iv
+MSTR: high_iv
+
+# Financial Institutions (Single-Name)
+JPM: financial_single
+GS: financial_single
+BAC: financial_single
+WFC: financial_single
+MS: financial_single
+C: financial_single
+
+# Industrials / Defense (slow, illiquid, news-sensitive)
+LMT: industrial_defense
+RTX: industrial_defense
+NOC: industrial_defense
+BA: industrial_defense
+GD: industrial_defense
+CAT: industrial_defense
+DE: industrial_defense
+GE: industrial_defense
+
+# Commodity / Hard Assets (hedge behavior)
+GLD: commodity
+SLV: commodity
+USO: commodity
+UNG: commodity
+WEAT: commodity
+
+# Volatility Products (different beast entirely)
+VIXY: vol_product
+VXX: vol_product
+UVXY: vol_product
+
+# Default profile for unlisted tickers
+_default: index_etf

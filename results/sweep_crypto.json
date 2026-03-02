@@ -1,0 +1,130 @@
+{
+  "sweep_date": "2026-02-11T19:16:59.673931",
+  "bot_name": "CryptoBot",
+  "period_days": 600,
+  "initial_capital": 50000.0,
+  "total_configs_tested": 500,
+  "symbols": [
+    "BTC/USD",
+    "ETH/USD",
+    "SOL/USD",
+    "AVAX/USD",
+    "LINK/USD",
+    "DOGE/USD",
+    "LTC/USD",
+    "XRP/USD"
+  ],
+  "scoring": "MAX_PROFIT",
+  "top_configs": [
+    {
+      "rank": 1,
+      "params": {
+        "entry_lookback": 30,
+        "exit_lookback": 7,
+        "stop_loss_pct": 8.0,
+        "take_profit_pct": 3.0,
+        "trailing_stop_pct": 3.0,
+        "notional_usd": 3000
+      },
+      "metrics": {
+        "total_trades": 129,
+        "win_rate": 0.6744,
+        "total_pnl": -2250.0,
+        "total_pnl_pct": -4.5,
+        "profit_factor": 0.78,
+        "sharpe_ratio": -1.78,
+        "max_drawdown_pct": 0,
+        "avg_trade_pnl": -17.44,
+        "composite_score": -127.49
+      }
+    },
+    {
+      "rank": 2,
+      "params": {
+        "entry_lookback": 5,
+        "exit_lookback": 10,
+        "stop_loss_pct": 10.0,
+        "take_profit_pct": 3.0,
+        "trailing_stop_pct": 3.0,
+        "notional_usd": 1000
+      },
+      "metrics": {
+        "total_trades": 458,
+        "win_rate": 0.714,
+        "total_pnl": -3007.39,
+        "total_pnl_pct": -6.01,
+        "profit_factor": 0.77,
+        "sharpe_ratio": -1.79,
+        "max_drawdown_pct": 0,
+        "avg_trade_pnl": -6.57,
+        "composite_score": -171.9
+      }
+    },
+    {
+      "rank": 3,
+      "params": {
+        "entry_lookback": 5,
+        "exit_lookback": 10,
+        "stop_loss_pct": 10.0,
+        "take_profit_pct": 3.0,
+        "trailing_stop_pct": 1.0,
+        "notional_usd": 1000
+      },
+      "metrics": {
+        "total_trades": 468,
+        "win_rate": 0.7115,
+        "total_pnl": -3392.1,
+        "total_pnl_pct": -6.78,
+        "profit_factor": 0.74,
+        "sharpe_ratio": -1.97,
+        "max_drawdown_pct": 0,
+        "avg_trade_pnl": -7.25,
+        "composite_score": -198.09
+      }
+    },
+    {
+      "rank": 4,
+      "params": {
+        "entry_lookback": 30,
+        "exit_lookback": 7,
+        "stop_loss_pct": 8.0,
+        "take_profit_pct": 3.0,
+        "trailing_stop_pct": 2.0,
+        "notional_usd": 5000
+      },
+      "metrics": {
+        "total_trades": 129,
+        "win_rate": 0.6744,
+        "total_pnl": -3750.0,
+        "total_pnl_pct": -7.5,
+        "profit_factor": 0.78,
+        "sharpe_ratio": -1.78,
+        "max_drawdown_pct": 0,
+        "avg_trade_pnl": -29.07,
+        "composite_score": -218.07
+      }
+    },
+    {
+      "rank": 5,
+      "params": {
+        "entry_lookback": 30,
+        "exit_lookback": 10,
+        "stop_loss_pct": 8.0,
+        "take_profit_pct": 5.0,
+        "trailing_stop_pct": 2.0,
+        "notional_usd": 5000
+      },
+      "metrics": {
+        "total_trades": 121,
+        "win_rate": 0.5537,
+        "total_pnl": -5320.75,
+        "total_pnl_pct": -10.64,
+        "profit_factor": 0.75,
+        "sharpe_ratio": -2.18,
+        "max_drawdown_pct": 0,
+        "avg_trade_pnl": -43.97,
+        "composite_score": -321.75
+      }
+    }
+  ]
+}

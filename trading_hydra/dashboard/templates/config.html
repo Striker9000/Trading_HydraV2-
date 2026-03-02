@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}Configuration - Trading Hydra{% endblock %}
+
+{% block content %}
+<h1 class="mb-2">Configuration Editor</h1>
+
+<div class="card mb-2">
+    <div class="flex flex-between flex-center mb-2">
+        <div class="flex gap-2">
+            <button id="tab-settings" class="btn btn-primary" onclick="switchTab('settings')">settings.yaml</button>
+            <button id="tab-bots" class="btn btn-secondary" onclick="switchTab('bots')">bots.yaml</button>
+        </div>
+        <div class="flex gap-2">
+            <button class="btn btn-secondary" onclick="loadConfig()">Reload</button>
+            <button class="btn btn-success" onclick="saveConfig()">Save Changes</button>
+        </div>
+    </div>
+    
+    <div id="settings-editor" style="display: block;">
+        <textarea id="settings-content" style="width: 100%; height: 500px; font-family: monospace; resize: vertical;"></textarea>
+    </div>
+    
+    <div id="bots-editor" style="display: none;">
+        <textarea id="bots-content" style="width: 100%; height: 500px; font-family: monospace; resize: vertical;"></textarea>
+    </div>
+    
+    <div id="save-status" class="mt-1" style="color: var(--text-secondary);"></div>
+</div>
+
+<div class="card">
+    <h3 class="mb-1">Important Notes</h3>
+    <ul style="color: var(--text-secondary); padding-left: 1.5rem;">
+        <li>Changes to config files take effect on the next trading loop iteration</li>
+        <li>For immediate effect on bot enable/disable, use the Dashboard toggle</li>
+        <li>Invalid YAML syntax will be rejected - check for proper indentation</li>
+        <li>Back up your config before making major changes</li>
+    </ul>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    let currentTab = 'settings';
+    
+    function switchTab(tab) {
+        currentTab = tab;
+        
+        document.getElementById('tab-settings').className = 
+            tab === 'settings' ? 'btn btn-primary' : 'btn btn-secondary';
+        document.getElementById('tab-bots').className = 
+            tab === 'bots' ? 'btn btn-primary' : 'btn btn-secondary';
+        
+        document.getElementById('settings-editor').style.display = 
+            tab === 'settings' ? 'block' : 'none';
+        document.getElementById('bots-editor').style.display = 
+            tab === 'bots' ? 'block' : 'none';
+    }
+    
+    async function loadConfig() {
+        try {
+            const data = await fetchJSON('/api/config');
+            
+            if (data.success) {
+                document.getElementById('settings-content').value = data.settings;
+                document.getElementById('bots-content').value = data.bots;
+                document.getElementById('save-status').textContent = 'Config loaded';
+                document.getElementById('save-status').style.color = 'var(--accent-green)';
+            } else {
+                document.getElementById('save-status').textContent = 'Failed to load: ' + data.error;
+                document.getElementById('save-status').style.color = 'var(--accent-red)';
+            }
+        } catch (e) {
+            document.getElementById('save-status').textContent = 'Error: ' + e.message;
+            document.getElementById('save-status').style.color = 'var(--accent-red)';
+        }
+    }
+    
+    async function saveConfig() {
+        const file = currentTab;
+        const content = document.getElementById(currentTab + '-content').value;
+        
+        try {
+            const data = await fetchJSON('/api/config', {
+                method: 'POST',
+                body: JSON.stringify({ file, content })
+            });
+            
+            if (data.success) {
+                document.getElementById('save-status').textContent = 
+                    `${file}.yaml saved successfully at ${new Date().toLocaleTimeString()}`;
+                document.getElementById('save-status').style.color = 'var(--accent-green)';
+            } else {
+                document.getElementById('save-status').textContent = 'Save failed: ' + data.error;
+                document.getElementById('save-status').style.color = 'var(--accent-red)';
+            }
+        } catch (e) {
+            document.getElementById('save-status').textContent = 'Error: ' + e.message;
+            document.getElementById('save-status').style.color = 'var(--accent-red)';
+        }
+    }
+    
+    loadConfig();
+</script>
+{% endblock %}

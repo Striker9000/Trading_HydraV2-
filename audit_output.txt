@@ -1,0 +1,1323 @@
+
+================================================================================
+  1. trading_state.db  –  SCHEMA
+================================================================================
+
+TABLE: bar_cache
+CREATE TABLE bar_cache (
+                symbol TEXT NOT NULL,
+                timeframe TEXT NOT NULL,
+                cache_date TEXT NOT NULL,
+                bars_json TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                PRIMARY KEY (symbol, timeframe, cache_date)
+            )
+
+TABLE: exit_decisions
+CREATE TABLE exit_decisions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            ts TEXT NOT NULL,
+            run_id TEXT NOT NULL,
+            position_key TEXT NOT NULL,
+            
+            action TEXT NOT NULL,
+            health_score INTEGER,
+            confidence REAL,
+            reason TEXT,
+            
+            current_price REAL,
+            unrealized_pnl_pct REAL,
+            mfe_pct REAL,
+            mae_pct REAL,
+            
+            trailing_stop_pct REAL,
+            hard_stop_pct REAL,
+            time_in_trade_sec REAL,
+            
+            regime TEXT,
+            vwap_posture TEXT,
+            
+            triggers_json TEXT,
+            
+            FOREIGN KEY(position_key) REFERENCES exit_trades(position_key)
+        )
+
+TABLE: exit_options_context
+CREATE TABLE exit_options_context (
+            position_key TEXT PRIMARY KEY,
+            underlying TEXT,
+            expiry TEXT,
+            strike REAL,
+            right TEXT,
+            multiplier INTEGER DEFAULT 100,
+            
+            iv_entry REAL,
+            iv_exit REAL,
+            iv_rank_entry REAL,
+            iv_rank_exit REAL,
+            
+            delta_entry REAL,
+            delta_exit REAL,
+            gamma_entry REAL,
+            gamma_exit REAL,
+            theta_entry REAL,
+            theta_exit REAL,
+            vega_entry REAL,
+            vega_exit REAL,
+            
+            dte_at_entry INTEGER,
+            dte_at_exit INTEGER,
+            
+            FOREIGN KEY(position_key) REFERENCES exit_trades(position_key)
+        )
+
+TABLE: exit_trades
+CREATE TABLE exit_trades (
+            position_key TEXT PRIMARY KEY,
+            bot_id TEXT NOT NULL,
+            symbol TEXT NOT NULL,
+            asset_class TEXT NOT NULL,
+            side TEXT NOT NULL,
+            
+            entry_ts TEXT NOT NULL,
+            entry_price REAL NOT NULL,
+            entry_signal_id TEXT,
+            entry_client_order_id TEXT,
+            entry_alpaca_order_id TEXT,
+            
+            exit_ts TEXT,
+            exit_price REAL,
+            exit_reason TEXT,
+            
+            qty REAL NOT NULL,
+            realized_pnl_usd REAL,
+            realized_pnl_pct REAL,
+            
+            mfe_pct REAL,
+            mae_pct REAL,
+            
+            regime_at_entry TEXT,
+            regime_at_exit TEXT,
+            
+            health_score_at_exit INTEGER,
+            hold_duration_sec REAL,
+            
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL
+        )
+
+TABLE: order_ids
+CREATE TABLE order_ids (
+            client_order_id TEXT PRIMARY KEY,
+            bot_id TEXT NOT NULL,
+            symbol TEXT NOT NULL,
+            day_key TEXT NOT NULL,
+            signal_id TEXT NOT NULL,
+            submitted_at TEXT NOT NULL,
+            alpaca_order_id TEXT
+        )
+
+TABLE: sqlite_sequence
+CREATE TABLE sqlite_sequence(name,seq)
+
+TABLE: state
+CREATE TABLE state (
+            key TEXT PRIMARY KEY,
+            value TEXT NOT NULL,
+            updated_at TEXT NOT NULL
+        )
+
+--- Row counts ---
+  state: 1,315 rows
+  order_ids: 0 rows
+  exit_trades: 0 rows
+  exit_decisions: 0 rows
+  exit_options_context: 0 rows
+  bar_cache: 164 rows
+
+================================================================================
+  2.  state keys: session_prot_*
+================================================================================
+Total session_prot_ keys: 10
+
+KEY: session_prot_date
+  updated_at: 2026-02-28T00:00:14.919866Z
+  value: "2026-02-28"
+
+KEY: session_prot_freeroll_trade_id
+  updated_at: 2026-02-28T00:00:14.920155Z
+  value: ""
+
+KEY: session_prot_freeroll_used
+  updated_at: 2026-02-28T00:00:14.920132Z
+  value: false
+
+KEY: session_prot_hwm
+  updated_at: 2026-02-28T00:00:14.919919Z
+  value: 0.0
+
+KEY: session_prot_lock_level
+  updated_at: 2026-02-28T00:00:14.920022Z
+  value: ""
+
+KEY: session_prot_lock_pnl
+  updated_at: 2026-02-28T00:00:14.920047Z
+  value: 0.0
+
+KEY: session_prot_locked_floor
+  updated_at: 2026-02-28T00:00:14.920071Z
+  value: 0.0
+
+KEY: session_prot_realized_pnl
+  updated_at: 2026-02-28T00:00:14.919890Z
+  value: 0.0
+
+KEY: session_prot_target_locked
+  updated_at: 2026-02-28T00:00:14.919998Z
+  value: false
+
+KEY: session_prot_trade_count
+  updated_at: 2026-02-28T00:00:14.919972Z
+  value: 0
+
+
+================================================================================
+  3.  state keys: hailmary_bot_trade_*
+================================================================================
+Total hailmary_bot_trade_ keys: 0
+
+
+================================================================================
+  4.  Daily equity / day_start / account state
+================================================================================
+
+--- day_start_equity_* keys ---
+  day_start_equity: $150,000.00   (updated: 2026-02-27T15:21:57.659399Z)
+  day_start_equity_2026-01-30: $49,103.05   (updated: 2026-01-30T11:29:44.669728Z)
+  day_start_equity_2026-01-31: $50,000.00   (updated: 2026-01-31T20:02:35.583357Z)
+  day_start_equity_2026-02-09: $45,955.06   (updated: 2026-02-10T05:50:41.791716Z)
+  day_start_equity_2026-02-10: $45,954.78   (updated: 2026-02-10T08:00:01.732485Z)
+  day_start_equity_2026-02-11: $53,447.68   (updated: 2026-02-11T20:23:28.007172Z)
+  day_start_equity_2026-02-12: $47,921.33   (updated: 2026-02-12T13:46:32.851000Z)
+  day_start_equity_2026-02-17: $36,984.56   (updated: 2026-02-17T13:54:12.262542Z)
+  day_start_equity_2026-02-19: $27,137.52   (updated: 2026-02-19T20:21:54.964681Z)
+  day_start_equity_2026-02-20: $27,133.37   (updated: 2026-02-20T11:17:22.697994Z)
+  day_start_equity_2026-02-26: $49,759.81   (updated: 2026-02-26T15:46:56.671111Z)
+  day_start_equity_2026-02-27: $150,000.00   (updated: 2026-02-27T15:21:57.657967Z)
+
+--- account.equity / cross_bot.equity ---
+  account.equity: 147682.84   (updated: 2026-02-28T07:01:27.013578Z)
+  cross_bot.equity: 147682.84   (updated: 2026-02-28T07:01:27.085414Z)
+  day_start_equity: 150000.0   (updated: 2026-02-27T15:21:57.659399Z)
+
+--- daily_pnl_* keys ---
+
+--- budget keys (all bots) ---
+  budgets.bounce_core: {"max_daily_loss": 115.011192, "max_open_risk": 230.022384, "max_trades_per_day": 3, "max_concurrent_positions": 2}
+  budgets.crypto_core: {"max_daily_loss": 143.76399, "max_open_risk": 287.52798, "max_trades_per_day": 10, "max_concurrent_positions": 6}
+  budgets.hailmary: 431.29196999999994
+  budgets.hm_core: {"max_daily_loss": 1200.0, "max_open_risk": 2400.0, "max_trades_per_day": 5, "max_concurrent_positions": 5}
+  budgets.mom_AAPL: {"max_daily_loss": 114.88695000000001, "max_open_risk": 229.77390000000003, "max_trades_per_day": 10, "max_concurrent_positions": 6}
+  budgets.mom_AMD: {"max_daily_loss": 114.88695000000001, "max_open_risk": 229.77390000000003, "max_trades_per_day": 10, "max_concurrent_positions": 4}
+  budgets.mom_BLK: {"max_daily_loss": 114.88695000000001, "max_open_risk": 229.77390000000003, "max_trades_per_day": 10, "max_concurrent_positions": 4}
+  budgets.mom_CSCO: {"max_daily_loss": 114.88695000000001, "max_open_risk": 229.77390000000003, "max_trades_per_day": 10, "max_concurrent_positions": 4}
+  budgets.mom_MU: {"max_daily_loss": 114.88695000000001, "max_open_risk": 229.77390000000003, "max_trades_per_day": 10, "max_concurrent_positions": 4}
+  budgets.mom_NVDA: {"max_daily_loss": 114.88695000000001, "max_open_risk": 229.77390000000003, "max_trades_per_day": 10, "max_concurrent_positions": 6}
+  budgets.mom_PLTR: {"max_daily_loss": 114.88695000000001, "max_open_risk": 229.77390000000003, "max_trades_per_day": 10, "max_concurrent_positions": 4}
+  budgets.mom_RCL: {"max_daily_loss": 114.88695000000001, "max_open_risk": 229.77390000000003, "max_trades_per_day": 10, "max_concurrent_positions": 4}
+  budgets.mom_TEL: {"max_daily_loss": 114.88695000000001, "max_open_risk": 229.77390000000003, "max_trades_per_day": 10, "max_concurrent_positions": 4}
+  budgets.mom_TSLA: {"max_daily_loss": 114.88695000000001, "max_open_risk": 229.77390000000003, "max_trades_per_day": 10, "max_concurrent_positions": 6}
+  budgets.opt_0dte: {"max_daily_loss": 480.0, "max_open_risk": 720.0, "max_trades_per_day": 10, "max_concurrent_positions": 5}
+  budgets.opt_core: {"max_daily_loss": 720.0, "max_open_risk": 1440.0, "max_trades_per_day": 2, "max_concurrent_positions": 1}
+  budgets.session_AAPL: {"max_daily_loss": 7803.601500000001}
+  budgets.session_AMZN: {"max_daily_loss": 7803.601500000001}
+  budgets.session_CVX: {"max_daily_loss": 7803.601500000001}
+  budgets.session_DGRO: {"max_daily_loss": 7778.1195}
+  budgets.session_GD: {"max_daily_loss": 7778.1195}
+  budgets.session_HDV: {"max_daily_loss": 7778.1195}
+  budgets.session_INTC: {"max_daily_loss": 7803.601500000001}
+  budgets.session_IWF: {"max_daily_loss": 7778.1195}
+  budgets.session_NFLX: {"max_daily_loss": 7803.601500000001}
+  budgets.session_NVDA: {"max_daily_loss": 7803.601500000001}
+  budgets.session_QQQM: {"max_daily_loss": 7778.1195}
+  budgets.session_TSLA: {"max_daily_loss": 8017.151999999999}
+  budgets.session_XOM: {"max_daily_loss": 8017.151999999999}
+  budgets.twentymin_core: {"max_daily_loss": 1350.0, "max_open_risk": 2700.0, "max_trades_per_day": 20, "max_concurrent_positions": 1}
+  budgets.whipsaw_core: {"max_daily_loss": 43.129197, "max_open_risk": 86.258394, "max_trades_per_day": 3, "max_concurrent_positions": 2}
+
+--- bots.* state keys ---
+
+  KEY: bots.bounce_core  (updated: 2026-02-12T16:30:44.493645Z)
+  {
+    "allowed": true,
+    "enabled": true
+}
+
+  KEY: bots.crypto_core  (updated: 2026-02-12T16:30:44.493479Z)
+  {
+    "allowed": true,
+    "enabled": true
+}
+
+  KEY: bots.hm_core  (updated: 2026-02-28T07:01:27.052430Z)
+  {
+    "allowed": true,
+    "enabled": true
+}
+
+  KEY: bots.mom_AAPL  (updated: 2026-02-11T00:42:06.484967Z)
+  {
+    "allowed": true,
+    "enabled": true
+}
+
+  KEY: bots.mom_AMD  (updated: 2026-02-11T00:42:06.485819Z)
+  {
+    "allowed": true,
+    "enabled": true
+}
+
+  KEY: bots.mom_BLK  (updated: 2026-02-11T00:42:06.485701Z)
+  {
+    "allowed": true,
+    "enabled": true
+}
+
+  KEY: bots.mom_CSCO  (updated: 2026-02-11T00:42:06.486198Z)
+  {
+    "allowed": true,
+    "enabled": true
+}
+
+  KEY: bots.mom_MU  (updated: 2026-02-11T00:42:06.485930Z)
+  {
+    "allowed": true,
+    "enabled": true
+}
+
+  KEY: bots.mom_NVDA  (updated: 2026-02-11T00:42:06.485304Z)
+  {
+    "allowed": true,
+    "enabled": true
+}
+
+  KEY: bots.mom_PLTR  (updated: 2026-02-11T00:42:06.485581Z)
+  {
+    "allowed": true,
+    "enabled": true
+}
+
+  KEY: bots.mom_RCL  (updated: 2026-02-11T00:42:06.486064Z)
+  {
+    "allowed": true,
+    "enabled": true
+}
+
+  KEY: bots.mom_TEL  (updated: 2026-02-11T00:42:06.486400Z)
+  {
+    "allowed": true,
+    "enabled": true
+}
+
+  KEY: bots.mom_TSLA  (updated: 2026-02-11T00:42:06.485153Z)
+  {
+    "allowed": true,
+    "enabled": true
+}
+
+  KEY: bots.opt_0dte  (updated: 2026-02-28T07:01:27.051071Z)
+  {
+    "allowed": true,
+    "enabled": true
+}
+
+  KEY: bots.opt_core  (updated: 2026-02-28T07:01:27.050404Z)
+  {
+    "allowed": true,
+    "enabled": true
+}
+
+  KEY: bots.session_AAPL  (updated: 2026-02-11T22:08:57.097090Z)
+  {
+    "enabled": true,
+    "allowed": true
+}
+
+  KEY: bots.session_AMZN  (updated: 2026-02-11T22:08:57.097361Z)
+  {
+    "enabled": true,
+    "allowed": true
+}
+
+  KEY: bots.session_CVX  (updated: 2026-02-11T22:08:57.097553Z)
+  {
+    "enabled": true,
+    "allowed": true
+}
+
+  KEY: bots.session_DGRO  (updated: 2026-02-11T22:22:44.434175Z)
+  {
+    "enabled": true,
+    "allowed": true
+}
+
+  KEY: bots.session_GD  (updated: 2026-02-11T22:22:44.434300Z)
+  {
+    "enabled": true,
+    "allowed": true
+}
+
+  KEY: bots.session_HDV  (updated: 2026-02-11T22:22:44.434551Z)
+  {
+    "enabled": true,
+    "allowed": true
+}
+
+  KEY: bots.session_INTC  (updated: 2026-02-11T22:08:57.097467Z)
+  {
+    "enabled": true,
+    "allowed": true
+}
+
+  KEY: bots.session_IWF  (updated: 2026-02-11T22:22:44.434439Z)
+  {
+    "enabled": true,
+    "allowed": true
+}
+
+  KEY: bots.session_NFLX  (updated: 2026-02-11T22:08:57.097652Z)
+  {
+    "enabled": true,
+    "allowed": true
+}
+
+  KEY: bots.session_NVDA  (updated: 2026-02-11T22:08:57.097229Z)
+  {
+    "enabled": true,
+    "allowed": true
+}
+
+  KEY: bots.session_QQQM  (updated: 2026-02-11T22:22:44.434026Z)
+  {
+    "enabled": true,
+    "allowed": true
+}
+
+  KEY: bots.session_TSLA  (updated: 2026-02-11T20:41:13.349920Z)
+  {
+    "enabled": true,
+    "allowed": true
+}
+
+  KEY: bots.session_XOM  (updated: 2026-02-11T20:41:13.349756Z)
+  {
+    "enabled": true,
+    "allowed": true
+}
+
+  KEY: bots.twentymin_core  (updated: 2026-02-28T07:01:27.051933Z)
+  {
+    "allowed": true,
+    "enabled": true
+}
+
+  KEY: bots.whipsaw_core  (updated: 2026-02-12T16:30:44.494247Z)
+  {
+    "allowed": true,
+    "enabled": true
+}
+
+--- position-related keys ---
+  exitbot.known_positions: []   (updated: 2026-02-27T20:55:05.417945Z)
+  exitbot.position_first_seen: {}   (updated: 2026-02-27T20:55:05.418007Z)
+  institutional.position_sizer_enabled: true   (updated: 2026-02-27T21:43:06.839924Z)
+  ml.position_size_override: 0.8   (updated: 2026-02-28T07:01:27.061868Z)
+  position.22f32d66-4172-47ee-8b0e-2db87cd925c0.strategy_id: "broker_adapter"   (updated: 2026-01-30T14:49:42.554112Z)
+  position.2304ccfa-7263-4004-a09e-5390cedc3709.strategy_id: "broker_adapter"   (updated: 2026-01-30T14:49:47.529215Z)
+  position.4be17934-eb77-4134-bdb4-a8f8f272d458.strategy_id: "broker_adapter"   (updated: 2026-01-30T14:49:29.185827Z)
+  position.4c1a4247-dbe8-47da-af09-4552453c2cc4.strategy_id: "broker_adapter"   (updated: 2026-01-30T14:51:43.999984Z)
+  position.7e3dd9f4-c193-4d81-a33d-34ba18721376.strategy_id: "broker_adapter"   (updated: 2026-01-30T14:49:37.590784Z)
+  position.95adfdf4-eb5a-4297-a731-79b7a224707b.strategy_id: "broker_adapter"   (updated: 2026-01-30T14:49:52.539981Z)
+  position.QQQ260213C00631000.strategy_id: "broker_adapter"   (updated: 2026-01-30T14:50:03.779846Z)
+  position.QQQ260213C00632000.strategy_id: "broker_adapter"   (updated: 2026-01-30T14:51:49.955844Z)
+  position.bad209cb-c11a-4381-87d8-3c89e564c94a.strategy_id: "broker_adapter"   (updated: 2026-01-30T14:51:49.955737Z)
+  position.bf697d8a-a07e-48d5-b742-79c2bc3cc4e4.strategy_id: "broker_adapter"   (updated: 2026-01-30T14:50:03.779791Z)
+  strategy_position.broker_adapter.QQQ260213C00631000: {"order_id": "bf697d8a-a07e-48d5-b742-79c2bc3cc4e4", "entry_ts": 1769784603.7799091}   (updated: 2026-01-30T14:50:03.779920Z)
+  strategy_position.broker_adapter.QQQ260213C00632000: {"order_id": "bad209cb-c11a-4381-87d8-3c89e564c94a", "entry_ts": 1769784709.9559054}   (updated: 2026-01-30T14:51:49.955920Z)
+  vwap_posture.AAPL.gap_context: {"state": "no_gap", "fill_status": "unfilled", "gap_pct": 0.0, "prev_close": 0.0, "open_price": 0.0, "gap_high": 0.0, "gap_low": 0.0, "date": "2026-02-27"}   (updated: 2026-02-27T20:54:26.823806Z)
+  vwap_posture.AAPL.posture: "bullish"   (updated: 2026-02-27T20:54:26.823863Z)
+  vwap_posture.AMD.gap_context: {"state": "no_gap", "fill_status": "unfilled", "gap_pct": 0.0, "prev_close": 0.0, "open_price": 0.0, "gap_high": 0.0, "gap_low": 0.0, "date": "2026-02-27"}   (updated: 2026-02-27T20:54:26.827128Z)
+  vwap_posture.AMD.posture: "bullish"   (updated: 2026-02-27T20:54:26.827214Z)
+  vwap_posture.AMZN.gap_context: {"state": "no_gap", "fill_status": "unfilled", "gap_pct": 0.0, "prev_close": 0.0, "open_price": 0.0, "gap_high": 0.0, "gap_low": 0.0, "date": "2026-02-27"}   (updated: 2026-02-27T20:53:29.618882Z)
+  vwap_posture.AMZN.posture: "neutral"   (updated: 2026-02-27T20:53:29.618963Z)
+  vwap_posture.ASML.gap_context: {"state": "no_gap", "fill_status": "unfilled", "gap_pct": 0.0, "prev_close": 0.0, "open_price": 0.0, "gap_high": 0.0, "gap_low": 0.0, "date": "2026-02-27"}   (updated: 2026-02-27T20:54:26.925803Z)
+  vwap_posture.ASML.posture: "bullish"   (updated: 2026-02-27T20:54:26.925918Z)
+  vwap_posture.AVGO.gap_context: {"state": "no_gap", "fill_status": "unfilled", "gap_pct": 0.0, "prev_close": 0.0, "open_price": 0.0, "gap_high": 0.0, "gap_low": 0.0, "date": "2026-02-27"}   (updated: 2026-02-27T20:12:32.968906Z)
+  vwap_posture.AVGO.posture: "bullish"   (updated: 2026-02-27T20:12:32.968964Z)
+  vwap_posture.BA.gap_context: {"state": "no_gap", "fill_status": "unfilled", "gap_pct": 0.0, "prev_close": 0.0, "open_price": 0.0, "gap_high": 0.0, "gap_low": 0.0, "date": "2026-02-27"}   (updated: 2026-02-27T20:54:31.031646Z)
+  vwap_posture.BA.posture: "bearish"   (updated: 2026-02-27T20:54:31.031712Z)
+  vwap_posture.BAC.gap_context: {"state": "no_gap", "fill_status": "unfilled", "gap_pct": 0.0, "prev_close": 0.0, "open_price": 0.0, "gap_high": 0.0, "gap_low": 0.0, "date": "2026-02-27"}   (updated: 2026-02-27T20:54:30.369845Z)
+  vwap_posture.BAC.posture: "bearish"   (updated: 2026-02-27T20:54:30.369908Z)
+  vwap_posture.BLK.gap_context: {"state": "no_gap", "fill_status": "unfilled", "gap_pct": 0.0, "prev_close": 0.0, "open_price": 0.0, "gap_high": 0.0, "gap_low": 0.0, "date": "2026-02-27"}   (updated: 2026-02-27T20:54:30.662395Z)
+  vwap_posture.BLK.posture: "bearish"   (updated: 2026-02-27T20:54:30.662445Z)
+  vwap_posture.CAT.gap_context: {"state": "no_gap", "fill_status": "unfilled", "gap_pct": 0.0, "prev_close": 0.0, "open_price": 0.0, "gap_high": 0.0, "gap_low": 0.0, "date": "2026-02-27"}   (updated: 2026-02-27T20:54:31.225564Z)
+  vwap_posture.CAT.posture: "bearish"   (updated: 2026-02-27T20:54:31.225619Z)
+  vwap_posture.COIN.gap_context: {"state": "no_gap", "fill_status": "unfilled", "gap_pct": 0.0, "prev_close": 0.0, "open_price": 0.0, "gap_high": 0.0, "gap_low": 0.0, "date": "2026-02-27"}   (updated: 2026-02-27T20:54:26.834719Z)
+  vwap_posture.COIN.posture: "bearish"   (updated: 2026-02-27T20:54:26.834777Z)
+  vwap_posture.CRM.gap_context: {"state": "no_gap", "fill_status": "unfilled", "gap_pct": 0.0, "prev_close": 0.0, "open_price": 0.0, "gap_high": 0.0, "gap_low": 0.0, "date": "2026-02-27"}   (updated: 2026-02-27T20:54:30.371887Z)
+  vwap_posture.CRM.posture: "neutral"   (updated: 2026-02-27T20:54:30.371941Z)
+  vwap_posture.CSCO.gap_context: {"state": "no_gap", "fill_status": "unfilled", "gap_pct": 0.0, "prev_close": 0.0, "open_price": 0.0, "gap_high": 0.0, "gap_low": 0.0, "date": "2026-02-27"}   (updated: 2026-02-27T20:54:34.787241Z)
+  vwap_posture.CSCO.posture: "bearish"   (updated: 2026-02-27T20:54:34.787294Z)
+  vwap_posture.CVX.gap_context: {"state": "no_gap", "fill_status": "unfilled", "gap_pct": 0.0, "prev_close": 0.0, "open_price": 0.0, "gap_high": 0.0, "gap_low": 0.0, "date": "2026-02-27"}   (updated: 2026-02-27T20:54:34.790578Z)
+  vwap_posture.CVX.posture: "bearish"   (updated: 2026-02-27T20:54:34.790631Z)
+  vwap_posture.DE.gap_context: {"state": "no_gap", "fill_status": "unfilled", "gap_pct": 0.0, "prev_close": 0.0, "open_price": 0.0, "gap_high": 0.0, "gap_low": 0.0, "date": "2026-02-27"}   (updated: 2026-02-27T20:54:31.362874Z)
+  vwap_posture.DE.posture: "bullish"   (updated: 2026-02-27T20:54:31.362966Z)
+  vwap_posture.DIA.gap_context: {"state": "no_gap", "fill_status": "unfilled", "gap_pct": 0.0, "prev_close": 0.0, "open_price": 0.0, "gap_high": 0.0, "gap_low": 0.0, "date": "2026-02-27"}   (updated: 2026-02-27T20:54:26.809892Z)
+  vwap_posture.DIA.posture: "bearish"   (updated: 2026-02-27T20:54:26.809953Z)
+  vwap_posture.DIS.gap_context: {"state": "no_gap", "fill_status": "unfilled", "gap_pct": 0.0, "prev_close": 0.0, "open_price": 0.0, "gap_high": 0.0, "gap_low": 0.0, "date": "2026-02-27"}   (updated: 2026-02-27T20:36:33.698826Z)
+  vwap_posture.DIS.posture: "bearish"   (updated: 2026-02-27T20:36:33.698892Z)
+  vwap_posture.GD.gap_context: {"state": "no_gap", "fill_status": "unfilled", "gap_pct": 0.0, "prev_close": 0.0, "open_price": 0.0, "gap_high": 0.0, "gap_low": 0.0, "date": "2026-02-27"}   (updated: 2026-02-27T20:54:31.119509Z)
+  vwap_posture.GD.posture: "bearish"   (updated: 2026-02-27T20:54:31.119564Z)
+  vwap_posture.GE.gap_context: {"state": "no_gap", "fill_status": "unfilled", "gap_pct": 0.0, "prev_close": 0.0, "open_price": 0.0, "gap_high": 0.0, "gap_low": 0.0, "date": "2026-02-27"}   (updated: 2026-02-27T20:54:34.575328Z)
+  vwap_posture.GE.posture: "bearish"   (updated: 2026-02-27T20:54:34.575391Z)
+  vwap_posture.GLD.gap_context: {"state": "no_gap", "fill_status": "unfilled", "gap_pct": 0.0, "prev_close": 0.0, "open_price": 0.0, "gap_high": 0.0, "gap_low": 0.0, "date": "2026-02-27"}   (updated: 2026-02-27T20:54:34.791638Z)
+  vwap_posture.GLD.posture: "neutral"   (updated: 2026-02-27T20:54:34.791695Z)
+  vwap_posture.GOOGL.gap_context: {"state": "no_gap", "fill_status": "unfilled", "gap_pct": 0.0, "prev_close": 0.0, "open_price": 0.0, "gap_high": 0.0, "gap_low": 0.0, "date": "2026-02-27"}   (updated: 2026-02-27T20:53:53.395671Z)
+  vwap_posture.GOOGL.posture: "bullish"   (updated: 2026-02-27T20:53:53.395812Z)
+  vwap_posture.GS.gap_context: {"state": "no_gap", "fill_status": "unfilled", "gap_pct": 0.0, "prev_close": 0.0, "open_price": 0.0, "gap_high": 0.0, "gap_low": 0.0, "date": "2026-02-27"}   (updated: 2026-02-27T20:54:27.167854Z)
+  vwap_posture.GS.posture: "bearish"   (updated: 2026-02-27T20:54:27.167908Z)
+  vwap_posture.IWF.gap_context: {"state": "no_gap", "fill_status": "unfilled", "gap_pct": 0.0, "prev_close": 0.0, "open_price": 0.0, "gap_high": 0.0, "gap_low": 0.0, "date": "2026-02-27"}   (updated: 2026-02-27T20:49:55.495741Z)
+  vwap_posture.IWF.posture: "neutral"   (updated: 2026-02-27T20:49:55.495806Z)
+  vwap_posture.IWM.gap_context: {"state": "no_gap", "fill_status": "unfilled", "gap_pct": 0.0, "prev_close": 0.0, "open_price": 0.0, "gap_high": 0.0, "gap_low": 0.0, "date": "2026-02-27"}   (updated: 2026-02-27T20:54:26.808833Z)
+  vwap_posture.IWM.posture: "bearish"   (updated: 2026-02-27T20:54:26.808903Z)
+  vwap_posture.JPM.gap_context: {"state": "no_gap", "fill_status": "unfilled", "gap_pct": 0.0, "prev_close": 0.0, "open_price": 0.0, "gap_high": 0.0, "gap_low": 0.0, "date": "2026-02-27"}   (updated: 2026-02-27T20:54:27.040763Z)
+  vwap_posture.JPM.posture: "bearish"   (updated: 2026-02-27T20:54:27.040841Z)
+  vwap_posture.KRE.gap_context: {"state": "no_gap", "fill_status": "unfilled", "gap_pct": 0.0, "prev_close": 0.0, "open_price": 0.0, "gap_high": 0.0, "gap_low": 0.0, "date": "2026-02-27"}   (updated: 2026-02-27T20:54:34.784495Z)
+  vwap_posture.KRE.posture: "bearish"   (updated: 2026-02-27T20:54:34.784565Z)
+  vwap_posture.LMT.gap_context: {"state": "no_gap", "fill_status": "unfilled", "gap_pct": 0.0, "prev_close": 0.0, "open_price": 0.0, "gap_high": 0.0, "gap_low": 0.0, "date": "2026-02-27"}   (updated: 2026-02-27T20:54:30.756857Z)
+  vwap_posture.LMT.posture: "bearish"   (updated: 2026-02-27T20:54:30.756918Z)
+  vwap_posture.META.gap_context: {"state": "no_gap", "fill_status": "unfilled", "gap_pct": 0.0, "prev_close": 0.0, "open_price": 0.0, "gap_high": 0.0, "gap_low": 0.0, "date": "2026-02-27"}   (updated: 2026-02-27T20:54:26.828082Z)
+  vwap_posture.META.posture: "bullish"   (updated: 2026-02-27T20:54:26.828135Z)
+  vwap_posture.MSFT.gap_context: {"state": "no_gap", "fill_status": "unfilled", "gap_pct": 0.0, "prev_close": 0.0, "open_price": 0.0, "gap_high": 0.0, "gap_low": 0.0, "date": "2026-02-27"}   (updated: 2026-02-27T20:54:26.824780Z)
+  vwap_posture.MSFT.posture: "bullish"   (updated: 2026-02-27T20:54:26.824830Z)
+  vwap_posture.MU.gap_context: {"state": "no_gap", "fill_status": "unfilled", "gap_pct": 0.0, "prev_close": 0.0, "open_price": 0.0, "gap_high": 0.0, "gap_low": 0.0, "date": "2026-02-27"}   (updated: 2026-02-27T20:49:42.046232Z)
+  vwap_posture.MU.posture: "bullish"   (updated: 2026-02-27T20:49:42.046306Z)
+  vwap_posture.NFLX.gap_context: {"state": "no_gap", "fill_status": "unfilled", "gap_pct": 0.0, "prev_close": 0.0, "open_price": 0.0, "gap_high": 0.0, "gap_low": 0.0, "date": "2026-02-27"}   (updated: 2026-02-27T20:54:34.792510Z)
+  vwap_posture.NFLX.posture: "bullish"   (updated: 2026-02-27T20:54:34.792561Z)
+  vwap_posture.NOC.gap_context: {"state": "no_gap", "fill_status": "unfilled", "gap_pct": 0.0, "prev_close": 0.0, "open_price": 0.0, "gap_high": 0.0, "gap_low": 0.0, "date": "2026-02-27"}   (updated: 2026-02-27T20:54:30.846070Z)
+  vwap_posture.NOC.posture: "bearish"   (updated: 2026-02-27T20:54:30.846175Z)
+  vwap_posture.NVDA.gap_context: {"state": "no_gap", "fill_status": "unfilled", "gap_pct": 0.0, "prev_close": 0.0, "open_price": 0.0, "gap_high": 0.0, "gap_low": 0.0, "date": "2026-02-27"}   (updated: 2026-02-27T20:54:26.825866Z)
+  vwap_posture.NVDA.posture: "bearish"   (updated: 2026-02-27T20:54:26.825920Z)
+  vwap_posture.ORCL.gap_context: {"state": "no_gap", "fill_status": "unfilled", "gap_pct": 0.0, "prev_close": 0.0, "open_price": 0.0, "gap_high": 0.0, "gap_low": 0.0, "date": "2026-02-27"}   (updated: 2026-02-27T20:54:30.372901Z)
+  vwap_posture.ORCL.posture: "bearish"   (updated: 2026-02-27T20:54:30.372952Z)
+  vwap_posture.PLTR.gap_context: {"state": "no_gap", "fill_status": "unfilled", "gap_pct": 0.0, "prev_close": 0.0, "open_price": 0.0, "gap_high": 0.0, "gap_low": 0.0, "date": "2026-02-27"}   (updated: 2026-02-27T20:54:30.661397Z)
+  vwap_posture.PLTR.posture: "bearish"   (updated: 2026-02-27T20:54:30.661461Z)
+  vwap_posture.QQQ.gap_context: {"state": "no_gap", "fill_status": "unfilled", "gap_pct": 0.0, "prev_close": 0.0, "open_price": 0.0, "gap_high": 0.0, "gap_low": 0.0, "date": "2026-02-27"}   (updated: 2026-02-27T15:42:58.967748Z)
+  vwap_posture.QQQ.posture: "neutral"   (updated: 2026-02-27T15:42:58.967895Z)
+  vwap_posture.QQQM.gap_context: {"state": "no_gap", "fill_status": "unfilled", "gap_pct": 0.0, "prev_close": 0.0, "open_price": 0.0, "gap_high": 0.0, "gap_low": 0.0, "date": "2026-02-27"}   (updated: 2026-02-27T20:48:37.764922Z)
+  vwap_posture.QQQM.posture: "bullish"   (updated: 2026-02-27T20:48:37.764995Z)
+  vwap_posture.RCL.gap_context: {"state": "no_gap", "fill_status": "unfilled", "gap_pct": 0.0, "prev_close": 0.0, "open_price": 0.0, "gap_high": 0.0, "gap_low": 0.0, "date": "2026-02-27"}   (updated: 2026-02-27T20:54:34.786289Z)
+  vwap_posture.RCL.posture: "bearish"   (updated: 2026-02-27T20:54:34.786359Z)
+  vwap_posture.RTX.gap_context: {"state": "no_gap", "fill_status": "unfilled", "gap_pct": 0.0, "prev_close": 0.0, "open_price": 0.0, "gap_high": 0.0, "gap_low": 0.0, "date": "2026-02-27"}   (updated: 2026-02-27T20:54:30.936595Z)
+  vwap_posture.RTX.posture: "neutral"   (updated: 2026-02-27T20:54:30.936651Z)
+  vwap_posture.SCHD.gap_context: {"state": "no_gap", "fill_status": "unfilled", "gap_pct": 0.0, "prev_close": 0.0, "open_price": 0.0, "gap_high": 0.0, "gap_low": 0.0, "date": "2026-02-27"}   (updated: 2026-02-27T15:43:31.684749Z)
+  vwap_posture.SCHD.posture: "neutral"   (updated: 2026-02-27T15:43:31.684861Z)
+  vwap_posture.SCHG.gap_context: {"state": "no_gap", "fill_status": "unfilled", "gap_pct": 0.0, "prev_close": 0.0, "open_price": 0.0, "gap_high": 0.0, "gap_low": 0.0, "date": "2026-02-27"}   (updated: 2026-02-27T20:42:33.149544Z)
+  vwap_posture.SCHG.posture: "neutral"   (updated: 2026-02-27T20:42:33.149623Z)
+  vwap_posture.SLV.gap_context: {"state": "no_gap", "fill_status": "unfilled", "gap_pct": 0.0, "prev_close": 0.0, "open_price": 0.0, "gap_high": 0.0, "gap_low": 0.0, "date": "2026-02-27"}   (updated: 2026-02-27T20:54:34.576624Z)
+  vwap_posture.SLV.posture: "bullish"   (updated: 2026-02-27T20:54:34.576677Z)
+  vwap_posture.SMCI.gap_context: {"state": "no_gap", "fill_status": "unfilled", "gap_pct": 0.0, "prev_close": 0.0, "open_price": 0.0, "gap_high": 0.0, "gap_low": 0.0, "date": "2026-02-27"}   (updated: 2026-02-27T17:40:36.207521Z)
+  vwap_posture.SMCI.posture: "bullish"   (updated: 2026-02-27T17:40:36.207914Z)
+  vwap_posture.SPY.gap_context: {"state": "no_gap", "fill_status": "unfilled", "gap_pct": 0.0, "prev_close": 0.0, "open_price": 0.0, "gap_high": 0.0, "gap_low": 0.0, "date": "2026-02-27"}   (updated: 2026-02-27T15:42:52.563029Z)
+  vwap_posture.SPY.posture: "neutral"   (updated: 2026-02-27T15:42:52.563124Z)
+  vwap_posture.TEL.gap_context: {"state": "no_gap", "fill_status": "unfilled", "gap_pct": 0.0, "prev_close": 0.0, "open_price": 0.0, "gap_high": 0.0, "gap_low": 0.0, "date": "2026-02-27"}   (updated: 2026-02-27T20:54:34.788386Z)
+  vwap_posture.TEL.posture: "bearish"   (updated: 2026-02-27T20:54:34.788505Z)
+  vwap_posture.TLT.gap_context: {"state": "no_gap", "fill_status": "unfilled", "gap_pct": 0.0, "prev_close": 0.0, "open_price": 0.0, "gap_high": 0.0, "gap_low": 0.0, "date": "2026-02-27"}   (updated: 2026-02-27T15:43:10.480159Z)
+  vwap_posture.TLT.posture: "neutral"   (updated: 2026-02-27T15:43:10.480255Z)
+  vwap_posture.TSLA.gap_context: {"state": "no_gap", "fill_status": "unfilled", "gap_pct": 0.0, "prev_close": 0.0, "open_price": 0.0, "gap_high": 0.0, "gap_low": 0.0, "date": "2026-02-27"}   (updated: 2026-02-27T20:53:29.415710Z)
+  vwap_posture.TSLA.posture: "bullish"   (updated: 2026-02-27T20:53:29.415824Z)
+  vwap_posture.TSM.gap_context: {"state": "no_gap", "fill_status": "unfilled", "gap_pct": 0.0, "prev_close": 0.0, "open_price": 0.0, "gap_high": 0.0, "gap_low": 0.0, "date": "2026-02-27"}   (updated: 2026-02-27T19:35:21.113685Z)
+  vwap_posture.TSM.posture: "bullish"   (updated: 2026-02-27T19:35:21.113869Z)
+  vwap_posture.USO.gap_context: {"state": "no_gap", "fill_status": "unfilled", "gap_pct": 0.0, "prev_close": 0.0, "open_price": 0.0, "gap_high": 0.0, "gap_low": 0.0, "date": "2026-02-27"}   (updated: 2026-02-27T20:54:34.674888Z)
+  vwap_posture.USO.posture: "bullish"   (updated: 2026-02-27T20:54:34.674972Z)
+  vwap_posture.VGT.gap_context: {"state": "no_gap", "fill_status": "unfilled", "gap_pct": 0.0, "prev_close": 0.0, "open_price": 0.0, "gap_high": 0.0, "gap_low": 0.0, "date": "2026-02-27"}   (updated: 2026-02-27T20:54:26.830639Z)
+  vwap_posture.VGT.posture: "bearish"   (updated: 2026-02-27T20:54:26.830695Z)
+  vwap_posture.VIXY.gap_context: {"state": "no_gap", "fill_status": "unfilled", "gap_pct": 0.0, "prev_close": 0.0, "open_price": 0.0, "gap_high": 0.0, "gap_low": 0.0, "date": "2026-02-27"}   (updated: 2026-02-27T20:54:26.833425Z)
+  vwap_posture.VIXY.posture: "bullish"   (updated: 2026-02-27T20:54:26.833488Z)
+  vwap_posture.VUG.gap_context: {"state": "no_gap", "fill_status": "unfilled", "gap_pct": 0.0, "prev_close": 0.0, "open_price": 0.0, "gap_high": 0.0, "gap_low": 0.0, "date": "2026-02-27"}   (updated: 2026-02-27T20:54:26.831592Z)
+  vwap_posture.VUG.posture: "bullish"   (updated: 2026-02-27T20:54:26.831648Z)
+  vwap_posture.VYM.gap_context: {"state": "no_gap", "fill_status": "unfilled", "gap_pct": 0.0, "prev_close": 0.0, "open_price": 0.0, "gap_high": 0.0, "gap_low": 0.0, "date": "2026-02-27"}   (updated: 2026-02-27T15:43:38.000929Z)
+  vwap_posture.VYM.posture: "neutral"   (updated: 2026-02-27T15:43:38.001182Z)
+  vwap_posture.WFC.gap_context: {"state": "no_gap", "fill_status": "unfilled", "gap_pct": 0.0, "prev_close": 0.0, "open_price": 0.0, "gap_high": 0.0, "gap_low": 0.0, "date": "2026-02-27"}   (updated: 2026-02-27T20:54:30.370926Z)
+  vwap_posture.WFC.posture: "bearish"   (updated: 2026-02-27T20:54:30.370991Z)
+  vwap_posture.XLE.gap_context: {"state": "no_gap", "fill_status": "unfilled", "gap_pct": 0.0, "prev_close": 0.0, "open_price": 0.0, "gap_high": 0.0, "gap_low": 0.0, "date": "2026-02-27"}   (updated: 2026-02-27T20:54:26.811917Z)
+  vwap_posture.XLE.posture: "bullish"   (updated: 2026-02-27T20:54:26.816776Z)
+  vwap_posture.XLF.gap_context: {"state": "no_gap", "fill_status": "unfilled", "gap_pct": 0.0, "prev_close": 0.0, "open_price": 0.0, "gap_high": 0.0, "gap_low": 0.0, "date": "2026-02-27"}   (updated: 2026-02-27T20:54:26.810756Z)
+  vwap_posture.XLF.posture: "bearish"   (updated: 2026-02-27T20:54:26.810809Z)
+  vwap_posture.XLK.gap_context: {"state": "no_gap", "fill_status": "unfilled", "gap_pct": 0.0, "prev_close": 0.0, "open_price": 0.0, "gap_high": 0.0, "gap_low": 0.0, "date": "2026-02-27"}   (updated: 2026-02-27T20:54:26.820478Z)
+  vwap_posture.XLK.posture: "bullish"   (updated: 2026-02-27T20:54:26.820582Z)
+  vwap_posture.XLV.gap_context: {"state": "no_gap", "fill_status": "unfilled", "gap_pct": 0.0, "prev_close": 0.0, "open_price": 0.0, "gap_high": 0.0, "gap_low": 0.0, "date": "2026-02-27"}   (updated: 2026-02-27T20:54:26.821601Z)
+  vwap_posture.XLV.posture: "neutral"   (updated: 2026-02-27T20:54:26.821655Z)
+  vwap_posture.XOM.gap_context: {"state": "no_gap", "fill_status": "unfilled", "gap_pct": 0.0, "prev_close": 0.0, "open_price": 0.0, "gap_high": 0.0, "gap_low": 0.0, "date": "2026-02-27"}   (updated: 2026-02-27T20:54:34.789535Z)
+  vwap_posture.XOM.posture: "bullish"   (updated: 2026-02-27T20:54:34.789614Z)
+
+--- cooldown keys ---
+  cooldown:crypto_core:AAVE/USD: 1770848556.9430478   (updated: 2026-02-11T22:22:36.943187Z)
+  cooldown:crypto_core:DOGE/USD: 1770848397.6547682   (updated: 2026-02-11T22:19:57.654785Z)
+  cooldown:crypto_core:BTC/USD: 1770847668.8297536   (updated: 2026-02-11T22:07:48.829772Z)
+  cooldown:crypto_core:SOL/USD: 1770847479.0978038   (updated: 2026-02-11T22:04:39.097814Z)
+  cooldown:crypto_core:LINK/USD: 1770847008.4138951   (updated: 2026-02-11T21:56:48.413906Z)
+  cooldown:crypto_core:UNI/USD: 1770846381.0186229   (updated: 2026-02-11T21:46:21.018634Z)
+  cooldown:crypto_core:ETH/USD: 1770846067.81855   (updated: 2026-02-11T21:41:07.818561Z)
+  cooldown:mom_TSLA:TSLA: 1770751211.865332   (updated: 2026-02-10T19:20:11.865347Z)
+  cooldown:mom_AAPL:AAPL: 1770750547.545428   (updated: 2026-02-10T19:09:07.545438Z)
+  cooldown:mom_PLTR:PLTR: 1770736591.9783597   (updated: 2026-02-10T15:16:31.978372Z)
+  cooldown:mom_BLK:BLK: 1770736566.9087427   (updated: 2026-02-10T15:16:06.908753Z)
+  cooldown:mom_AMD:AMD: 1770735727.9317405   (updated: 2026-02-10T15:02:07.931751Z)
+  cooldown:mom_NVDA:NVDA: 1770734113.0275652   (updated: 2026-02-10T14:35:13.027613Z)
+  cooldown:mom_RCL:RCL: 1769784597.3620594   (updated: 2026-01-30T14:49:57.362067Z)
+
+================================================================================
+  5.  exit_lock keys – staleness check
+================================================================================
+Total exit_lock keys: 164
+  exit_lock:mom_NVDA:us_equity:NVDA:NVDA_long_189.4430                              age=690.0h *** STALE ***
+  exit_lock:mom_AAPL:us_equity:AAPL:AAPL_long_256.5960                              age=688.6h *** STALE ***
+  exit_lock:mom_RCL:us_equity:RCL:RCL_long_327.9280                                 age=688.3h *** STALE ***
+  exit_lock:mom_RCL:us_equity:RCL:RCL_long_328.2180                                 age=688.3h *** STALE ***
+  exit_lock:manual:us_option:QQQ260213C00631000:QQQ260213C00631000_long_7.8100      age=688.2h *** STALE ***
+  exit_lock:manual:us_option:QQQ260213C00631000:QQQ260213C00631000_long_7.9000      age=688.2h *** STALE ***
+  exit_lock:manual:us_option:QQQ260213C00631000:QQQ260213C00631000_long_7.8300      age=688.2h *** STALE ***
+  exit_lock:manual:us_option:QQQ260213C00631000:QQQ260213C00631000_long_7.8400      age=688.2h *** STALE ***
+  exit_lock:manual:us_option:QQQ260213C00631000:QQQ260213C00631000_long_7.8200      age=688.2h *** STALE ***
+  exit_lock:manual:us_option:QQQ260213C00631000:QQQ260213C00631000_long_7.7800      age=688.2h *** STALE ***
+  exit_lock:manual:us_option:QQQ260213C00632000:QQQ260213C00632000_long_7.5700      age=688.2h *** STALE ***
+  exit_lock:manual:us_option:QQQ260213C00632000:QQQ260213C00632000_long_7.5300      age=684.7h *** STALE ***
+  exit_lock:mom_AAPL:us_equity:AAPL:AAPL_long_255.9760                              age=684.4h *** STALE ***
+  exit_lock:mom_AAPL:us_equity:AAPL:AAPL_long_256.2740                              age=684.4h *** STALE ***
+  exit_lock:mom_AAPL:us_equity:AAPL:AAPL_long_256.4760                              age=684.3h *** STALE ***
+  exit_lock:manual:crypto:AVAXUSD:AVAXUSD_long_11.0110                              age=684.0h *** STALE ***
+  exit_lock:mom_TSLA:us_equity:TSLA:TSLA_long_434.5400                              age=683.4h *** STALE ***
+  exit_lock:mom_AAPL:us_equity:AAPL:AAPL_long_258.1080                              age=683.3h *** STALE ***
+  exit_lock:manual:crypto:CRVUSD:CRVUSD_long_0.3200                                 age=682.9h *** STALE ***
+  exit_lock:mom_TSLA:us_equity:TSLA:TSLA_long_434.2460                              age=682.1h *** STALE ***
+  exit_lock:crypto_core:crypto:ETHUSD:ETHUSD_long_2377.3890                         age=658.9h *** STALE ***
+  exit_lock:crypto_core:crypto:BTCUSD:BTCUSD_long_77788.3380                        age=658.9h *** STALE ***
+  exit_lock:manual:crypto:AAVEUSD:AAVEUSD_long_123.0430                             age=658.9h *** STALE ***
+  exit_lock:manual:crypto:UNIUSD:UNIUSD_long_3.8182                                 age=658.9h *** STALE ***
+  exit_lock:manual:crypto:LTCUSD:LTCUSD_long_58.0500                                age=658.9h *** STALE ***
+  exit_lock:manual:crypto:DOTUSD:DOTUSD_long_1.4942                                 age=658.9h *** STALE ***
+  exit_lock:manual:crypto:AVAXUSD:AVAXUSD_long_9.8263                               age=658.9h *** STALE ***
+  exit_lock:manual:crypto:LINKUSD:LINKUSD_long_9.6500                               age=658.4h *** STALE ***
+  exit_lock:manual:crypto:DOGEUSD:DOGEUSD_long_0.1000                               age=657.7h *** STALE ***
+  exit_lock:manual:crypto:AAVEUSD:AAVEUSD_long_126.6000                             age=657.0h *** STALE ***
+  exit_lock:crypto_core:crypto:ETHUSD:ETHUSD_long_2417.7600                         age=657.0h *** STALE ***
+  exit_lock:manual:crypto:CRVUSD:CRVUSD_long_0.2860                                 age=657.0h *** STALE ***
+  exit_lock:manual:us_option:SLV260211P00072000:SLV260211P00072000_long_1.3900      age=422.0h *** STALE ***
+  exit_lock:opt_core:us_option:MU260213P00375000:MU260213P00375000_long_13.3500     age=421.7h *** STALE ***
+  exit_lock:manual:us_option:WFC260213C00093000:WFC260213C00093000_long_1.0500      age=421.6h *** STALE ***
+  exit_lock:manual:us_option:SLV260211P00073000:SLV260211P00073000_long_1.5300      age=421.4h *** STALE ***
+  exit_lock:manual:us_option:TLT260213C00088000:TLT260213C00088000_long_0.1694      age=421.3h *** STALE ***
+  exit_lock:mom_NVDA:us_equity:NVDA:NVDA_long_189.7733                              age=420.7h *** STALE ***
+  exit_lock:crypto_core:crypto:UNIUSD:UNIUSD_long_3.5088                            age=394.1h *** STALE ***
+  exit_lock:crypto_core:crypto:SOLUSD:SOLUSD_long_79.7875                           age=394.1h *** STALE ***
+  exit_lock:crypto_core:crypto:UNIUSD:UNIUSD_long_3.5818                            age=394.0h *** STALE ***
+  exit_lock:crypto_core:crypto:SOLUSD:SOLUSD_long_79.6219                           age=393.9h *** STALE ***
+  exit_lock:crypto_core:crypto:UNIUSD:UNIUSD_long_3.5221                            age=393.9h *** STALE ***
+  exit_lock:crypto_core:crypto:UNIUSD:UNIUSD_long_3.5350                            age=393.7h *** STALE ***
+  exit_lock:crypto_core:crypto:LINKUSD:LINKUSD_long_8.3542                          age=393.7h *** STALE ***
+  exit_lock:crypto_core:crypto:UNIUSD:UNIUSD_long_3.5442                            age=393.6h *** STALE ***
+  exit_lock:crypto_core:crypto:LINKUSD:LINKUSD_long_8.3578                          age=393.6h *** STALE ***
+  exit_lock:crypto_core:crypto:UNIUSD:UNIUSD_long_3.5503                            age=393.5h *** STALE ***
+  exit_lock:crypto_core:crypto:LINKUSD:LINKUSD_long_8.4185                          age=393.5h *** STALE ***
+  exit_lock:crypto_core:crypto:UNIUSD:UNIUSD_long_3.5807                            age=393.4h *** STALE ***
+  exit_lock:crypto_core:crypto:UNIUSD:UNIUSD_long_3.5766                            age=393.3h *** STALE ***
+  exit_lock:crypto_core:crypto:LINKUSD:LINKUSD_long_8.4171                          age=393.2h *** STALE ***
+  exit_lock:crypto_core:crypto:UNIUSD:UNIUSD_long_3.5669                            age=393.2h *** STALE ***
+  exit_lock:crypto_core:crypto:LINKUSD:LINKUSD_long_8.4249                          age=393.1h *** STALE ***
+  exit_lock:crypto_core:crypto:SOLUSD:SOLUSD_long_80.0094                           age=393.0h *** STALE ***
+  exit_lock:crypto_core:crypto:BTCUSD:BTCUSD_long_67908.4360                        age=393.0h *** STALE ***
+  exit_lock:crypto_core:crypto:LINKUSD:LINKUSD_long_8.4221                          age=393.0h *** STALE ***
+  exit_lock:crypto_core:crypto:BTCUSD:BTCUSD_long_67798.8190                        age=392.9h *** STALE ***
+  exit_lock:crypto_core:crypto:SOLUSD:SOLUSD_long_79.9636                           age=392.9h *** STALE ***
+  exit_lock:crypto_core:crypto:BTCUSD:BTCUSD_long_67783.0600                        age=392.8h *** STALE ***
+  exit_lock:crypto_core:crypto:DOGEUSD:DOGEUSD_long_0.0919                          age=392.6h *** STALE ***
+  exit_lock:crypto_core:crypto:AVAXUSD:AVAXUSD_long_8.9424                          age=376.5h *** STALE ***
+  exit_lock:crypto_core:crypto:AVAXUSD:AVAXUSD_long_8.9589                          age=376.4h *** STALE ***
+  exit_lock:manual:us_option:SLV260218C00066000:SLV260218C00066000_long_1.6050      age=256.2h *** STALE ***
+  exit_lock:manual:us_option:SMCI260220C00030500:SMCI260220C00030500_long_0.8300    age=256.2h *** STALE ***
+  exit_lock:manual:us_option:CRM260220P00185000:CRM260220P00185000_long_3.2000      age=256.2h *** STALE ***
+  exit_lock:manual:us_option:COIN260220P00160000:COIN260220P00160000_long_5.2000    age=256.0h *** STALE ***
+  exit_lock:manual:us_equity:SLV:SLV_long_66.0725                                   age=255.3h *** STALE ***
+  exit_lock:manual:us_equity:AMD:AMD_long_200.5950                                  age=255.2h *** STALE ***
+  exit_lock:manual:us_equity:GOOGL:GOOGL_long_299.8500                              age=255.2h *** STALE ***
+  exit_lock:manual:us_equity:RTX:RTX_short_200.0000                                 age=255.2h *** STALE ***
+  exit_lock:manual:us_equity:TSM:TSM_long_360.7900                                  age=255.2h *** STALE ***
+  exit_lock:manual:us_equity:VIXY:VIXY_short_28.3884                                age=255.2h *** STALE ***
+  exit_lock:manual:us_equity:XLE:XLE_long_53.7700                                   age=255.2h *** STALE ***
+  exit_lock:manual:us_option:AMZN260218P00200000:AMZN260218P00200000_long_2.0400    age=255.1h *** STALE ***
+  exit_lock:manual:us_option:COIN260220C00165000:COIN260220C00165000_long_6.6500    age=255.1h *** STALE ***
+  exit_lock:manual:us_option:GOOGL260218C00300000:GOOGL260218C00300000_long_2.6000  age=255.1h *** STALE ***
+  exit_lock:manual:us_option:XLE260220P00053000:XLE260220P00053000_long_0.4600      age=255.1h *** STALE ***
+  exit_lock:manual:us_option:TSM260227P00365000:TSM260227P00365000_long_7.0000      age=181.2h *** STALE ***
+  exit_lock:manual:us_option:COIN260227P00165000:COIN260227P00165000_long_5.0000    age=181.1h *** STALE ***
+  exit_lock:opt_core:us_option:AAPL260225P00262500:AAPL260225P00262500_long_2.9900  age=180.9h *** STALE ***
+  exit_lock:manual:us_option:SLV260223C00074000:SLV260223C00074000_long_2.0800      age=180.9h *** STALE ***
+  exit_lock:manual:us_option:RTX260306P00205000:RTX260306P00205000_long_5.0750      age=180.8h *** STALE ***
+  exit_lock:manual:us_option:COIN260227P00172500:COIN260227P00172500_long_8.0500    age=180.7h *** STALE ***
+  exit_lock:manual:us_option:RTX260306P00207500:RTX260306P00207500_long_6.5500      age=180.5h *** STALE ***
+  exit_lock:opt_core:us_option:AAPL260223P00265000:AAPL260223P00265000_long_2.7000  age=180.5h *** STALE ***
+  exit_lock:manual:us_option:SLV260223C00076000:SLV260223C00076000_long_1.1125      age=180.5h *** STALE ***
+  exit_lock:manual:us_option:SLV260223C00074500:SLV260223C00074500_long_1.7300      age=180.5h *** STALE ***
+  exit_lock:manual:us_option:SLV260223C00075500:SLV260223C00075500_long_1.2000      age=180.5h *** STALE ***
+  exit_lock:manual:us_option:TSM260227P00367500:TSM260227P00367500_long_7.4083      age=180.4h *** STALE ***
+  exit_lock:manual:us_option:RTX260306P00202500:RTX260306P00202500_long_3.7500      age=180.4h *** STALE ***
+  exit_lock:manual:us_option:SLV260223C00074000:SLV260223C00074000_long_1.8600      age=180.3h *** STALE ***
+  exit_lock:manual:us_option:BA260227C00235000:BA260227C00235000_long_3.5000        age=180.3h *** STALE ***
+  exit_lock:manual:us_option:COIN260227P00170000:COIN260227P00170000_long_7.4000    age=180.2h *** STALE ***
+  exit_lock:opt_core:us_option:RCL260306P00312500:RCL260306P00312500_long_9.5500    age=180.2h *** STALE ***
+  exit_lock:opt_core:us_option:SLV260223C00075000:SLV260223C00075000_long_1.4454    age=180.2h *** STALE ***
+  exit_lock:manual:us_option:COIN260227P00175000:COIN260227P00175000_long_9.6000    age=180.1h *** STALE ***
+  exit_lock:manual:us_option:TSM260227P00370000:TSM260227P00370000_long_8.1500      age=180.0h *** STALE ***
+  exit_lock:manual:us_option:COIN260306P00177500:COIN260306P00177500_long_13.2500   age=180.0h *** STALE ***
+  exit_lock:manual:us_option:COIN260227P00167500:COIN260227P00167500_long_5.4500    age=180.0h *** STALE ***
+  exit_lock:manual:us_option:BA260227C00235000:BA260227C00235000_long_3.4250        age=179.5h *** STALE ***
+  exit_lock:manual:us_option:BA260306C00235000:BA260306C00235000_long_5.1000        age=179.3h *** STALE ***
+  exit_lock:manual:us_option:CRM260306P00195000:CRM260306P00195000_long_6.7000      age=15.3h
+  exit_lock:manual:us_option:CRM260313P00197500:CRM260313P00197500_long_10.2500     age=15.3h
+  exit_lock:manual:us_option:ORCL260306P00145000:ORCL260306P00145000_long_4.7500    age=15.3h
+  exit_lock:manual:us_option:ORCL260306P00147000:ORCL260306P00147000_long_5.9000    age=15.3h
+  exit_lock:manual:us_option:ORCL260306P00146000:ORCL260306P00146000_long_5.3000    age=15.2h
+  exit_lock:manual:us_option:RTX260313P00197500:RTX260313P00197500_long_4.5500      age=15.2h
+  exit_lock:manual:us_option:RTX260306P00197500:RTX260306P00197500_long_3.2000      age=15.2h
+  exit_lock:manual:us_option:DIS260306P00106000:DIS260306P00106000_long_1.9500      age=15.0h
+  exit_lock:manual:us_option:GE260306P00340000:GE260306P00340000_long_5.4000        age=14.8h
+  exit_lock:opt_core:us_option:CVX260306P00185000:CVX260306P00185000_long_3.5000    age=14.8h
+  exit_lock:manual:us_option:GE260306P00340000:GE260306P00340000_long_5.3667        age=14.7h
+  exit_lock:opt_core:us_option:XOM260306P00150000:XOM260306P00150000_long_2.8500    age=14.7h
+  exit_lock:opt_core:us_option:RCL260306P00310000:RCL260306P00310000_long_6.5000    age=14.4h
+  exit_lock:manual:us_option:XLV260313P00160000:XLV260313P00160000_long_2.5800      age=14.1h
+  exit_lock:opt_core:us_option:CVX260313P00185000:CVX260313P00185000_long_4.7000    age=14.0h
+  exit_lock:opt_core:us_option:CVX260313P00185000:CVX260313P00185000_long_4.6500    age=13.9h
+  exit_lock:manual:us_option:GE260306P00340000:GE260306P00340000_long_4.8000        age=13.9h
+  exit_lock:opt_core:us_option:CVX260306P00185000:CVX260306P00185000_long_3.2000    age=13.9h
+  exit_lock:opt_core:us_option:CVX260313P00185000:CVX260313P00185000_long_4.1000    age=13.6h
+  exit_lock:manual:us_option:DIS260306P00105000:DIS260306P00105000_long_1.5600      age=13.4h
+  exit_lock:manual:us_option:XLV260313P00160000:XLV260313P00160000_long_2.3500      age=13.4h
+  exit_lock:opt_core:us_option:XOM260306P00150000:XOM260306P00150000_long_2.3200    age=13.4h
+  exit_lock:opt_core:us_option:XOM260306P00152500:XOM260306P00152500_long_3.5500    age=13.2h
+  exit_lock:opt_core:us_option:XOM260313P00152500:XOM260313P00152500_long_4.8000    age=13.2h
+  exit_lock:opt_core:us_option:XOM260313P00149000:XOM260313P00149000_long_3.1000    age=13.2h
+  exit_lock:opt_core:us_option:XOM260313P00150000:XOM260313P00150000_long_3.5000    age=13.2h
+  exit_lock:opt_core:us_option:XOM260306P00150000:XOM260306P00150000_long_2.2800    age=13.1h
+  exit_lock:opt_core:us_option:XOM260306P00150000:XOM260306P00150000_long_2.2200    age=12.9h
+  exit_lock:opt_core:us_option:XOM260306P00150000:XOM260306P00150000_long_2.2150    age=12.8h
+  exit_lock:opt_core:us_option:CVX260306P00185000:CVX260306P00185000_long_2.5400    age=12.7h
+  exit_lock:opt_core:us_option:XOM260313P00152500:XOM260313P00152500_long_4.6000    age=12.7h
+  exit_lock:manual:us_option:XLV260313P00160000:XLV260313P00160000_long_2.2900      age=12.5h
+  exit_lock:opt_core:us_option:XOM260313P00152500:XOM260313P00152500_long_4.6500    age=12.4h
+  exit_lock:opt_core:us_option:CVX260306P00185000:CVX260306P00185000_long_2.5000    age=12.3h
+  exit_lock:opt_core:us_option:XOM260306P00150000:XOM260306P00150000_long_2.2300    age=12.3h
+  exit_lock:manual:us_option:XLV260306P00159000:XLV260306P00159000_long_1.2200      age=12.2h
+  exit_lock:manual:us_option:XLV260306P00159000:XLV260306P00159000_long_1.2050      age=12.1h
+  exit_lock:manual:us_option:XLV260313P00160000:XLV260313P00160000_long_2.2750      age=12.1h
+  exit_lock:manual:us_option:XLV260306P00160000:XLV260306P00160000_long_1.7100      age=12.1h
+  exit_lock:manual:us_option:XLV260313P00160000:XLV260313P00160000_long_2.2633      age=12.0h
+  exit_lock:opt_core:us_option:XOM260313P00150000:XOM260313P00150000_long_3.3000    age=12.0h
+  exit_lock:opt_core:us_option:XOM260313P00152500:XOM260313P00152500_long_4.4000    age=11.9h
+  exit_lock:opt_core:us_option:CVX260306P00187500:CVX260306P00187500_long_3.7000    age=11.5h
+  exit_lock:opt_core:us_option:CVX260306P00185000:CVX260306P00185000_long_2.4700    age=11.3h
+  exit_lock:opt_core:us_option:XOM260306P00152500:XOM260306P00152500_long_3.2000    age=11.3h
+  exit_lock:opt_core:us_option:XOM260306P00152500:XOM260306P00152500_long_3.1750    age=10.9h
+  exit_lock:opt_core:us_option:BLK260306P01060000:BLK260306P01060000_long_23.9000   age=10.8h
+  exit_lock:opt_core:us_option:XOM260313P00152500:XOM260313P00152500_long_4.2833    age=10.8h
+  exit_lock:opt_core:us_option:XOM260306P00152500:XOM260306P00152500_long_2.8200    age=10.8h
+  exit_lock:opt_core:us_option:CVX260306P00185000:CVX260306P00185000_long_2.4300    age=10.6h
+  exit_lock:opt_core:us_option:CVX260306P00187500:CVX260306P00187500_long_3.6500    age=10.6h
+  exit_lock:opt_core:us_option:XOM260306P00152500:XOM260306P00152500_long_2.6500    age=10.6h
+  exit_lock:manual:us_option:DIS260306P00106000:DIS260306P00106000_long_1.4700      age=10.5h
+  exit_lock:manual:us_option:XLV260313P00160000:XLV260313P00160000_long_2.1700      age=10.5h
+  exit_lock:manual:us_option:DIS260306P00107000:DIS260306P00107000_long_2.0400      age=10.4h
+  exit_lock:opt_core:us_option:RCL260306P00305000:RCL260306P00305000_long_6.4000    age=10.4h
+  exit_lock:opt_core:us_option:CVX260313P00185000:CVX260313P00185000_long_3.5000    age=10.3h
+  exit_lock:opt_core:us_option:CVX260313P00187500:CVX260313P00187500_long_4.7500    age=10.3h
+  exit_lock:manual:us_option:XLV260313P00161000:XLV260313P00161000_long_2.7100      age=10.2h
+  exit_lock:opt_core:us_option:XOM260306P00155000:XOM260306P00155000_long_4.2000    age=10.2h
+  exit_lock:opt_core:us_option:XOM260306P00152500:XOM260306P00152500_long_2.6700    age=10.1h
+  exit_lock:opt_core:us_option:XOM260313P00155000:XOM260313P00155000_long_5.0000    age=10.1h
+
+*** 102 STALE exit_lock keys (>48h old):
+    exit_lock:mom_NVDA:us_equity:NVDA:NVDA_long_189.4430  age=690.0h
+    exit_lock:mom_AAPL:us_equity:AAPL:AAPL_long_256.5960  age=688.6h
+    exit_lock:mom_RCL:us_equity:RCL:RCL_long_327.9280  age=688.3h
+    exit_lock:mom_RCL:us_equity:RCL:RCL_long_328.2180  age=688.3h
+    exit_lock:manual:us_option:QQQ260213C00631000:QQQ260213C00631000_long_7.8100  age=688.2h
+    exit_lock:manual:us_option:QQQ260213C00631000:QQQ260213C00631000_long_7.9000  age=688.2h
+    exit_lock:manual:us_option:QQQ260213C00631000:QQQ260213C00631000_long_7.8300  age=688.2h
+    exit_lock:manual:us_option:QQQ260213C00631000:QQQ260213C00631000_long_7.8400  age=688.2h
+    exit_lock:manual:us_option:QQQ260213C00631000:QQQ260213C00631000_long_7.8200  age=688.2h
+    exit_lock:manual:us_option:QQQ260213C00631000:QQQ260213C00631000_long_7.7800  age=688.2h
+    exit_lock:manual:us_option:QQQ260213C00632000:QQQ260213C00632000_long_7.5700  age=688.2h
+    exit_lock:manual:us_option:QQQ260213C00632000:QQQ260213C00632000_long_7.5300  age=684.7h
+    exit_lock:mom_AAPL:us_equity:AAPL:AAPL_long_255.9760  age=684.4h
+    exit_lock:mom_AAPL:us_equity:AAPL:AAPL_long_256.2740  age=684.4h
+    exit_lock:mom_AAPL:us_equity:AAPL:AAPL_long_256.4760  age=684.3h
+    exit_lock:manual:crypto:AVAXUSD:AVAXUSD_long_11.0110  age=684.0h
+    exit_lock:mom_TSLA:us_equity:TSLA:TSLA_long_434.5400  age=683.4h
+    exit_lock:mom_AAPL:us_equity:AAPL:AAPL_long_258.1080  age=683.3h
+    exit_lock:manual:crypto:CRVUSD:CRVUSD_long_0.3200  age=682.9h
+    exit_lock:mom_TSLA:us_equity:TSLA:TSLA_long_434.2460  age=682.1h
+    exit_lock:crypto_core:crypto:ETHUSD:ETHUSD_long_2377.3890  age=658.9h
+    exit_lock:crypto_core:crypto:BTCUSD:BTCUSD_long_77788.3380  age=658.9h
+    exit_lock:manual:crypto:AAVEUSD:AAVEUSD_long_123.0430  age=658.9h
+    exit_lock:manual:crypto:UNIUSD:UNIUSD_long_3.8182  age=658.9h
+    exit_lock:manual:crypto:LTCUSD:LTCUSD_long_58.0500  age=658.9h
+    exit_lock:manual:crypto:DOTUSD:DOTUSD_long_1.4942  age=658.9h
+    exit_lock:manual:crypto:AVAXUSD:AVAXUSD_long_9.8263  age=658.9h
+    exit_lock:manual:crypto:LINKUSD:LINKUSD_long_9.6500  age=658.4h
+    exit_lock:manual:crypto:DOGEUSD:DOGEUSD_long_0.1000  age=657.7h
+    exit_lock:manual:crypto:AAVEUSD:AAVEUSD_long_126.6000  age=657.0h
+    exit_lock:crypto_core:crypto:ETHUSD:ETHUSD_long_2417.7600  age=657.0h
+    exit_lock:manual:crypto:CRVUSD:CRVUSD_long_0.2860  age=657.0h
+    exit_lock:manual:us_option:SLV260211P00072000:SLV260211P00072000_long_1.3900  age=422.0h
+    exit_lock:opt_core:us_option:MU260213P00375000:MU260213P00375000_long_13.3500  age=421.7h
+    exit_lock:manual:us_option:WFC260213C00093000:WFC260213C00093000_long_1.0500  age=421.6h
+    exit_lock:manual:us_option:SLV260211P00073000:SLV260211P00073000_long_1.5300  age=421.4h
+    exit_lock:manual:us_option:TLT260213C00088000:TLT260213C00088000_long_0.1694  age=421.3h
+    exit_lock:mom_NVDA:us_equity:NVDA:NVDA_long_189.7733  age=420.7h
+    exit_lock:crypto_core:crypto:UNIUSD:UNIUSD_long_3.5088  age=394.1h
+    exit_lock:crypto_core:crypto:SOLUSD:SOLUSD_long_79.7875  age=394.1h
+    exit_lock:crypto_core:crypto:UNIUSD:UNIUSD_long_3.5818  age=394.0h
+    exit_lock:crypto_core:crypto:SOLUSD:SOLUSD_long_79.6219  age=393.9h
+    exit_lock:crypto_core:crypto:UNIUSD:UNIUSD_long_3.5221  age=393.9h
+    exit_lock:crypto_core:crypto:UNIUSD:UNIUSD_long_3.5350  age=393.7h
+    exit_lock:crypto_core:crypto:LINKUSD:LINKUSD_long_8.3542  age=393.7h
+    exit_lock:crypto_core:crypto:UNIUSD:UNIUSD_long_3.5442  age=393.6h
+    exit_lock:crypto_core:crypto:LINKUSD:LINKUSD_long_8.3578  age=393.6h
+    exit_lock:crypto_core:crypto:UNIUSD:UNIUSD_long_3.5503  age=393.5h
+    exit_lock:crypto_core:crypto:LINKUSD:LINKUSD_long_8.4185  age=393.5h
+    exit_lock:crypto_core:crypto:UNIUSD:UNIUSD_long_3.5807  age=393.4h
+    exit_lock:crypto_core:crypto:UNIUSD:UNIUSD_long_3.5766  age=393.3h
+    exit_lock:crypto_core:crypto:LINKUSD:LINKUSD_long_8.4171  age=393.2h
+    exit_lock:crypto_core:crypto:UNIUSD:UNIUSD_long_3.5669  age=393.2h
+    exit_lock:crypto_core:crypto:LINKUSD:LINKUSD_long_8.4249  age=393.1h
+    exit_lock:crypto_core:crypto:SOLUSD:SOLUSD_long_80.0094  age=393.0h
+    exit_lock:crypto_core:crypto:BTCUSD:BTCUSD_long_67908.4360  age=393.0h
+    exit_lock:crypto_core:crypto:LINKUSD:LINKUSD_long_8.4221  age=393.0h
+    exit_lock:crypto_core:crypto:BTCUSD:BTCUSD_long_67798.8190  age=392.9h
+    exit_lock:crypto_core:crypto:SOLUSD:SOLUSD_long_79.9636  age=392.9h
+    exit_lock:crypto_core:crypto:BTCUSD:BTCUSD_long_67783.0600  age=392.8h
+    exit_lock:crypto_core:crypto:DOGEUSD:DOGEUSD_long_0.0919  age=392.6h
+    exit_lock:crypto_core:crypto:AVAXUSD:AVAXUSD_long_8.9424  age=376.5h
+    exit_lock:crypto_core:crypto:AVAXUSD:AVAXUSD_long_8.9589  age=376.4h
+    exit_lock:manual:us_option:SLV260218C00066000:SLV260218C00066000_long_1.6050  age=256.2h
+    exit_lock:manual:us_option:SMCI260220C00030500:SMCI260220C00030500_long_0.8300  age=256.2h
+    exit_lock:manual:us_option:CRM260220P00185000:CRM260220P00185000_long_3.2000  age=256.2h
+    exit_lock:manual:us_option:COIN260220P00160000:COIN260220P00160000_long_5.2000  age=256.0h
+    exit_lock:manual:us_equity:SLV:SLV_long_66.0725  age=255.3h
+    exit_lock:manual:us_equity:AMD:AMD_long_200.5950  age=255.2h
+    exit_lock:manual:us_equity:GOOGL:GOOGL_long_299.8500  age=255.2h
+    exit_lock:manual:us_equity:RTX:RTX_short_200.0000  age=255.2h
+    exit_lock:manual:us_equity:TSM:TSM_long_360.7900  age=255.2h
+    exit_lock:manual:us_equity:VIXY:VIXY_short_28.3884  age=255.2h
+    exit_lock:manual:us_equity:XLE:XLE_long_53.7700  age=255.2h
+    exit_lock:manual:us_option:AMZN260218P00200000:AMZN260218P00200000_long_2.0400  age=255.1h
+    exit_lock:manual:us_option:COIN260220C00165000:COIN260220C00165000_long_6.6500  age=255.1h
+    exit_lock:manual:us_option:GOOGL260218C00300000:GOOGL260218C00300000_long_2.6000  age=255.1h
+    exit_lock:manual:us_option:XLE260220P00053000:XLE260220P00053000_long_0.4600  age=255.1h
+    exit_lock:manual:us_option:TSM260227P00365000:TSM260227P00365000_long_7.0000  age=181.2h
+    exit_lock:manual:us_option:COIN260227P00165000:COIN260227P00165000_long_5.0000  age=181.1h
+    exit_lock:opt_core:us_option:AAPL260225P00262500:AAPL260225P00262500_long_2.9900  age=180.9h
+    exit_lock:manual:us_option:SLV260223C00074000:SLV260223C00074000_long_2.0800  age=180.9h
+    exit_lock:manual:us_option:RTX260306P00205000:RTX260306P00205000_long_5.0750  age=180.8h
+    exit_lock:manual:us_option:COIN260227P00172500:COIN260227P00172500_long_8.0500  age=180.7h
+    exit_lock:manual:us_option:RTX260306P00207500:RTX260306P00207500_long_6.5500  age=180.5h
+    exit_lock:opt_core:us_option:AAPL260223P00265000:AAPL260223P00265000_long_2.7000  age=180.5h
+    exit_lock:manual:us_option:SLV260223C00076000:SLV260223C00076000_long_1.1125  age=180.5h
+    exit_lock:manual:us_option:SLV260223C00074500:SLV260223C00074500_long_1.7300  age=180.5h
+    exit_lock:manual:us_option:SLV260223C00075500:SLV260223C00075500_long_1.2000  age=180.5h
+    exit_lock:manual:us_option:TSM260227P00367500:TSM260227P00367500_long_7.4083  age=180.4h
+    exit_lock:manual:us_option:RTX260306P00202500:RTX260306P00202500_long_3.7500  age=180.4h
+    exit_lock:manual:us_option:SLV260223C00074000:SLV260223C00074000_long_1.8600  age=180.3h
+    exit_lock:manual:us_option:BA260227C00235000:BA260227C00235000_long_3.5000  age=180.3h
+    exit_lock:manual:us_option:COIN260227P00170000:COIN260227P00170000_long_7.4000  age=180.2h
+    exit_lock:opt_core:us_option:RCL260306P00312500:RCL260306P00312500_long_9.5500  age=180.2h
+    exit_lock:opt_core:us_option:SLV260223C00075000:SLV260223C00075000_long_1.4454  age=180.2h
+    exit_lock:manual:us_option:COIN260227P00175000:COIN260227P00175000_long_9.6000  age=180.1h
+    exit_lock:manual:us_option:TSM260227P00370000:TSM260227P00370000_long_8.1500  age=180.0h
+    exit_lock:manual:us_option:COIN260306P00177500:COIN260306P00177500_long_13.2500  age=180.0h
+    exit_lock:manual:us_option:COIN260227P00167500:COIN260227P00167500_long_5.4500  age=180.0h
+    exit_lock:manual:us_option:BA260227C00235000:BA260227C00235000_long_3.4250  age=179.5h
+    exit_lock:manual:us_option:BA260306C00235000:BA260306C00235000_long_5.1000  age=179.3h
+
+================================================================================
+  6.  exit_trades – completed trades this week
+================================================================================
+Recent completed trades (up to 100):
+
+
+Sum realized PnL (shown rows): $+0.00
+
+--- Open (entry filled, no exit_ts) ---
+Open positions: 0
+
+================================================================================
+  7.  order_ids – recent submitted orders
+================================================================================
+Showing up to 60 most-recent orders:
+
+
+================================================================================
+  8.  exit_decisions – recent
+================================================================================
+Last 60 exit decisions:
+
+
+--- Action summary ---
+
+================================================================================
+  9.  State DB – corruption / anomaly scan
+================================================================================
+
+--- Keys with NULL or empty values ---
+  None found.
+
+--- Keys with unparseable JSON (where JSON expected) ---
+  None found.
+
+--- Duplicate/orphan exit_lock keys for same position ---
+  *** AVAXUSD: 4 exit_lock entries (possible accumulation)
+      exit_lock:crypto_core:crypto:AVAXUSD:AVAXUSD_long_8.9424
+      exit_lock:crypto_core:crypto:AVAXUSD:AVAXUSD_long_8.9589
+      exit_lock:manual:crypto:AVAXUSD:AVAXUSD_long_11.0110
+      exit_lock:manual:crypto:AVAXUSD:AVAXUSD_long_9.8263
+  *** BTCUSD: 4 exit_lock entries (possible accumulation)
+      exit_lock:crypto_core:crypto:BTCUSD:BTCUSD_long_67783.0600
+      exit_lock:crypto_core:crypto:BTCUSD:BTCUSD_long_67798.8190
+      exit_lock:crypto_core:crypto:BTCUSD:BTCUSD_long_67908.4360
+      exit_lock:crypto_core:crypto:BTCUSD:BTCUSD_long_77788.3380
+  *** LINKUSD: 7 exit_lock entries (possible accumulation)
+      exit_lock:crypto_core:crypto:LINKUSD:LINKUSD_long_8.3542
+      exit_lock:crypto_core:crypto:LINKUSD:LINKUSD_long_8.3578
+      exit_lock:crypto_core:crypto:LINKUSD:LINKUSD_long_8.4171
+      exit_lock:crypto_core:crypto:LINKUSD:LINKUSD_long_8.4185
+      exit_lock:crypto_core:crypto:LINKUSD:LINKUSD_long_8.4221
+      exit_lock:crypto_core:crypto:LINKUSD:LINKUSD_long_8.4249
+      exit_lock:manual:crypto:LINKUSD:LINKUSD_long_9.6500
+  *** SOLUSD: 4 exit_lock entries (possible accumulation)
+      exit_lock:crypto_core:crypto:SOLUSD:SOLUSD_long_79.6219
+      exit_lock:crypto_core:crypto:SOLUSD:SOLUSD_long_79.7875
+      exit_lock:crypto_core:crypto:SOLUSD:SOLUSD_long_79.9636
+      exit_lock:crypto_core:crypto:SOLUSD:SOLUSD_long_80.0094
+  *** UNIUSD: 10 exit_lock entries (possible accumulation)
+      exit_lock:crypto_core:crypto:UNIUSD:UNIUSD_long_3.5088
+      exit_lock:crypto_core:crypto:UNIUSD:UNIUSD_long_3.5221
+      exit_lock:crypto_core:crypto:UNIUSD:UNIUSD_long_3.5350
+      exit_lock:crypto_core:crypto:UNIUSD:UNIUSD_long_3.5442
+      exit_lock:crypto_core:crypto:UNIUSD:UNIUSD_long_3.5503
+      exit_lock:crypto_core:crypto:UNIUSD:UNIUSD_long_3.5669
+      exit_lock:crypto_core:crypto:UNIUSD:UNIUSD_long_3.5766
+      exit_lock:crypto_core:crypto:UNIUSD:UNIUSD_long_3.5807
+      exit_lock:crypto_core:crypto:UNIUSD:UNIUSD_long_3.5818
+      exit_lock:manual:crypto:UNIUSD:UNIUSD_long_3.8182
+  *** QQQ260213C00631000: 6 exit_lock entries (possible accumulation)
+      exit_lock:manual:us_option:QQQ260213C00631000:QQQ260213C00631000_long_7.7800
+      exit_lock:manual:us_option:QQQ260213C00631000:QQQ260213C00631000_long_7.8100
+      exit_lock:manual:us_option:QQQ260213C00631000:QQQ260213C00631000_long_7.8200
+      exit_lock:manual:us_option:QQQ260213C00631000:QQQ260213C00631000_long_7.8300
+      exit_lock:manual:us_option:QQQ260213C00631000:QQQ260213C00631000_long_7.8400
+      exit_lock:manual:us_option:QQQ260213C00631000:QQQ260213C00631000_long_7.9000
+  *** XLV260313P00160000: 6 exit_lock entries (possible accumulation)
+      exit_lock:manual:us_option:XLV260313P00160000:XLV260313P00160000_long_2.1700
+      exit_lock:manual:us_option:XLV260313P00160000:XLV260313P00160000_long_2.2633
+      exit_lock:manual:us_option:XLV260313P00160000:XLV260313P00160000_long_2.2750
+      exit_lock:manual:us_option:XLV260313P00160000:XLV260313P00160000_long_2.2900
+      exit_lock:manual:us_option:XLV260313P00160000:XLV260313P00160000_long_2.3500
+      exit_lock:manual:us_option:XLV260313P00160000:XLV260313P00160000_long_2.5800
+  *** AAPL: 5 exit_lock entries (possible accumulation)
+      exit_lock:mom_AAPL:us_equity:AAPL:AAPL_long_255.9760
+      exit_lock:mom_AAPL:us_equity:AAPL:AAPL_long_256.2740
+      exit_lock:mom_AAPL:us_equity:AAPL:AAPL_long_256.4760
+      exit_lock:mom_AAPL:us_equity:AAPL:AAPL_long_256.5960
+      exit_lock:mom_AAPL:us_equity:AAPL:AAPL_long_258.1080
+  *** CVX260306P00185000: 6 exit_lock entries (possible accumulation)
+      exit_lock:opt_core:us_option:CVX260306P00185000:CVX260306P00185000_long_2.4300
+      exit_lock:opt_core:us_option:CVX260306P00185000:CVX260306P00185000_long_2.4700
+      exit_lock:opt_core:us_option:CVX260306P00185000:CVX260306P00185000_long_2.5000
+      exit_lock:opt_core:us_option:CVX260306P00185000:CVX260306P00185000_long_2.5400
+      exit_lock:opt_core:us_option:CVX260306P00185000:CVX260306P00185000_long_3.2000
+      exit_lock:opt_core:us_option:CVX260306P00185000:CVX260306P00185000_long_3.5000
+  *** CVX260313P00185000: 4 exit_lock entries (possible accumulation)
+      exit_lock:opt_core:us_option:CVX260313P00185000:CVX260313P00185000_long_3.5000
+      exit_lock:opt_core:us_option:CVX260313P00185000:CVX260313P00185000_long_4.1000
+      exit_lock:opt_core:us_option:CVX260313P00185000:CVX260313P00185000_long_4.6500
+      exit_lock:opt_core:us_option:CVX260313P00185000:CVX260313P00185000_long_4.7000
+  *** XOM260306P00150000: 6 exit_lock entries (possible accumulation)
+      exit_lock:opt_core:us_option:XOM260306P00150000:XOM260306P00150000_long_2.2150
+      exit_lock:opt_core:us_option:XOM260306P00150000:XOM260306P00150000_long_2.2200
+      exit_lock:opt_core:us_option:XOM260306P00150000:XOM260306P00150000_long_2.2300
+      exit_lock:opt_core:us_option:XOM260306P00150000:XOM260306P00150000_long_2.2800
+      exit_lock:opt_core:us_option:XOM260306P00150000:XOM260306P00150000_long_2.3200
+      exit_lock:opt_core:us_option:XOM260306P00150000:XOM260306P00150000_long_2.8500
+  *** XOM260306P00152500: 6 exit_lock entries (possible accumulation)
+      exit_lock:opt_core:us_option:XOM260306P00152500:XOM260306P00152500_long_2.6500
+      exit_lock:opt_core:us_option:XOM260306P00152500:XOM260306P00152500_long_2.6700
+      exit_lock:opt_core:us_option:XOM260306P00152500:XOM260306P00152500_long_2.8200
+      exit_lock:opt_core:us_option:XOM260306P00152500:XOM260306P00152500_long_3.1750
+      exit_lock:opt_core:us_option:XOM260306P00152500:XOM260306P00152500_long_3.2000
+      exit_lock:opt_core:us_option:XOM260306P00152500:XOM260306P00152500_long_3.5500
+  *** XOM260313P00152500: 5 exit_lock entries (possible accumulation)
+      exit_lock:opt_core:us_option:XOM260313P00152500:XOM260313P00152500_long_4.2833
+      exit_lock:opt_core:us_option:XOM260313P00152500:XOM260313P00152500_long_4.4000
+      exit_lock:opt_core:us_option:XOM260313P00152500:XOM260313P00152500_long_4.6000
+      exit_lock:opt_core:us_option:XOM260313P00152500:XOM260313P00152500_long_4.6500
+      exit_lock:opt_core:us_option:XOM260313P00152500:XOM260313P00152500_long_4.8000
+
+--- Exit trades with no exit but very old entry (>7 days) ---
+  None (no open entries before 2026-02-20).
+
+================================================================================
+  10. metrics.db  –  daily_metrics (full history)
+================================================================================
+Date               Equity         Cash     DailyPnL  DailyPnL%       CumPnL  Trades  WinRate   MaxDD%  OpenPos
+--------------------------------------------------------------------------------------------------------------
+2026-02-11   $  49,987.14 $  48,089.17 $     -12.86    -0.026% $  +2,987.14       0     0.0%   0.000%        3
+
+First equity: $49,987.14  (2026-02-11)
+Last  equity: $49,987.14  (2026-02-11)
+Net change:   $+0.00
+Best  day:  2026-02-11  $-12.86  (-0.026%)
+Worst day: 2026-02-11  $-12.86  (-0.026%)
+
+--- bot_performance (all bots, all dates) ---
+Date         Bot                     Trades    W    L        PnL   WR30d  MaxDD30d
+-------------------------------------------------------------------------------------
+
+--- regime_history – last 30 records ---
+Timestamp              VolRegime          Sentiment          PSM  Halt  VVIXw
+--------------------------------------------------------------------------------
+
+--- risk_decisions – all ---
+Total risk decisions: 0
+
+================================================================================
+  11. system_state.jsonl  –  first 200 / last 200 lines + summary
+================================================================================
+Total lines: 4,233
+
+--- First 200 lines ---
+  2026-01-21T16:09:05  [?]  
+  2026-01-21T16:11:06  [?]  
+  2026-01-21T16:19:53  [?]  
+  2026-01-21T16:45:16  [?]  
+  2026-01-21T16:50:29  [?]  
+  2026-02-10T05:50:44  [?]  
+  2026-02-10T05:51:43  [?]  
+  2026-02-10T05:53:35  [?]  
+  2026-02-10T05:55:25  [?]  
+  2026-02-10T05:55:36  [?]  
+  2026-02-10T05:55:55  [?]  
+  2026-02-10T05:56:07  [?]  
+  2026-02-10T05:56:21  [?]  
+  2026-02-10T05:56:36  [?]  
+  2026-02-10T05:57:26  [?]  
+  2026-02-10T05:57:37  [?]  
+  2026-02-10T05:57:52  [?]  
+  2026-02-10T05:58:07  [?]  
+  2026-02-10T05:58:23  [?]  
+  2026-02-10T05:58:38  [?]  
+  ... (180 more in first 200)
+
+--- Last 200 lines ---
+  2026-02-28T06:51:41  [?]  
+  2026-02-28T06:51:57  [?]  
+  2026-02-28T06:52:11  [?]  
+  2026-02-28T06:52:27  [?]  
+  2026-02-28T06:52:41  [?]  
+  2026-02-28T06:52:57  [?]  
+  2026-02-28T06:53:11  [?]  
+  2026-02-28T06:53:27  [?]  
+  2026-02-28T06:53:41  [?]  
+  2026-02-28T06:53:57  [?]  
+  2026-02-28T06:54:11  [?]  
+  2026-02-28T06:54:27  [?]  
+  2026-02-28T06:54:41  [?]  
+  2026-02-28T06:54:57  [?]  
+  2026-02-28T06:55:11  [?]  
+  2026-02-28T06:55:27  [?]  
+  2026-02-28T06:55:41  [?]  
+  2026-02-28T06:55:57  [?]  
+  2026-02-28T06:56:11  [?]  
+  2026-02-28T06:56:27  [?]  
+  2026-02-28T06:56:41  [?]  
+  2026-02-28T06:56:57  [?]  
+  2026-02-28T06:57:11  [?]  
+  2026-02-28T06:57:27  [?]  
+  2026-02-28T06:57:41  [?]  
+  2026-02-28T06:57:57  [?]  
+  2026-02-28T06:58:11  [?]  
+  2026-02-28T06:58:27  [?]  
+  2026-02-28T06:58:41  [?]  
+  2026-02-28T06:58:56  [?]  
+  2026-02-28T06:59:11  [?]  
+  2026-02-28T06:59:27  [?]  
+  2026-02-28T06:59:41  [?]  
+  2026-02-28T06:59:57  [?]  
+  2026-02-28T07:00:12  [?]  
+  2026-02-28T07:00:27  [?]  
+  2026-02-28T07:00:42  [?]  
+  2026-02-28T07:00:57  [?]  
+  2026-02-28T07:01:12  [?]  
+  2026-02-28T07:01:27  [?]  
+
+--- Event-type distribution (full file) ---
+Total parseable records: 4,233
+Event/Type                                  Count
+--------------------------------------------------
+  UNKNOWN                                   4,233
+
+--- Anomaly scan – ERROR / WARNING / CRITICAL events ---
+Total anomaly records: 0
+
+================================================================================
+  12. decision_records.jsonl  –  full analysis
+================================================================================
+Total lines: 6,550
+Parseable records: 6,550
+
+--- Sample records from start/middle/end ---
+  2026-01-21T16:29:41  opt_core             MULTI           -> NO_TRADE  attempted=0  reason=Managed 0 positions, 0 trades
+  2026-02-10T15:46:05  twentymin_core       MULTI           -> NO_TRADE  attempted=0  reason=Managed 6 positions, 0 trades
+  2026-02-10T15:48:09  twentymin_core       MULTI           -> NO_TRADE  attempted=0  reason=Managed 6 positions, 0 trades
+  2026-02-10T15:49:57  twentymin_core       MULTI           -> NO_TRADE  attempted=0  reason=Managed 6 positions, 0 trades
+  2026-02-10T15:52:23  twentymin_core       MULTI           -> NO_TRADE  attempted=0  reason=Managed 6 positions, 0 trades
+  2026-02-10T15:54:08  twentymin_core       MULTI           -> NO_TRADE  attempted=0  reason=Managed 6 positions, 0 trades
+  2026-02-10T15:57:57  twentymin_core       MULTI           -> NO_TRADE  attempted=0  reason=Managed 5 positions, 0 trades
+  2026-02-10T15:59:44  twentymin_core       MULTI           -> NO_TRADE  attempted=0  reason=Managed 5 positions, 0 trades
+  2026-02-10T16:01:56  twentymin_core       MULTI           -> NO_TRADE  attempted=0  reason=Managed 5 positions, 0 trades
+  2026-02-10T16:03:49  twentymin_core       MULTI           -> NO_TRADE  attempted=0  reason=Managed 5 positions, 0 trades
+  2026-02-20T17:49:06  twentymin_core       MULTI           -> TRADE  attempted=1  reason=Managed 0 positions, 1 trades
+  2026-02-20T17:50:45  twentymin_core       MULTI           -> TRADE  attempted=1  reason=Managed 0 positions, 1 trades
+  2026-02-20T17:52:22  twentymin_core       MULTI           -> TRADE  attempted=1  reason=Managed 0 positions, 1 trades
+  2026-02-20T17:53:24  twentymin_core       MULTI           -> TRADE  attempted=1  reason=Managed 0 positions, 1 trades
+  2026-02-20T17:53:27  twentymin_core       MULTI           -> TRADE  attempted=1  reason=Managed 0 positions, 1 trades
+  2026-02-20T17:55:07  twentymin_core       MULTI           -> TRADE  attempted=1  reason=Managed 0 positions, 1 trades
+  2026-02-20T17:56:53  twentymin_core       MULTI           -> TRADE  attempted=1  reason=Managed 0 positions, 1 trades
+  2026-02-20T17:58:19  twentymin_core       MULTI           -> TRADE  attempted=1  reason=Managed 0 positions, 1 trades
+  2026-02-20T17:58:51  twentymin_core       MULTI           -> TRADE  attempted=1  reason=Managed 0 positions, 1 trades
+  2026-02-20T17:59:15  twentymin_core       MULTI           -> TRADE  attempted=1  reason=Managed 0 positions, 1 trades
+  2026-02-28T00:39:00  twentymin_core       MULTI           -> NO_TRADE  attempted=0  reason=Managed 0 positions, 0 trades
+  2026-02-28T00:41:13  twentymin_core       MULTI           -> NO_TRADE  attempted=0  reason=Managed 0 positions, 0 trades
+  2026-02-28T00:43:50  twentymin_core       MULTI           -> NO_TRADE  attempted=0  reason=Managed 0 positions, 0 trades
+  2026-02-28T00:46:00  twentymin_core       MULTI           -> NO_TRADE  attempted=0  reason=Managed 0 positions, 0 trades
+  2026-02-28T00:48:17  twentymin_core       MULTI           -> NO_TRADE  attempted=0  reason=Managed 0 positions, 0 trades
+  2026-02-28T00:49:56  twentymin_core       MULTI           -> NO_TRADE  attempted=0  reason=Managed 0 positions, 0 trades
+  2026-02-28T00:51:55  twentymin_core       MULTI           -> NO_TRADE  attempted=0  reason=Managed 0 positions, 0 trades
+  2026-02-28T00:55:19  twentymin_core       MULTI           -> NO_TRADE  attempted=0  reason=Managed 0 positions, 0 trades
+  2026-02-28T00:57:30  twentymin_core       MULTI           -> NO_TRADE  attempted=0  reason=Managed 0 positions, 0 trades
+  2026-02-28T01:00:17  twentymin_core       MULTI           -> NO_TRADE  attempted=0  reason=Managed 0 positions, 0 trades
+
+--- Decision distribution (final_action) ---
+  NO_TRADE                          6,342  (96.8%)
+  TRADE                               208  (3.2%)
+
+--- NO_TRADE reason distribution (top 20) ---
+  NOTE: 'NO_TRADE' reason is always 'Managed N positions, 0 trades'
+        meaning loops ran but no new entry/exit executed
+Reason                                                                              Count
+------------------------------------------------------------------------------------------
+  Managed 1 positions, 0 trades                                                     2,068
+  Managed 0 positions, 0 trades                                                     1,485
+  Managed 2 positions, 0 trades                                                     1,392
+  Managed 3 positions, 0 trades                                                       470
+  Managed 5 positions, 0 trades                                                       261
+  Managed 10 positions, 0 trades                                                      217
+  Managed 4 positions, 0 trades                                                       144
+  Managed 9 positions, 0 trades                                                       138
+  Managed 6 positions, 0 trades                                                       110
+  Managed 7 positions, 0 trades                                                        35
+  Managed 20 positions, 0 trades                                                       14
+  Managed 8 positions, 0 trades                                                         7
+  Managed 15 positions, 0 trades                                                        1
+
+--- TRADE decisions – all {len([r for r in all_dr if r.get('final_action')=='TRADE'])} records by date ---
+Total TRADE loops: 208
+  2026-02-10: 31 TRADE loops  bots={'twentymin_core': 1, 'crypto_core': 30}
+  2026-02-11: 8 TRADE loops  bots={'crypto_core': 8}
+  2026-02-12: 2 TRADE loops  bots={'crypto_core': 2}
+  2026-02-17: 2 TRADE loops  bots={'twentymin_core': 2}
+  2026-02-20: 65 TRADE loops  bots={'twentymin_core': 65}
+  2026-02-26: 4 TRADE loops  bots={'twentymin_core': 4}
+  2026-02-27: 96 TRADE loops  bots={'twentymin_core': 96}
+
+--- Decision counts by bot ---
+  crypto_core                total= 2,730  trades=   40  no_trade= 2,690  trade_rate=1.5%
+  opt_core                   total=     1  trades=    0  no_trade=     1  trade_rate=0.0%
+  twentymin_core             total= 3,819  trades=  168  no_trade= 3,651  trade_rate=4.4%
+
+================================================================================
+  13. performance_metrics.jsonl  –  full file
+================================================================================
+Total lines: 1
+Parseable records: 1
+
+{
+  "date": "2026-02-11",
+  "equity": 50000.0,
+  "daily_pnl": 0.0,
+  "daily_return_pct": 0.0,
+  "cumulative_pnl": 0.0,
+  "trades_executed": 0,
+  "trades_profitable": 0,
+  "win_rate": 0,
+  "avg_win": 0,
+  "avg_loss": 0,
+  "profit_factor": 999.0,
+  "max_drawdown_pct": 0.0,
+  "sharpe_ratio": null
+}
+
+================================================================================
+  14. slippage_events.jsonl  –  full summary
+================================================================================
+Total lines: 77
+Parseable records: 77
+
+  2026-02-10T14:35:13  NVDA       sell   slip_bps=0.0  expected=190.68  fill=190.68  time=open
+  2026-02-10T14:35:15  PLTR       sell   slip_bps=0.0  expected=145.49  fill=145.49  time=open
+  2026-02-10T14:35:42  AAPL       sell   slip_bps=0.0  expected=268.835  fill=268.835  time=open
+  2026-02-10T14:36:55  AAPL       sell   slip_bps=0.0  expected=269.015  fill=269.015  time=open
+  2026-02-10T14:38:08  PLTR       buy    slip_bps=0.0  expected=145.67000000000002  fill=145.67000000000002  time=open
+  2026-02-10T14:39:38  AAPL       buy    slip_bps=0.0  expected=274.805  fill=274.805  time=open
+  2026-02-10T14:46:00  AAPL       sell   slip_bps=0.0  expected=268.875  fill=268.875  time=open
+  2026-02-10T14:48:02  AMD        sell   slip_bps=0.0  expected=214.305  fill=214.305  time=open
+  2026-02-10T14:49:46  PLTR       sell   slip_bps=0.0  expected=142.85  fill=142.85  time=open
+  2026-02-10T14:49:46  BLK        buy    slip_bps=0.0  expected=1104.51  fill=1104.51  time=open
+  2026-02-10T14:55:44  BLK        sell   slip_bps=0.0  expected=1058.21  fill=1058.21  time=open
+  2026-02-10T14:57:02  BLK        buy    slip_bps=0.0  expected=1063.5  fill=1063.5  time=open
+  2026-02-10T14:58:36  AAPL       buy    slip_bps=0.0  expected=274.5  fill=274.5  time=open
+  2026-02-10T15:00:14  AAPL       buy    slip_bps=0.0  expected=274.96500000000003  fill=274.96500000000003  time=morning
+  2026-02-10T15:00:53  AAPL       sell   slip_bps=0.0  expected=269.45  fill=269.45  time=morning
+  2026-02-10T15:02:06  BLK        sell   slip_bps=0.0  expected=1060.1100000000001  fill=1060.1100000000001  time=morning
+  2026-02-10T15:02:07  AMD        sell   slip_bps=0.0  expected=214.345  fill=214.345  time=morning
+  2026-02-10T15:08:21  AAPL       sell   slip_bps=0.0  expected=269.255  fill=269.255  time=morning
+  2026-02-10T15:11:36  BLK        sell   slip_bps=0.0  expected=1060.255  fill=1060.255  time=morning
+  2026-02-10T15:16:06  BLK        sell   slip_bps=0.0  expected=1059.345  fill=1059.345  time=morning
+  2026-02-10T15:16:31  PLTR       sell   slip_bps=0.0  expected=144.17000000000002  fill=144.17000000000002  time=morning
+  2026-02-10T16:05:43  TSLA       sell   slip_bps=0.0  expected=422.695  fill=422.695  time=morning
+  2026-02-10T16:12:47  AAPL       sell   slip_bps=0.0  expected=268.985  fill=268.985  time=morning
+  2026-02-10T17:55:01  AAPL       buy    slip_bps=0.0  expected=273.9  fill=273.9  time=morning
+  2026-02-10T18:00:58  AAPL       sell   slip_bps=0.0  expected=268.855  fill=268.855  time=midday
+  2026-02-10T18:12:55  TSLA       buy    slip_bps=0.0  expected=426.505  fill=426.505  time=midday
+  2026-02-10T18:14:04  AAPL       buy    slip_bps=0.0  expected=274.135  fill=274.135  time=midday
+  2026-02-10T18:16:35  TSLA       buy    slip_bps=0.0  expected=426.47  fill=426.47  time=midday
+  2026-02-10T18:18:23  AAPL       buy    slip_bps=0.0  expected=273.925  fill=273.925  time=midday
+  2026-02-10T18:44:56  TSLA       buy    slip_bps=0.0  expected=425.27  fill=425.27  time=midday
+  2026-02-10T18:45:45  AAPL       buy    slip_bps=0.0  expected=274.225  fill=274.225  time=midday
+  2026-02-10T18:45:47  TSLA       sell   slip_bps=0.0  expected=422.83000000000004  fill=422.83000000000004  time=midday
+  2026-02-10T18:48:30  AAPL       sell   slip_bps=0.0  expected=268.91499999999996  fill=268.91499999999996  time=midday
+  2026-02-10T18:51:40  AAPL       buy    slip_bps=0.0  expected=273.925  fill=273.925  time=midday
+  2026-02-10T18:55:21  AAPL       buy    slip_bps=0.0  expected=273.765  fill=273.765  time=midday
+  2026-02-10T18:55:55  TSLA       buy    slip_bps=0.0  expected=424.15  fill=424.15  time=midday
+  2026-02-10T18:59:59  TSLA       buy    slip_bps=0.0  expected=425.5  fill=425.5  time=midday
+  2026-02-10T19:09:07  AAPL       sell   slip_bps=0.0  expected=269.32  fill=269.32  time=midday
+  2026-02-10T19:09:09  TSLA       sell   slip_bps=0.0  expected=422.625  fill=422.625  time=midday
+  2026-02-10T19:11:25  TSLA       buy    slip_bps=0.0  expected=425.58500000000004  fill=425.58500000000004  time=midday
+  2026-02-10T19:20:11  TSLA       buy    slip_bps=0.0  expected=424.05999999999995  fill=424.05999999999995  time=midday
+  2026-02-11T20:48:01  UNI/USD    buy    slip_bps=0.0  expected=3.4981600000000004  fill=3.4981600000000004  time=close
+  2026-02-11T20:50:42  SOL/USD    buy    slip_bps=0.0  expected=79.7235  fill=79.7235  time=close
+  2026-02-11T20:53:47  UNI/USD    buy    slip_bps=0.0  expected=3.5112  fill=3.5112  time=close
+  2026-02-11T20:56:53  UNI/USD    buy    slip_bps=0.0  expected=3.5049  fill=3.5049  time=close
+  2026-02-11T20:59:43  SOL/USD    buy    slip_bps=0.0  expected=79.59700000000001  fill=79.59700000000001  time=close
+  2026-02-11T21:03:32  UNI/USD    buy    slip_bps=0.0  expected=3.50725  fill=3.50725  time=afterhours
+  2026-02-11T21:05:54  SOL/USD    buy    slip_bps=0.0  expected=79.9812  fill=79.9812  time=afterhours
+  2026-02-11T21:08:27  ETH/USD    buy    slip_bps=0.0  expected=1954.06  fill=1954.06  time=afterhours
+  2026-02-11T21:11:41  UNI/USD    buy    slip_bps=0.0  expected=3.5220700000000003  fill=3.5220700000000003  time=afterhours
+  2026-02-11T21:13:44  ETH/USD    buy    slip_bps=0.0  expected=1953.8600000000001  fill=1953.8600000000001  time=afterhours
+  2026-02-11T21:15:38  LINK/USD   buy    slip_bps=0.0  expected=8.3284  fill=8.3284  time=afterhours
+  2026-02-11T21:18:25  UNI/USD    buy    slip_bps=0.0  expected=3.5338849999999997  fill=3.5338849999999997  time=afterhours
+  2026-02-11T21:19:55  ETH/USD    buy    slip_bps=0.0  expected=1955.0774999999999  fill=1955.0774999999999  time=afterhours
+  2026-02-11T21:21:41  LINK/USD   buy    slip_bps=0.0  expected=8.333549999999999  fill=8.333549999999999  time=afterhours
+  2026-02-11T21:23:41  UNI/USD    buy    slip_bps=0.0  expected=3.54149  fill=3.54149  time=afterhours
+  2026-02-11T21:25:10  ETH/USD    buy    slip_bps=0.0  expected=1970.2224999999999  fill=1970.2224999999999  time=afterhours
+  2026-02-11T21:26:31  ETH/USD    buy    slip_bps=0.0  expected=1971.9  fill=1971.9  time=afterhours
+  2026-02-11T21:28:09  LINK/USD   buy    slip_bps=0.0  expected=8.3966  fill=8.3966  time=afterhours
+  2026-02-11T21:29:35  UNI/USD    buy    slip_bps=0.0  expected=3.5677  fill=3.5677  time=afterhours
+  2026-02-11T21:31:41  ETH/USD    buy    slip_bps=0.0  expected=1969.005  fill=1969.005  time=afterhours
+  2026-02-11T21:36:04  UNI/USD    buy    slip_bps=0.0  expected=3.5633350000000004  fill=3.5633350000000004  time=afterhours
+  2026-02-11T21:38:37  ETH/USD    buy    slip_bps=0.0  expected=1983.9  fill=1983.9  time=afterhours
+  2026-02-11T21:41:07  ETH/USD    buy    slip_bps=0.0  expected=1977.125  fill=1977.125  time=afterhours
+  2026-02-11T21:43:44  LINK/USD   buy    slip_bps=0.0  expected=8.399335  fill=8.399335  time=afterhours
+  2026-02-11T21:46:21  UNI/USD    buy    slip_bps=0.0  expected=3.553835  fill=3.553835  time=afterhours
+  2026-02-11T21:49:36  LINK/USD   buy    slip_bps=0.0  expected=8.401495  fill=8.401495  time=afterhours
+  2026-02-11T21:54:30  BTC/USD    buy    slip_bps=0.0  expected=67903.58600000001  fill=67903.58600000001  time=afterhours
+  2026-02-11T21:56:48  LINK/USD   buy    slip_bps=0.0  expected=8.395399999999999  fill=8.395399999999999  time=afterhours
+  2026-02-11T21:59:18  SOL/USD    buy    slip_bps=0.0  expected=80.17349999999999  fill=80.17349999999999  time=afterhours
+  2026-02-11T22:01:43  BTC/USD    buy    slip_bps=0.0  expected=67790.2205  fill=67790.2205  time=afterhours
+  2026-02-11T22:04:39  SOL/USD    buy    slip_bps=0.0  expected=79.9103  fill=79.9103  time=afterhours
+  2026-02-11T22:07:48  BTC/USD    buy    slip_bps=0.0  expected=67754.595  fill=67754.595  time=afterhours
+  2026-02-11T22:14:41  DOGE/USD   buy    slip_bps=0.0  expected=0.09173  fill=0.09173  time=afterhours
+  2026-02-11T22:17:02  AAVE/USD   buy    slip_bps=0.0  expected=108.9265  fill=108.9265  time=afterhours
+  2026-02-11T22:19:57  DOGE/USD   buy    slip_bps=0.0  expected=0.0917287  fill=0.0917287  time=afterhours
+  2026-02-11T22:22:36  AAVE/USD   buy    slip_bps=0.0  expected=108.685  fill=108.685  time=afterhours
+
+Slippage summary (77 events):
+  Mean  : 0.0000 bps
+  Min   : 0.0000 bps
+  Max   : 0.0000 bps
+  Adverse  (>0 bps): 0
+  Zero     (=0 bps): 77
+  Favorable(<0 bps): 0
+  NOTE: All 77 fills recorded at 0 bps slippage – bot_id field is null on all records (paper/simulation fills)
+
+--- Slippage by symbol ---
+  AAPL             n=  18  mean=+0.0000 bps
+  AAVE/USD         n=   2  mean=+0.0000 bps
+  AMD              n=   2  mean=+0.0000 bps
+  BLK              n=   6  mean=+0.0000 bps
+  BTC/USD          n=   3  mean=+0.0000 bps
+  DOGE/USD         n=   2  mean=+0.0000 bps
+  ETH/USD          n=   8  mean=+0.0000 bps
+  LINK/USD         n=   6  mean=+0.0000 bps
+  NVDA             n=   1  mean=+0.0000 bps
+  PLTR             n=   4  mean=+0.0000 bps
+  SOL/USD          n=   5  mean=+0.0000 bps
+  TSLA             n=  10  mean=+0.0000 bps
+  UNI/USD          n=  10  mean=+0.0000 bps
+
+--- Slippage by side ---
+  buy         n=  55  mean=+0.0000 bps
+  sell        n=  22  mean=+0.0000 bps
+
+--- Slippage by bot ---
+  NONE                       n=  77  mean=+0.0000 bps
+
+================================================================================
+  15. AUDIT SUMMARY
+================================================================================
+
+KEY FINDINGS (auto-generated – verify against output above):
+
+[DB]
+  - trading_state.db tables: state, order_ids, exit_trades, exit_decisions,
+    exit_options_context, bar_cache
+  - metrics.db tables: daily_metrics, bot_performance, regime_history, risk_decisions
+
+[STATE]
+  - All session_prot_ and hailmary_bot_trade_ keys reported above
+  - Daily equity from day_start_equity_* keys and daily_metrics table
+  - exit_lock staleness: see Section 5 above for any STALE flags
+  - JSON corruption: see Section 9
+
+[DECISIONS]
+  - Full decision distribution in Section 12
+  - Top NO_TRADE block reasons in Section 12
+
+[SLIPPAGE]
+  - Summary statistics in Section 14
+
+[METRICS]
+  - Daily PnL table in Section 10
+  - Bot performance breakdown in Section 10
+
+Audit completed: 2026-02-27T23:01:31.744644

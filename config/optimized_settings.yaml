@@ -1,0 +1,214 @@
+# =============================================================================
+# PROFIT-OPTIMIZED BOT SETTINGS - Generated 2026-02-11 04:03
+# =============================================================================
+# Optimization: Dynamic Parameter Optimizer (Export Edition)
+# Selected Tier: TIER 1: MOST PROFITABLE
+# Backtest Period: 30 days
+# Account Size: $15,000
+# Daily Target: $159
+#
+# PHILOSOPHY: Let winners run, cut losers quickly, optimize for expectancy.
+# Expectancy = (Win% x Avg Win) - (Loss% x Avg Loss)
+
+# =============================================================================
+# MOMENTUM OPTIMIZED
+# =============================================================================
+# PnL=$379.56 | WR=80.9% | PF=1.29 | Sharpe=3.10 | MaxDD=2.1%
+
+momentumbot:
+  turtle:
+    entry_lookback: 10
+    exit_lookback: 10
+  exits:
+    stop_loss_pct: 5
+    take_profit_pct: 50
+  risk:
+    position_size_pct: 15
+    min_position_usd: 500
+
+  profit_sniper:
+    velocity_window: 3
+    velocity_reversal_pct: 0.8
+    ratchet_arm_pct: 0.3
+    ratchet_base_distance_pct: 0.15
+    ratchet_tighten_per_pct: 0.02
+    ratchet_min_distance_pct: 0.08
+    exhaustion_bars: 4
+    exhaustion_min_profit_pct: 0.5
+
+  exitbot:
+    tp1_pct: 2.0
+    tp1_exit_pct: 0.25
+    tp2_pct: 10.0
+    tp2_exit_pct: 0.33
+    tp3_pct: 30.0
+    hard_stop_pct: 12.0
+    reversal_sense_drop_pct: 5.0
+    reversal_sense_min_gain_pct: 2.0
+
+# =============================================================================
+# CRYPTO OPTIMIZED
+# =============================================================================
+# PnL=$68.28 | WR=71.7% | PF=1.06 | Sharpe=0.52 | MaxDD=3.5%
+
+cryptobot:
+  entries:
+    entry_lookback: 5
+    rsi_oversold: 30
+    rsi_overbought: 80
+  exits:
+    stop_loss_pct: 5
+    take_profit_pct: 2
+    exit_lookback: 10
+  risk:
+    position_size_pct: 20
+    min_position_usd: 750
+
+  profit_sniper:
+    velocity_window: 10
+    velocity_reversal_pct: 0.2
+    ratchet_arm_pct: 0.3
+    ratchet_base_distance_pct: 0.25
+    ratchet_tighten_per_pct: 0.02
+    ratchet_min_distance_pct: 0.08
+    exhaustion_bars: 4
+    exhaustion_min_profit_pct: 0.2
+
+  exitbot:
+    tp1_pct: 2.0
+    tp1_exit_pct: 0.5
+    tp2_pct: 8.0
+    tp2_exit_pct: 0.75
+    tp3_pct: 15.0
+    hard_stop_pct: 12.0
+    reversal_sense_drop_pct: 5.0
+    reversal_sense_min_gain_pct: 1.0
+
+# =============================================================================
+# WHIPSAW OPTIMIZED
+# =============================================================================
+# PnL=$281.30 | WR=89.3% | PF=29.06 | Sharpe=27.06 | MaxDD=0.0%
+
+whipsaw_trader:
+  entries:
+    lookback_bars: 20
+    std_dev_mult: 2.5
+    support_buffer_pct: 0.5
+  exits:
+    stop_loss_pct: 2
+    take_profit_pct: 5.0
+    trailing_stop_pct: 0.8
+    trailing_activation_pct: 0.8
+  risk:
+    position_size_pct: 4
+    min_position_usd: 1000
+
+  profit_sniper:
+    velocity_window: 3
+    velocity_reversal_pct: 0.5
+    ratchet_arm_pct: 0.3
+    ratchet_base_distance_pct: 0.25
+    ratchet_tighten_per_pct: 0.05
+    ratchet_min_distance_pct: 0.05
+    exhaustion_bars: 2
+    exhaustion_min_profit_pct: 0.2
+
+  exitbot:
+    tp1_pct: 1.0
+    tp1_exit_pct: 0.25
+    tp2_pct: 10.0
+    tp2_exit_pct: 0.5
+    tp3_pct: 15.0
+    hard_stop_pct: 8.0
+    reversal_sense_drop_pct: 3.0
+    reversal_sense_min_gain_pct: 1.0
+
+# =============================================================================
+# BOUNCEBOT OPTIMIZED
+# =============================================================================
+# PnL=$1,043.05 | WR=81.4% | PF=9.28 | Sharpe=13.39 | MaxDD=0.3%
+
+bouncebot:
+  entry:
+    drawdown_threshold_pct: 7.0
+    rsi_oversold: 35
+  exits:
+    stop_loss_pct: 2
+    take_profit_pct: 1.5
+  risk:
+    position_size_pct: 15
+    min_position_usd: 500
+
+  profit_sniper:
+    velocity_window: 10
+    velocity_reversal_pct: 0.3
+    ratchet_arm_pct: 2.0
+    ratchet_base_distance_pct: 0.6
+    ratchet_tighten_per_pct: 0.03
+    ratchet_min_distance_pct: 0.12
+    exhaustion_bars: 2
+    exhaustion_min_profit_pct: 1.0
+
+  exitbot:
+    tp1_pct: 4.0
+    tp1_exit_pct: 0.5
+    tp2_pct: 5.0
+    tp2_exit_pct: 0.33
+    tp3_pct: 8.0
+    hard_stop_pct: 8.0
+    reversal_sense_drop_pct: 3.0
+    reversal_sense_min_gain_pct: 2.0
+
+# =============================================================================
+# TWENTYMINUTE OPTIMIZED
+# =============================================================================
+# PnL=$235.99 | WR=60.0% | PF=2.09 | Sharpe=5.81 | MaxDD=0.4%
+
+twentyminute_bot:
+  pattern:
+    min_gap_pct: 0.25
+    confirmation_bars: 3
+  exits:
+    stop_loss_pct: 3
+    take_profit_pct: 7
+    max_hold_bars: 15
+  risk:
+    position_size_pct: 6
+    min_position_usd: 300
+
+  profit_sniper:
+    velocity_window: 10
+    velocity_reversal_pct: 0.3
+    ratchet_arm_pct: 0.5
+    ratchet_base_distance_pct: 0.4
+    ratchet_tighten_per_pct: 0.02
+    ratchet_min_distance_pct: 0.08
+    exhaustion_bars: 4
+    exhaustion_min_profit_pct: 1.0
+
+  exitbot:
+    tp1_pct: 2.0
+    tp1_exit_pct: 0.5
+    tp2_pct: 3.0
+    tp2_exit_pct: 0.5
+    tp3_pct: 15.0
+    hard_stop_pct: 12.0
+    reversal_sense_drop_pct: 2.0
+    reversal_sense_min_gain_pct: 2.0
+
+# =============================================================================
+# HAILMARY OPTIMIZED
+# =============================================================================
+# PnL=$185,674.39 | WR=14.9% | PF=5.53 | Sharpe=3.23 | MaxDD=118.0%
+
+hailmary:
+  profit_target_mult: 5
+  dte_max: 5
+  strike_otm_pct: 2
+  min_stock_change_pct: 0.3
+  max_risk_per_trade_usd: 200
+  max_premium: 2
+  tier1_multiplier: 2
+  tier1_sell_pct: 50
+  tier2_multiplier: 8
+  tier2_sell_pct: 25

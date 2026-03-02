@@ -1,0 +1,1061 @@
+# =============================================================================
+# PRE-STAGED ENTRIES - Predetermined entries ready before market open
+# =============================================================================
+# Runs at 6:00 AM PST to identify setups and calculate entry levels BEFORE
+# the move happens. Entries are "staged" and ready to execute immediately.
+#
+# Setup Types:
+# - GAP_DOWN_BREAKDOWN: Puts when gap down continues lower
+# - GAP_UP_BREAKOUT: Calls when gap up continues higher
+# - GAP_FADE_REVERSAL: Counter-trend when gaps fail
+# - REVERSAL_BOUNCE: Mean reversion when oversold/overbought reverses
+prestaged_entries:
+  enabled: true
+  scan_start_time: "06:00"        # Start scanning at 6:00 AM PST
+  entry_window_start: "06:30"     # Entries can trigger starting at 6:30 AM
+  entry_window_end: "07:30"       # Entries expire if not triggered by 7:30 AM
+  
+  # Gap detection thresholds
+  min_gap_pct: 0.5                # Minimum gap to consider (0.5%)
+  large_gap_pct: 1.5              # Large gap that may fade (1.5%)
+  
+  # Entry trigger buffers (how far past open price to trigger)
+  breakdown_buffer_pct: 0.15      # Trigger puts 0.15% below gap low
+  breakout_buffer_pct: 0.15       # Trigger calls 0.15% above gap high
+  
+  # Reversal detection
+  reversal_deviation_pct: 2.0     # Deviation from 4-day avg for reversal
+  
+  # Default targets/stops for staged entries
+  default_target_pct: 1.5         # Target 1.5% move
+  default_stop_pct: 0.75          # Stop at 0.75% loss
+  
+  # Limits
+  max_staged_per_symbol: 2        # Max 2 staged entries per symbol
+  max_total_staged: 10            # Max 10 total staged entries
+  
+  # Option parameters for staged entries
+  preferred_dte_min: 3            # Minimum 3 DTE
+  preferred_dte_max: 14           # Maximum 14 DTE
+  max_option_premium: 3.00        # Max $3.00 per contract
+  
+  # Watchlist for premarket scanning
+  watchlist:
+    - SPY
+    - QQQ
+    - IWM
+    - XLF
+    - XLE
+    - XLK
+    - AAPL
+    - MSFT
+    - NVDA
+    - TSLA
+    - AMD
+    - META
+    - AMZN
+    - GOOGL
+    - SMCI
+    - AVGO
+    - COIN
+
+# =============================================================================
+# GREEK RISK LIMITS - Portfolio-level delta/gamma caps
+# =============================================================================
+# Institutional-grade controls for options exposure. Prevents over-concentration
+# of directional (delta) or acceleration (gamma) risk.
+#
+# Delta: Expressed as % of equity. 20% means max directional exposure of $8,700
+#        on a $43,500 account (equivalent to ~17 SPY shares at $500).
+# Gamma: Rate of delta change per $1 underlying move. High gamma = acceleration risk.
+greek_limits:
+  enabled: true
+  max_delta_pct_of_equity: 20.0    # Max 20% of equity in directional exposure
+  max_gamma_per_dollar: 5.0        # Max gamma per $1 underlying move
+  max_vega_per_iv_point: 500.0     # Max vega per 1% IV change
+  max_theta_daily_usd: 100.0       # Max daily theta decay (absolute value)
+  delta_warning_pct: 80.0          # Warn at 80% of delta limit
+  gamma_warning_pct: 80.0          # Warn at 80% of gamma limit
+
+# =============================================================================
+# P&L ATTRIBUTION - Track how much P&L comes from each Greek
+# =============================================================================
+# Decomposes option P&L into delta, gamma, theta, vega, and residual components.
+# Helps understand if profits come from directional bets, time decay, or volatility.
+pnl_attribution:
+  enabled: true
+
+exitbot:
+  enabled: true
+  cooloff_minutes: 390
+  kill_conditions:
+    api_failure_halt: true
+    data_stale_halt: true
+    max_daily_loss_halt: true
+    anomaly_halt: true
+  # Default trailing stop for manual trades (user-created positions)
+  # Bots use their own trailing stop config from their respective sections
+  default_trailing_stop:
+    enabled: true
+    mode: percent          # "percent" or "price"
+    value: 1.0             # 1.0% trailing stop for manual trades
+    activation_profit_pct: 50  # Activate after 50% profit (manual trades)
+    update_only_if_improves: true
+    epsilon_pct: 0.02      # Buffer to prevent noise triggers
+    exit_order_type: market
+    # REVERSAL-SENSE TRAILING STOP (optional enhancement)
+    # Detects momentum/volume reversals and dynamically tightens stops
+    # Signals: momentum deceleration, volume spikes on adverse moves, reversal candles
+    reversal_sense:
+      enabled: true
+      # Momentum reversal detection
+      momentum_lookback: 5            # Bars to calculate momentum
+      momentum_reversal_threshold: 0.5  # Min momentum change % to trigger
+      # Volume spike detection  
+      volume_spike_mult: 2.0          # Volume > 2x avg = spike
+      volume_lookback: 20             # Bars for avg volume calc
+      # Price action reversal
+      reversal_candle_body_pct: 70.0  # Strong reversal candle (body > 70% of range)
+      # Tightening behavior
+      reversal_tighten_ratio: 0.4     # Tighten by 40% on reversal signal
+      strong_reversal_tighten_ratio: 0.6  # Tighten by 60% on strong reversal
+      cooldown_minutes: 15            # Don't re-tighten within 15 min
+      max_tightenings: 3              # Max tightenings before hitting stop
+  
+  # ==========================================================================
+  # HARD STOP-LOSS ENFORCEMENT
+  # ==========================================================================
+  # Exits FULL position if it drops X% from entry, regardless of trailing stop.
+  # This is the absolute safety net - protects capital when trailing stops 
+  # haven't armed yet (position never reached profit threshold).
+  # 
+  # Dynamic adjustments:
+  # - VIX regime: tightens by 25% during high volatility regimes
+  # - ATR scaling: (future) scale stops based on asset volatility
+  # - ML confidence: (future) widen for high-confidence trades
+  hard_stop:
+    enabled: true
+    # Default stop percentages by asset class (can be overridden per-bot):
+    # - crypto: uses cryptobot.exits.stop_loss_pct (currently 0.4%)
+    # - options: uses optionsbot.exits.stop_loss_pct (currently 50%)  
+    # - equities: uses momentum_bot.exits.stop_loss_pct (currently 2%)
+    # - manual trades: uses default_stop_loss_pct below
+    default_stop_loss_pct: 5.0  # 5% default for manual/unassigned positions
+    vix_regime_tighten: true    # Tighten by 25% in high VIX regimes
+    atr_scaling: false          # Future: scale by ATR
+    ml_confidence_adjust: false # Future: adjust based on ML confidence
+  
+  # ==========================================================================
+  # TIERED TAKE-PROFIT TARGETS (TP1, TP2, TP3)
+  # ==========================================================================
+  # Executes PARTIAL position exits at profit milestones:
+  # - TP1: Exit 33% of position, move stop to breakeven
+  # - TP2: Exit 50% of remaining, move stop to TP1 level  
+  # - TP3: Exit 100% of remaining (full exit)
+  #
+  # Benefits:
+  # - Locks in profits progressively
+  # - Reduces risk as profit grows
+  # - Lets winners run with house money
+  #
+  # Note: Target percentages are scaled per asset class from bot configs.
+  take_profit:
+    enabled: true
+    # Exit percentages at each tier
+    tp1_exit_pct: 0.33    # Exit 33% at first target
+    tp2_exit_pct: 0.50    # Exit 50% of remaining at second target
+    tp3_exit_pct: 1.00    # Exit all remaining at third target
+    # Stop adjustment after hitting targets
+    move_stop_after_tp1: breakeven  # "breakeven" or "none"
+    move_stop_after_tp2: tp1        # "tp1" or "none" (move stop to TP1 level)
+    # Dynamic scaling (future)
+    atr_scaling: false    # Scale TP levels by ATR
+    atr_multiplier: 1.5   # ATR multiplier for TP distances
+    
+    # ========================================================================
+    # PARABOLIC RUNNER MODE
+    # ========================================================================
+    # After TP2 hits, disable TP3 and let trailing stop ride extended moves.
+    # Instead of forcing full exit at TP3, the trailing stop follows the peak.
+    # This captures the tail of parabolic runs instead of exiting too early.
+    #
+    # How it works:
+    # 1. TP1 hits (e.g., +3%) -> Exit 33%, move stop to breakeven
+    # 2. TP2 hits (e.g., +6%) -> Exit 50%, move stop to TP1 level
+    # 3. RUNNER MODE ACTIVATES -> TP3 disabled, trailing stop rides the move
+    # 4. Price peaks at +25% -> Trailing stop follows
+    # 5. Price retraces 2% from peak -> Trailing stop triggers exit
+    #
+    # Result: Captured +23% on remaining position vs +10% with TP3
+    parabolic_runner:
+      enabled: true                     # Enable runner mode after TP2
+      widen_trailing_pct: 50.0          # Widen trailing stop by 50% to give room
+      min_profit_to_activate: 0.0       # Minimum profit % above TP2 to activate (0 = immediate)
+      # ATR-based adaptive thresholds - auto-adjust based on volatility
+      adaptive:
+        enabled: true                   # Enable ATR-based adaptive thresholds
+        atr_period: 14                  # ATR lookback period
+        base_atr_mult_tp1: 0.5          # TP1 = base + (ATR * this multiplier)
+        base_atr_mult_tp2: 1.0          # TP2 = base + (ATR * this multiplier)
+        base_atr_mult_tp3: 2.0          # TP3 = base + (ATR * this multiplier)
+        min_tp1_pct: 1.5                # Floor for TP1 (never lower)
+        max_tp1_pct: 4.0                # Ceiling for TP1 (never higher)
+        min_tp2_pct: 3.0                # Floor for TP2
+        max_tp2_pct: 8.0                # Ceiling for TP2
+        min_tp3_pct: 6.0                # Floor for TP3
+        max_tp3_pct: 15.0               # Ceiling for TP3
+
+portfoliobot:
+  enabled: true
+  cash_reserve_pct: 30
+  buckets:
+    momentum_bucket_pct_of_daily_risk: 20
+    options_bucket_pct_of_daily_risk: 35
+    crypto_bucket_pct_of_daily_risk: 20
+    bounce_bucket_pct_of_daily_risk: 10
+    twentymin_bucket_pct_of_daily_risk: 15
+  guardrails:
+    per_bot_min_pct_of_daily_risk: 5
+    per_bot_max_pct_of_daily_risk: 25
+
+momentum_bots:
+  - bot_id: mom_AAPL
+    enabled: true
+    ticker: AAPL
+    # Direction control: "long_only", "short_only", or "both"
+    direction: both
+    session:
+      trade_start: "06:35"
+      trade_end: "12:55"
+      manage_until: "12:55"
+    risk:
+      max_trades_per_day: 3
+      max_concurrent_positions: 4  # Turtle allows up to 4 units
+    # Turtle Traders Strategy Configuration
+    turtle:
+      enabled: true
+      system: "system_1"          # "system_1" (20-day) or "system_2" (55-day)
+      entry_lookback: 20          # Days for entry breakout channel
+      exit_lookback: 10           # Days for exit channel
+      atr_period: 20              # ATR calculation period (the "N")
+      risk_pct_per_unit: 1.0      # % of equity risked per unit
+      stop_loss_atr_mult: 2.0     # Stop at 2N from entry
+      pyramid_enabled: true       # Add to winners
+      pyramid_trigger_atr: 0.5    # Add unit every 0.5N move
+      max_units: 4                # Maximum units per position
+      winner_filter_enabled: true # Skip signal after winner
+    # Legacy exits (fallback if Turtle disabled)
+    exits:
+      stop_loss_pct: 2.00         # Wider stop for trend-following
+      take_profit_pct: 10.00      # Let winners run
+      time_stop_minutes: 0        # No time stop for Turtle (trend-following)
+    signal:
+      mode: "turtle"
+      params: {}
+
+  - bot_id: mom_TSLA
+    enabled: true
+    ticker: TSLA
+    direction: both
+    session:
+      trade_start: "06:35"
+      trade_end: "12:55"
+      manage_until: "12:55"
+    risk:
+      max_trades_per_day: 3
+      max_concurrent_positions: 4
+    turtle:
+      enabled: true
+      system: "system_1"
+      entry_lookback: 20
+      exit_lookback: 10
+      atr_period: 20
+      risk_pct_per_unit: 1.0
+      stop_loss_atr_mult: 2.0
+      pyramid_enabled: true
+      pyramid_trigger_atr: 0.5
+      max_units: 4
+      winner_filter_enabled: true
+    exits:
+      stop_loss_pct: 2.00
+      take_profit_pct: 10.00
+      time_stop_minutes: 0
+    signal:
+      mode: "turtle"
+      params: {}
+
+  - bot_id: mom_NVDA
+    enabled: true
+    ticker: NVDA
+    direction: both
+    session:
+      trade_start: "06:35"
+      trade_end: "12:55"
+      manage_until: "12:55"
+    risk:
+      max_trades_per_day: 3
+      max_concurrent_positions: 4
+    turtle:
+      enabled: true
+      system: "system_1"
+      entry_lookback: 20
+      exit_lookback: 10
+      atr_period: 20
+      risk_pct_per_unit: 1.0
+      stop_loss_atr_mult: 2.0
+      pyramid_enabled: true
+      pyramid_trigger_atr: 0.5
+      max_units: 4
+      winner_filter_enabled: true
+    exits:
+      stop_loss_pct: 2.00
+      take_profit_pct: 10.00
+      time_stop_minutes: 0
+    signal:
+      mode: "turtle"
+      params: {}
+
+  - bot_id: mom_PLTR
+    enabled: true
+    ticker: PLTR
+    direction: both
+    session:
+      trade_start: "06:35"
+      trade_end: "09:30"
+      manage_until: "12:55"
+    risk:
+      max_trades_per_day: 3
+      max_concurrent_positions: 1
+      trailing_stop:
+        enabled: true
+        mode: percent
+        value: 1.2
+        activation_profit_pct: 40  # Activate after 40% profit (stocks)
+        update_only_if_improves: true
+        epsilon_pct: 0.02
+        exit_order:
+          type: market
+    exits:
+      stop_loss_pct: 0.60
+      take_profit_pct: 1.20
+      time_stop_minutes: 25
+    signal:
+      mode: "placeholder_momentum_v1"
+      params: {}
+
+  - bot_id: mom_BLK
+    enabled: true
+    ticker: BLK
+    direction: both
+    session:
+      trade_start: "06:35"
+      trade_end: "09:30"
+      manage_until: "12:55"
+    risk:
+      max_trades_per_day: 3
+      max_concurrent_positions: 1
+      trailing_stop:
+        enabled: true
+        mode: percent
+        value: 0.8
+        activation_profit_pct: 30  # Activate after 30% profit (stocks)
+        update_only_if_improves: true
+        epsilon_pct: 0.02
+        exit_order:
+          type: market
+    exits:
+      stop_loss_pct: 0.50
+      take_profit_pct: 1.00
+      time_stop_minutes: 25
+    signal:
+      mode: "placeholder_momentum_v1"
+      params: {}
+
+  - bot_id: mom_AMD
+    enabled: true
+    ticker: AMD
+    direction: both
+    session:
+      trade_start: "06:35"
+      trade_end: "09:30"
+      manage_until: "12:55"
+    risk:
+      max_trades_per_day: 3
+      max_concurrent_positions: 1
+      trailing_stop:
+        enabled: true
+        mode: percent
+        value: 1.0
+        activation_profit_pct: 40  # Activate after 40% profit (stocks)
+        update_only_if_improves: true
+        epsilon_pct: 0.02
+        exit_order:
+          type: market
+    exits:
+      stop_loss_pct: 0.60
+      take_profit_pct: 1.20
+      time_stop_minutes: 25
+    signal:
+      mode: "placeholder_momentum_v1"
+      params: {}
+
+optionsbot:
+  enabled: true
+  bot_id: opt_core
+  # Strategy System Integration (PDF rules-based strategies)
+  # When enabled, uses StrategyRunner from config/strategies/*.yaml
+  # When disabled, uses existing behavior (no change)
+  use_strategy_system: true
+  # Using cheaper underlyings that require less buying power
+  tickers: [AAPL, AMD, MSFT, NVDA, TSLA, PLTR, BLK]
+  session:
+    trade_start: "06:40"    # PST: 9:40 AM EST
+    trade_end: "12:30"      # PST: 3:30 PM EST (30min before close)
+    manage_until: "13:00"   # PST: 4:00 PM EST
+  # Mode-based DTE rules to enable short-term trades (previously excluded)
+  default_mode: swing       # Default mode: "swing" or "short_term"
+  # IV Percentile Entry Gate - Only trade when IV is in favorable range
+  # For BUYING options (long calls/puts): Want LOW IV (buy cheap)
+  # For SELLING options (shorts/spreads): Want HIGH IV (sell expensive)
+  iv_gate:
+    enabled: true
+    # Long options: Only buy when IV is below this percentile (buy cheap)
+    buy_max_iv_percentile: 60    # Don't buy when IV > 60th percentile
+    buy_min_iv_percentile: 10    # Don't buy when IV < 10th percentile (too quiet)
+    # Credit/sell strategies: Only sell when IV is above this percentile
+    sell_min_iv_percentile: 50   # Don't sell unless IV > 50th percentile
+    # Straddles need elevated IV for premium capture
+    straddle_min_iv_percentile: 40
+  risk:
+    max_trades_per_day: 15       # INCREASED: Allow more trades per day
+    max_concurrent_positions: 8  # INCREASED: Allow more concurrent positions
+    max_position_size_usd: 500   # INCREASED: $500 per position for $43,500 account
+    profit_target_usd: 75        # INCREASED: Larger profit target
+    trailing_stop:
+      enabled: true
+      mode: percent
+      value: 2.0
+      activation_profit_pct: 50  # Activate after 50% profit (options)
+      update_only_if_improves: true
+      epsilon_pct: 0.05
+      exit_order:
+        type: market
+  strategies:
+    # BUY-SIDE ONLY - No selling options (avoids margin/buying power issues)
+    long_call:
+      enabled: true
+      max_cost: 3.00         # Max $3 per contract ($300 for 1 contract)
+      min_delta: 0.30        # Not too far OTM
+      max_delta: 0.60        # Not too deep ITM
+      profit_target: 0.30    # 30% gain target
+    long_put:
+      enabled: true
+      max_cost: 3.00
+      min_delta: 0.30
+      max_delta: 0.60
+      profit_target: 0.30
+    straddle:
+      enabled: true
+      max_cost: 5.00         # Max $5 per straddle
+      profit_target: 0.25
+    # DISABLED - Credit spreads require margin/cash securing
+    bull_put_spread:
+      enabled: true
+      min_credit: 0.50
+      max_credit: 3.00
+      profit_target: 0.50
+      max_dte: 45
+    bear_call_spread:
+      enabled: true
+      min_credit: 0.50
+      max_credit: 3.00
+      profit_target: 0.50
+      max_dte: 45
+    iron_condor:
+      enabled: true
+      min_credit: 1.00
+      max_credit: 4.00
+      profit_target: 0.25
+      max_dte: 60
+  exits:
+    take_profit_pct: 30      # Take 30% profit on long options
+    stop_loss_pct: 50        # 50% stop loss (tighter for long options)
+    time_stop_minutes: 180   # 3 hours max hold for long options
+    flatten_before_close_minutes: 30
+  chain_rules:
+    # Mode-based DTE rules - allows short-term trades that were previously excluded
+    modes:
+      swing:
+        dte_min: 5
+        dte_max: 60
+        size_multiplier: 1.0
+      short_term:
+        dte_min: 1          # Allows weeklies and reaction trades
+        dte_max: 7
+        size_multiplier: 0.5  # Half size for short-term (higher risk)
+    # Legacy defaults (used as fallback)
+    dte_min: 5               # LOOSENED: Allow shorter DTE (was 7)
+    dte_max: 60              # LOOSENED: Allow longer DTE (was 45)
+    delta_min: 0.25          # LOOSENED: Allow slightly lower delta (was 0.30)
+    delta_max: 0.70          # LOOSENED: Allow deeper ITM (was 0.60)
+    min_volume: 25           # LOOSENED: Reduced from 50
+    min_open_interest: 50    # LOOSENED: Reduced from 100
+
+# 0DTE Options Bot - Same-day expiration strategies for quick intraday plays
+# DISABLED: 0DTE requires special approval and higher margin requirements
+optionsbot_0dte:
+  enabled: true                     # Disabled - requires special account permissions
+  bot_id: opt_0dte
+  tickers: [SPY, QQQ, AAPL, AMD, MSFT, NVDA, TSLA, PLTR, BLK]  # High-liquidity indices only for 0DTE
+  session:
+    trade_start: "06:45"    # PST: 9:45 AM EST - let market settle first
+    trade_end: "10:00"      # PST: 1:00 PM EST - stop new trades early
+    manage_until: "12:55"   # PST: 3:55 PM EST - close all before 4pm
+  # Early-session loosening - makes 0DTE executable at open
+  min_open_interest: 150    # LOOSENED: Allow lower OI early (was 1000)
+  min_volume: 25            # LOOSENED: Allow lower volume early (was 1000)
+  max_cost: 2.50            # LOOSENED: Allow slightly more expensive contracts
+  risk:
+    max_trades_per_day: 5           # More trades, smaller size
+    max_concurrent_positions: 2      # Limit exposure
+    max_position_size_usd: 200       # Smaller positions for 0DTE
+    profit_target_usd: 50            # Quick $50 scalps
+    trailing_stop:
+      enabled: true
+      mode: percent
+      value: 0.5                     # Tighter 0.5% trailing stop
+      activation_profit_pct: 10      # Activate faster for 0DTE (10% profit)
+      update_only_if_improves: true
+      epsilon_pct: 0.02
+      exit_order:
+        type: market
+  strategies:
+    # BUY-SIDE ONLY for 0DTE (avoid margin issues)
+    long_call:
+      enabled: true
+      max_cost: 2.50            # LOOSENED: Allow slightly higher cost
+      min_delta: 0.30           # LOOSENED: Allow wider delta range
+      max_delta: 0.60
+      profit_target: 0.25
+    long_put:
+      enabled: true
+      max_cost: 2.50            # LOOSENED: Allow slightly higher cost
+      min_delta: 0.30           # LOOSENED: Allow wider delta range
+      max_delta: 0.60
+      profit_target: 0.25
+    straddle:
+      enabled: true                  # Good for 0DTE volatility plays
+      max_cost: 4.00
+      profit_target: 0.20            # 20% gain target
+    # DISABLED - Credit spreads require margin
+    bull_put_spread:
+      enabled: true                   # Good for 0DTE directional plays
+      min_credit: 0.25
+      max_credit: 1.50
+      profit_target: 0.50
+      max_dte: 0
+    bear_call_spread:
+      enabled: true                   # Good for 0DTE directional plays
+      min_credit: 0.25
+      max_credit: 1.50
+      profit_target: 0.50
+      max_dte: 0
+    iron_condor:
+      enabled: true                   # Good for 0DTE volatility plays
+      min_credit: 0.50
+      max_credit: 2.00
+      profit_target: 0.25
+      max_dte: 0
+  exits:
+    take_profit_pct: 25              # Take profits faster on 0DTE
+    stop_loss_pct: 50                # Tighter stop loss for long options
+    time_stop_minutes: 60            # Max 1 hour hold for 0DTE
+    flatten_before_close_minutes: 15 # Close 15 min before EOD
+  chain_rules:
+    dte_min: 0                       # 0DTE - same day expiration
+    dte_max: 2                       # LOOSENED: Allow 0-1 DTE for more opportunities
+    delta_min: 0.25                  # LOOSENED: Slightly lower delta (was 0.30)
+    delta_max: 0.65                  # LOOSENED: Allow deeper ITM (was 0.55)
+    min_volume: 50                   # LOOSENED: Reduced from 100
+    min_open_interest: 200           # LOOSENED: Reduced from 500
+
+twentyminute_bot:
+  enabled: true
+  bot_id: "twentymin_core"
+  ml_enabled: false                 # DISABLED: Let momentum filters decide instead of ML scoring
+  # Full universe for gap analysis - organized by category
+  tickers:
+    # Note: XSP removed - it's an index (not quotable via Alpaca stock API)
+    # Use SPY/QQQ options as index proxies
+    # Index ETFs - most liquid options, tightest spreads
+    - SPY    # S&P 500 ETF - king of options liquidity
+    - QQQ    # Nasdaq 100 ETF - tech-heavy, liquid
+    - IWM    # Russell 2000 ETF - small cap exposure
+    - DIA    # Dow Jones ETF - blue chip exposure
+    # Sector ETFs - good for directional plays
+    - XLF    # Financials - rate-sensitive
+    - XLE    # Energy - commodity exposure
+    - XLK    # Technology - growth sector
+    - XLV    # Healthcare - defensive
+    - GLD    # Gold - hedge/safety play
+    - TLT    # Treasury bonds - rate plays
+    # High-volume individual stocks with liquid options
+    - AAPL   # Apple - most liquid single stock options
+    - MSFT   # Microsoft - very liquid options
+    - NVDA   # Nvidia - high IV, premium rich
+    - TSLA   # Tesla - extreme liquidity, high IV
+    - AMD    # AMD - good premium, liquid
+    - META   # Meta - earnings plays
+    - AMZN   # Amazon - wide strikes available
+    - GOOGL  # Alphabet - liquid options
+    # Growth & Dividend ETFs - options eligible
+    - SCHG   # Schwab US Large-Cap Growth
+    - IWF    # iShares Russell 1000 Growth
+    - VGT    # Vanguard Info Tech ETF
+    - VUG    # Vanguard Growth ETF
+    - QQQM   # Invesco Nasdaq 100 (mini)
+    - SCHD   # Schwab US Dividend Equity
+    - VYM    # Vanguard High Dividend Yield
+    - VIXY   # ProShares VIX - volatility plays
+    # Crypto proxy - high IV, liquid options
+    - COIN   # Coinbase - crypto volatility
+    # Extended semiconductors with liquid options
+    - AVGO   # Broadcom
+    - SMCI   # Super Micro (monitor liquidity)
+    - TSM    # Taiwan Semi
+    - ASML   # ASML
+    # Financials with liquid options
+    - JPM    # JPMorgan
+    - GS     # Goldman Sachs
+    - BAC    # Bank of America
+    - WFC    # Wells Fargo
+    # Enterprise tech with options
+    - CRM    # Salesforce
+    - ORCL   # Oracle
+    # User-requested tickers
+    - PLTR   # Palantir - AI/defense
+    - BLK    # BlackRock - asset management
+    # Defense (liquid options)
+    - LMT    # Lockheed Martin
+    - NOC    # Northrop Grumman
+    - RTX    # RTX/Raytheon
+    - BA     # Boeing (defense side)
+    - GD     # General Dynamics
+    # Industrials with options
+    - CAT    # Caterpillar
+    - DE     # Deere
+    - GE     # GE Aerospace
+    # Commodities & Hedges
+    - SLV    # Silver ETF
+    - USO    # Crude oil ETF
+    - KRE    # Regional banks ETF
+  session:
+    trade_start: "06:30"      # PST: 9:30 AM EST (market open)
+    trade_end: "09:50"        # PST: 10:50 AM EST (extended window)
+  gap:
+    min_gap_pct: 0.2          # LOOSENED: Minimum gap size (was 0.3%)
+  pattern:
+    min_first_bar_range_pct: 0.10  # LOOSENED: Minimum first bar range (was 0.15%)
+    confirmation_bars: 1      # LOOSENED: Faster confirmation (was 2)
+  momentum:
+    rsi_overbought: 80        # LOOSENED: RSI threshold for overbought (was 85)
+    rsi_oversold: 20          # LOOSENED: RSI threshold for oversold (was 15)
+    require_volume_spike: false  # If true, require 1.5x volume for entry
+  risk:
+    max_trades_per_day: 8     # INCREASED: Allow more trades (was 5)
+    max_concurrent_positions: 8  # INCREASED: Allow more concurrent positions (was 6)
+  execution:
+    use_options: true         # Use options execution path (video rules)
+    options_max_cost: 5.00
+    # Equity fallback when options unavailable - prevents valid signals from being vetoed
+    allow_equity_fallback: true
+    equity_fallback_delay_seconds: 180  # Wait 3 min for options before equity fallback
+    
+    # Video Rules Options Configuration - TIME-AWARE FILTERS
+    options:
+      # Early session (first 20 minutes) - VERY LOOSE filters for low liquidity
+      early_session:
+        applies_minutes_from_open: 20
+        min_open_interest: 100      # LOOSENED: from 400 - allow lower OI early
+        min_volume: 300              # LOOSENED: from 300 - allow lower volume early
+        max_spread: 0.05            # LOOSENED: from 0.08 - allow wider spreads early
+        prefer_delta_min: 0.25      # LOOSENED: from 0.35 - allow lower delta
+        prefer_delta_max: 0.75      # LOOSENED: from 0.65 - allow higher delta
+      
+      # Normal session - standard filters
+      normal_session:
+        min_open_interest: 1000
+        min_volume: 1000
+        max_spread: 0.05
+        prefer_delta_min: 0.45
+        prefer_delta_max: 0.60
+      
+      # Legacy single-value defaults (used if time-aware not wired)
+      max_spread: 0.05        # Only trade options with $0.02-$0.05 spread
+      prefer_spread: 0.05     # Prefer tighter spreads
+      min_volume: 1000        # Minimum option volume
+      min_open_interest: 1000 # Minimum open interest
+      prefer_delta_min: 0.45  # Prefer delta in this range
+      prefer_delta_max: 0.60  # for better delta translation
+      
+      move_model:
+        k_first_bar: 0.75     # Multiplier for first bar range
+        min_move_pct: 0.0008  # Minimum underlying move (0.08%)
+        max_move_pct: 0.0035  # Maximum underlying move (0.35%)
+      
+      bracket_bands:
+        stop_pct_min: 0.04    # Stop clamped to 4-8% of option premium
+        stop_pct_max: 0.08
+        tp_pct_min: 0.04      # Take profit clamped to 4-8%
+        tp_pct_max: 0.08
+      
+      risk:
+        daily_budget_usd: 2000 # Daily risk budget for options
+        max_contracts: 10     # Maximum contracts per trade
+        stop_after_losses: 2  # Stop trading after N losses in a day
+  exits:
+    max_hold_minutes: 30      # Max hold time (2-15 min typical)
+    stop_loss_pct: 0.5        # Tight 0.5% stop loss
+    take_profit_pct: 0.5      # Quick 0.5% profit target
+
+cryptobot:
+  enabled: true
+  bot_id: "crypto_core"
+  pairs: ["BTC/USD", "ETH/USD"]  # Static pairs (used if universe disabled)
+  # Dynamic coin universe selection
+  universe:
+    enabled: true                    # Enable dynamic coin selection
+    min_volume_24h_usd: 0            # No minimum (paper trading has low volume)
+    max_spread_pct: 10.0             # Maximum bid/ask spread allowed
+    min_price_usd: 0.0001            # Minimum coin price
+    max_coins: 10                    # Max coins for initial screening
+    prefer_high_volume: true         # Weight volume in ranking
+    prefer_high_volatility: true     # Weight volatility for momentum plays
+    exclude_stablecoins: true        # Exclude USDT, USDC, etc.
+    usd_pairs_only: true             # Only /USD pairs (not BTC/ETH pairs)
+    refresh_interval_minutes: 60     # Cache refresh interval
+    # Two-stage ML selection: screen top 10, ML-score for profitability, pick best 3
+    ml_rerank_enabled: true          # Enable ML-based re-ranking
+    ml_rerank_candidates: 10         # Number of candidates to evaluate with ML
+    ml_rerank_select: 3              # Final number of coins to trade
+  session:
+    trade_start: "04:00"           # CHANGED: Skip 00:00-04:00 low-liquidity hours
+    trade_end: "23:59"
+    manage_until: "23:59"
+    # Quiet hours: 00:00-04:00 PST is lowest liquidity (Asia sleep, US sleep, EU pre-open)
+    # This prevents trailing stops from triggering on flash wicks during thin markets
+    quiet_hours_enabled: true
+    quiet_hours_start: "00:00"
+    quiet_hours_end: "04:00"
+  execution:
+    order_type: limit
+    tif: gtc
+    use_notional: true
+    # Dynamic sizing: use equity_pct of account, with min/max bounds
+    dynamic_sizing_enabled: true
+    equity_pct: 3.5                 # INCREASED: Use 1.5% of account equity per trade ($650 at $43,500)
+    min_notional_usd: 15            # Minimum trade size (increased for meaningful positions)
+    max_notional_usd: 5000           # Maximum trade size cap (increased)
+    default_notional_usd: 100       # Fallback if dynamic sizing fails
+  risk:
+    max_trades_per_day: 5
+    max_concurrent_positions: 5
+    min_order_size: 10.0  # Above Alpaca's $10 minimum with buffer
+    trailing_stop:
+      enabled: true
+      mode: percent
+      value: 0.6               # TIGHTENED from 1.5% to lock in profits faster at peaks
+      activation_profit_pct: 15  # Activate after 15% profit (crypto)
+      update_only_if_improves: true
+      epsilon_pct: 0.03        # Smaller buffer for quicker updates
+      exit_order:
+        type: market
+  exits:
+    stop_loss_pct: 1.2            # WIDENED from 0.4% - avoid whipsaw stops on normal noise
+    take_profit_pct: 2.0          # INCREASED from 0.8% - let winners run to overcome slippage
+    time_stop_minutes: 240
+  # PARABOLIC RUNNER - Crypto-specific thresholds (higher than equities due to volatility)
+  # Crypto moves are bigger; need wider thresholds to capture 20-50% runs
+  parabolic_runner:
+    enabled: true
+    # Higher thresholds for crypto volatility
+    tp1_pct: 4.0                  # First target at 4% (vs 2% equities)
+    tp2_pct: 8.0                  # Second target at 8% (vs 4% equities)
+    tp3_pct: 15.0                 # Third target at 15% (vs 8% equities)
+    widen_trailing_pct: 70.0      # Widen trailing stop by 70% (vs 50% equities)
+    # ATR-based adaptive thresholds - auto-adjust based on volatility
+    adaptive:
+      enabled: true               # Enable ATR-based adaptive thresholds
+      atr_period: 14              # ATR lookback period
+      base_atr_mult_tp1: 1.0      # TP1 = base + (ATR * this multiplier)
+      base_atr_mult_tp2: 2.0      # TP2 = base + (ATR * this multiplier)
+      base_atr_mult_tp3: 3.5      # TP3 = base + (ATR * this multiplier)
+      min_tp1_pct: 2.0            # Floor for TP1 (never lower)
+      max_tp1_pct: 8.0            # Ceiling for TP1 (never higher)
+      min_tp2_pct: 5.0            # Floor for TP2
+      max_tp2_pct: 15.0           # Ceiling for TP2
+      min_tp3_pct: 10.0           # Floor for TP3
+      max_tp3_pct: 30.0           # Ceiling for TP3
+  # ANTI-CHURN PROTECTION - Prevents overtrading and whipsaw losses
+  # Problem: Bot was entering/exiting 15+ times in 4 hours, losing ~$50-100 each round-trip
+  anti_churn:
+    enabled: true
+    # Minimum hold time before regular stop-loss can trigger (hard stop always works)
+    min_hold_minutes: 10           # Wait 10 minutes before allowing soft stop-loss
+    # Extended cooldown after stop-out (prevents revenge trading)
+    stop_out_cooldown_minutes: 30  # 30 minutes after stop-loss (vs 1 minute normal)
+    # Whipsaw detection - pause trading after consecutive losses
+    max_consecutive_stopouts: 3    # After 3 stop-outs on same symbol
+    whipsaw_pause_minutes: 120     # Pause trading that symbol for 2 hours
+  # Turtle Traders Strategy Configuration (24/7 markets)
+  # Uses hourly bars with equivalent lookbacks (480 periods = 20 days)
+  turtle:
+    enabled: true
+    system: "system_1"
+    entry_lookback: 480            # 20 days * 24 hours (hourly bars)
+    exit_lookback: 240             # 10 days * 24 hours (hourly bars)
+    atr_period: 480                # 20 days * 24 hours (hourly bars)
+    risk_pct_per_unit: 1.0
+    stop_loss_atr_mult: 2.0
+    pyramid_enabled: true
+    pyramid_trigger_atr: 0.5
+    max_units: 4
+    winner_filter_enabled: true
+  signal:
+    mode: "turtle"
+    params: {}
+
+# =============================================================================
+# WHIPSAW TRADER - Profit from Range-Bound Markets
+# =============================================================================
+# When markets are whipsawing (2+ consecutive stop-outs), switches from momentum
+# to mean-reversion strategy. Buys at support, sells at resistance with tight TPs.
+# Exits when range breaks (volatility expansion) and returns to momentum mode.
+
+whipsaw_trader:
+  enabled: true
+  # Detection thresholds
+  consecutive_stopouts_threshold: 2    # Stop-outs to trigger whipsaw mode
+  stopout_window_minutes: 120          # Window for counting stop-outs
+  atr_compression_ratio: 0.6           # ATR < 60% of avg = compression
+  # Range calculation
+  range_lookback_bars: 20              # Bars to calculate support/resistance
+  support_buffer_pct: 0.2              # Buffer above support for entries
+  resistance_buffer_pct: 0.2           # Buffer below resistance for entries
+  # Mean-reversion trading params
+  take_profit_pct: 0.75                # Quick 0.75% take profit
+  stop_loss_pct: 0.5                   # Tight 0.5% stop loss
+  max_trades_in_range: 5               # Max trades before re-evaluation
+  # Exit conditions (return to trending mode)
+  volatility_expansion_ratio: 1.5      # ATR > 150% of range ATR = breakout
+  range_break_pct: 1.0                 # Price breaks range by 1% = exit mode
+  min_whipsaw_duration_minutes: 30     # Stay in whipsaw mode at least 30 min
+  max_whipsaw_duration_hours: 8        # Force re-evaluation after 8 hours
+
+# =============================================================================
+# BOUNCEBOT - Overnight Crypto Dip-Buying Strategy
+# =============================================================================
+# Captures overnight crypto drawdowns during 1-5:30am PST when volatility spikes.
+# Strategy: Buy the dip on oversold conditions, ride the bounce back up.
+# Separate from CryptoBot to avoid interference and maintain independent risk limits.
+
+bouncebot:
+  enabled: true
+  bot_id: "bounce_core"
+  # Top liquid pairs only for overnight (thinner liquidity = stick to majors)
+  pairs: ["BTC/USD", "ETH/USD", "SOL/USD"]
+  
+  # Overnight window (PST) - when crypto sees consistent volatility
+  session:
+    window_start: "01:00"    # 1:00 AM PST
+    window_end: "05:30"      # 5:30 AM PST
+  
+  # Entry criteria - looking for oversold dips
+  entry:
+    drawdown_threshold_pct: 1.5   # Minimum drawdown from 4-hour high
+    rsi_oversold: 30              # RSI must be below this (oversold)
+    require_reversal_candle: true # Wait for green candle after red
+    lookback_hours: 4             # Hours to look back for recent high
+  
+  # Execution settings
+  execution:
+    order_type: market
+    tif: gtc
+    use_notional: true
+    equity_pct: 1.75              # 1.75% of account per trade
+    min_notional_usd: 15          # Minimum trade size
+    max_notional_usd: 1000        # Maximum trade size
+  
+  # Risk controls - tighter for overnight
+  risk:
+    max_trades_per_session: 2     # Max 2 trades per overnight window
+    position_size_multiplier: 0.5 # 50% of normal size for overnight
+    trailing_stop:
+      enabled: true
+      mode: percent
+      value: 0.5                  # 0.5% trailing stop (tight for bounces)
+      activation_profit_pct: 0.4  # Activate after 0.4% profit
+      update_only_if_improves: true
+      epsilon_pct: 0.02
+      exit_order:
+        type: market
+  
+  # Exit settings - quick profits, tight stops
+  exits:
+    take_profit_pct: 0.8          # +0.8% quick take-profit
+    stop_loss_pct: 0.5            # -0.5% tight stop-loss
+    max_hold_minutes: 120         # Max 2 hours hold time
+
+# =============================================================================
+# MARKET INTELLIGENCE SYSTEM
+# =============================================================================
+# All intel modules are DISABLED by default (fail-closed)
+# Enable modules individually after testing
+
+intelligence:
+  # Global settings
+  dry_run: false  # Log actions without executing trades
+  
+  # Debug mode (ONLY for simulation/testing)
+  debug:
+    simulation_mode: false
+    force_active: false
+    ignore_neutral_band: false
+    lower_confidence_floor: 0.0
+  
+  # Phase 1: News Intelligence for exits and entries
+  news:
+    enabled: true  # DISABLED by default - enable after testing
+    provider: openai  # Uses Replit AI Integration
+    refresh_seconds: 60  # How often to refresh news cache
+    max_items_per_symbol: 10  # Max headlines to cache per symbol
+    timeout_seconds: 10  # API timeout
+    
+    # OpenAI sentiment scoring
+    openai_sentiment:
+      enabled: true
+      model: gpt-4o-mini  # Fast and cheap
+      timeout_seconds: 5
+    
+    # Exit triggers (Phase 1)
+    exits:
+      enabled: true  # Enable news-based exits
+      negative_threshold: -0.70  # Exit on sentiment <= this (if profitable)
+      severe_threshold: -0.85  # Exit even if losing position
+      min_confidence: 0.60  # Minimum confidence to act
+      profit_exit_requires_profit: true  # Normal exits only if position is green
+      loss_exit_on_severe: true  # Severe news exits even if red
+    
+    # Entry filters (Phase 2)
+    entry_filter:
+      enabled: true  # Enable news-based entry filtering
+      bullish_min: 0.20  # Min sentiment for call entries
+      bearish_max: -0.20  # Max sentiment for put entries
+      neutral_band: 0.15  # Treat abs(sentiment) < this as neutral
+      mixed_handling: skip  # skip | reduce_size | allow
+  
+  # Phase 3: Smart Money (Congress + 13F)
+  smart_money:
+    enabled: true  # ENABLED by default - core institutional intelligence
+    refresh_seconds: 3600  # Refresh hourly (data changes slowly)
+    congress:
+      enabled: false
+      min_conviction: 0.50
+      min_trade_value: 15000  # Minimum trade value to consider
+    institutional:
+      enabled: false
+      min_convergence: 0.30  # Multiple funds buying
+    boost_factor: 1.2  # Universe scoring boost for smart money signals
+  
+  # Phase 4: Macro Intelligence (Fed + White House)
+  macro:
+    enabled: true  # ENABLED by default - core macro intelligence
+    refresh_seconds: 300  # Check every 5 minutes
+    hawkish_caution_threshold: 0.40  # Become CAUTION at this level
+    hawkish_stress_threshold: 0.70  # Become STRESS at this level
+    stress_size_multiplier: 0.5  # Reduce position sizes 50% in STRESS
+    caution_size_multiplier: 0.75  # Reduce 25% in CAUTION
+
+# =============================================================================
+# LIQUIDITY FILTER - Options bid-ask spread and volume requirements
+# =============================================================================
+# Prevents trading options with insufficient liquidity that would result in
+# slippage losses and difficulty exiting positions.
+liquidity_filter:
+  enabled: true
+  max_spread_pct: 10.0      # Max bid-ask spread as % of mid price (10%)
+  min_dollar_volume: 50000  # Minimum daily dollar volume ($50k)
+  min_open_interest: 100    # Minimum open interest (contracts)
+  
+  # Real-time check before order placement
+  pre_order_check: true     # Fetch fresh quote before submitting order
+  
+  # Early session relaxation (first 20 min of market)
+  early_session_max_spread_pct: 15.0  # Wider spread allowed at open
+  early_session_min_oi: 50            # Lower OI threshold at open
+
+# =============================================================================
+# EDGE DECAY MONITORING - Track strategy performance degradation
+# =============================================================================
+# Monitors rolling Sharpe ratios to detect when strategies are losing edge.
+edge_decay:
+  enabled: true
+  # Rolling window sizes (days)
+  short_window: 7
+  medium_window: 30
+  long_window: 90
+  
+  # Decay ratio thresholds (30d Sharpe / 90d Sharpe)
+  healthy_ratio: 0.8       # Above this = healthy
+  warning_ratio: 0.5       # Below this = warning
+  degraded_ratio: 0.3      # Below this = reduce allocation 50%
+  
+  # Minimum Sharpe for healthy status
+  min_sharpe_healthy: 0.5
+  min_sharpe_viable: 0.0
+
+# =============================================================================
+# CROSS-BOT CORRELATION MONITOR - Aggregate exposure limits
+# =============================================================================
+# Prevents all bots from going the same direction, which would cause
+# correlated drawdowns during market crashes.
+cross_bot_monitor:
+  enabled: true
+  # Exposure limits (as % of equity)
+  max_net_delta_pct: 40.0   # Max net directional exposure
+  near_limit_pct: 30.0      # Warning threshold
+  max_sector_pct: 30.0      # Max exposure to single sector
+  
+  # Cross-bot loss detection
+  loss_window_minutes: 60   # Window for detecting correlated losses
+  loss_trigger_count: 3     # Number of bots losing to trigger pause
+
+# =============================================================================
+# SLIPPAGE TRACKING - Monitor execution quality
+# =============================================================================
+# Records actual vs expected fill prices to measure execution quality
+# and build a slippage model for backtesting.
+slippage_tracking:
+  enabled: true
+  # Thresholds (basis points)
+  acceptable_bps: 10        # Normal slippage (0.10%)
+  warning_bps: 25           # Warning level (0.25%)
+  severe_bps: 50            # Severe slippage (0.50%)
+  
+  # VIX-adjusted sizing
+  vix_slippage_multiplier: true  # Increase expected slippage in high VIX
+
+# =============================================================================
+# ML DRIFT DETECTION - Monitor model accuracy over time
+# =============================================================================
+# Detects when ML models need retraining due to distribution shift.
+ml_drift:
+  enabled: true
+  # Detection thresholds
+  ks_threshold: 0.3             # Kolmogorov-Smirnov statistic for feature drift
+  calibration_threshold: 0.15   # Max allowed calibration error
+  accuracy_drop_threshold: 0.10 # Accuracy drop to trigger warning (10%)
+  
+  # Retraining schedule
+  auto_retrain: false           # Set true to enable scheduled retraining
+  retrain_interval_days: 90     # Retrain every 90 days if enabled

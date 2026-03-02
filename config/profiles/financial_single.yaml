@@ -1,0 +1,18 @@
+# Financial Institutions (Single-Name) Profile
+# JPM, GS, BAC, WFC
+# Controlled exposure to balance-sheet risk - news-driven gaps
+
+delta_target: 0.20
+delta_min: 0.16
+delta_max: 0.25
+
+dte_min: 30
+dte_max: 45
+
+max_position_pct: 0.08
+max_total_exposure: 0.30
+max_open_positions: 4
+max_new_trades_per_day: 1
+
+min_open_interest: 300
+max_bid_ask_pct: 0.15

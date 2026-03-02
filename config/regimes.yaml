@@ -1,0 +1,31 @@
+# Volatility Regime Configuration
+# TUNED FOR $50K: VIX-based regime classification with institutional modifiers
+
+vix_thresholds:
+  low: 14      # VIX < 14 = calm markets
+  stress: 22   # VIX > 22 = elevated risk
+
+# Modifiers applied to base profile parameters per regime
+modifiers:
+  LOW:
+    delta_multiplier: 1.05        # Slightly higher delta ok - premium is thin
+    dte_shift_days: 7             # Go farther out for decay
+    size_multiplier: 1.10         # Can size up slightly
+    max_new_trades_per_day: 18    # More activity allowed in calm markets
+
+  NORMAL:
+    delta_multiplier: 1.00        # No adjustment
+    dte_shift_days: 0             # Standard DTE
+    size_multiplier: 1.00         # Standard sizing
+    max_new_trades_per_day: 100   # High pace for max profit
+
+  STRESS:
+    delta_multiplier: 0.70        # Lower delta - reduce assignment + gap pain
+    dte_shift_days: -7            # Bring closer - avoid long exposure to chaos
+    size_multiplier: 0.50         # Reduce size significantly (50% = $2,500 max)
+    max_new_trades_per_day: 4     # Minimal new exposure in stress
+
+# Fail-closed behavior
+defaults:
+  missing_vix_regime: STRESS      # If VIX data unavailable, assume worst
+  missing_vix_value: 25.0         # Default VIX when API fails

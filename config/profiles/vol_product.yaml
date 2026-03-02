@@ -1,0 +1,22 @@
+# Volatility Products Profile
+# VIXY (and similar)
+# Non-linear behavior, mean reversion traps, path dependency
+
+delta_target: 0.15
+delta_min: 0.10
+delta_max: 0.20
+
+dte_min: 7
+dte_max: 14
+
+max_position_pct: 0.03
+max_total_exposure: 0.08
+max_open_positions: 1
+max_new_trades_per_day: 1
+
+min_open_interest: 500
+max_bid_ask_pct: 0.15
+
+# Vol product specific rules
+disable_put_selling: true
+debit_only: true

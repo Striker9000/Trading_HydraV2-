@@ -1,0 +1,23 @@
+# Sector / Rate-Sensitive ETFs Profile
+# XLF, XLK, XLE, XLV, KRE, TLT
+# Macro-aware exposure, sensitive to Fed/CPI/yields
+
+delta_target: 0.22
+delta_min: 0.18
+delta_max: 0.28
+
+dte_min: 30
+dte_max: 45
+
+max_position_pct: 0.10
+max_total_exposure: 0.40
+max_open_positions: 4
+max_new_trades_per_day: 2
+
+min_open_interest: 500
+max_bid_ask_pct: 0.12
+
+throttle_on_events:
+  - FOMC
+  - CPI
+  - PCE

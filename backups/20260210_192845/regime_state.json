@@ -1,0 +1,11 @@
+{
+  "state": "risk_on",
+  "confidence": 0.8,
+  "risk_on": true,
+  "breadth_score": 1.0,
+  "volatility_score": 0.5,
+  "momentum_score": 0.5,
+  "leadership_score": 0.0,
+  "last_update": "2026-02-10T19:25:37.232346",
+  "notes": "breadth bullish"
+}

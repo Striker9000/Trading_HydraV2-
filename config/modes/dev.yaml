@@ -1,0 +1,53 @@
+
+# Development configuration for after-hours testing
+# Override settings for realistic development experience
+
+development:
+  enabled: true
+  mock_trading: true
+  
+  # Enhanced risk budgets for testing
+  risk_multiplier: 20  # 20x normal risk for testing
+  
+  # Faster trading for development
+  loop_interval_seconds: 3
+  
+  # More aggressive signal generation
+  signal_probability:
+    momentum: 0.25    # 25% chance per cycle
+    crypto: 0.20      # 20% chance per cycle  
+    options: 0.15     # 15% chance per cycle (market hours only)
+  
+  # Mock market conditions
+  market_conditions:
+    trend_changes_per_hour: 2
+    volatility_events_per_hour: 1
+    
+  # Development portfolio
+  positions:
+    - symbol: "META"
+      qty: 108
+      market_value: 66456.0
+      side: "long"
+    - symbol: "AAPL" 
+      qty: 25
+      market_value: 6800.0
+      side: "long"
+
+# Override bot configurations for development
+development_bots:
+  momentum_bots:
+    - bot_id: mom_AAPL
+      enabled: true
+      session:
+        trade_start: "00:00"  # Allow trading 24/7 for development
+        trade_end: "23:59"
+        
+  cryptobot:
+    risk:
+      max_trades_per_day: 10  # More trades for testing
+      
+  optionsbot:
+    session:
+      trade_start: "00:00"    # Allow options trading 24/7 for development
+      trade_end: "23:59"

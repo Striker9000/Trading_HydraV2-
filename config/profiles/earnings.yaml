@@ -1,0 +1,23 @@
+# Earnings Week Override Profile
+# Activated when symbol is in earnings window
+# This profile OVERRIDES any base profile - no merging
+
+delta_target: 0.12
+delta_min: 0.08
+delta_max: 0.18
+
+dte_min: 7
+dte_max: 14
+
+max_position_pct: 0.04
+max_total_exposure: 0.15
+max_open_positions: 2
+max_new_trades_per_day: 1
+
+min_open_interest: 1000
+max_bid_ask_pct: 0.08
+
+# Earnings-specific rules
+force_defined_risk: true
+exit_before_event: true
+disable_rolling: true

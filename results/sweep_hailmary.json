@@ -1,0 +1,131 @@
+{
+  "sweep_date": "2026-02-11T19:15:34.354609",
+  "bot_name": "HailMary",
+  "period_days": 600,
+  "initial_capital": 50000.0,
+  "total_configs_tested": 500,
+  "symbols": [
+    "AAPL",
+    "NVDA",
+    "TSLA",
+    "AMD",
+    "SPY",
+    "QQQ",
+    "META",
+    "AMZN",
+    "MSFT",
+    "GOOGL"
+  ],
+  "top_configs": [
+    {
+      "rank": 1,
+      "params": {
+        "max_premium": 7.0,
+        "min_stock_change_pct": 0.3,
+        "profit_target_multiplier": 25.0,
+        "max_trades_per_day": 5,
+        "dte_max": 0,
+        "strike_otm_pct": 0.5
+      },
+      "metrics": {
+        "total_trades": 3202,
+        "win_rate": 0.243,
+        "total_pnl": 16142435.24,
+        "total_pnl_pct": 32284.87,
+        "profit_factor": 7.71,
+        "sharpe_ratio": 7.51,
+        "max_drawdown_pct": 13.03,
+        "avg_trade_pnl": 5041.36,
+        "composite_score": 969163.13
+      }
+    },
+    {
+      "rank": 2,
+      "params": {
+        "max_premium": 7.0,
+        "min_stock_change_pct": 0.3,
+        "profit_target_multiplier": 25.0,
+        "max_trades_per_day": 2,
+        "dte_max": 1,
+        "strike_otm_pct": 0.5
+      },
+      "metrics": {
+        "total_trades": 3319,
+        "win_rate": 0.2181,
+        "total_pnl": 14673873.51,
+        "total_pnl_pct": 29347.75,
+        "profit_factor": 6.71,
+        "sharpe_ratio": 6.85,
+        "max_drawdown_pct": 13.04,
+        "avg_trade_pnl": 4421.17,
+        "composite_score": 880961.79
+      }
+    },
+    {
+      "rank": 3,
+      "params": {
+        "max_premium": 3.0,
+        "min_stock_change_pct": 0.5,
+        "profit_target_multiplier": 25.0,
+        "max_trades_per_day": 5,
+        "dte_max": 0,
+        "strike_otm_pct": 0.5
+      },
+      "metrics": {
+        "total_trades": 2771,
+        "win_rate": 0.2501,
+        "total_pnl": 14462538.23,
+        "total_pnl_pct": 28925.08,
+        "profit_factor": 8.01,
+        "sharpe_ratio": 7.7,
+        "max_drawdown_pct": 8.86,
+        "avg_trade_pnl": 5219.25,
+        "composite_score": 868436.29
+      }
+    },
+    {
+      "rank": 4,
+      "params": {
+        "max_premium": 2.0,
+        "min_stock_change_pct": 0.3,
+        "profit_target_multiplier": 20.0,
+        "max_trades_per_day": 2,
+        "dte_max": 1,
+        "strike_otm_pct": 0.5
+      },
+      "metrics": {
+        "total_trades": 3319,
+        "win_rate": 0.2606,
+        "total_pnl": 13878371.54,
+        "total_pnl_pct": 27756.74,
+        "profit_factor": 6.71,
+        "sharpe_ratio": 7.62,
+        "max_drawdown_pct": 16.66,
+        "avg_trade_pnl": 4181.49,
+        "composite_score": 833183.88
+      }
+    },
+    {
+      "rank": 5,
+      "params": {
+        "max_premium": 10.0,
+        "min_stock_change_pct": 0.5,
+        "profit_target_multiplier": 15.0,
+        "max_trades_per_day": 3,
+        "dte_max": 0,
+        "strike_otm_pct": 0.5
+      },
+      "metrics": {
+        "total_trades": 2771,
+        "win_rate": 0.3288,
+        "total_pnl": 10824425.06,
+        "total_pnl_pct": 21648.85,
+        "profit_factor": 6.86,
+        "sharpe_ratio": 8.86,
+        "max_drawdown_pct": 8.31,
+        "avg_trade_pnl": 3906.32,
+        "composite_score": 650025.38
+      }
+    }
+  ]
+}

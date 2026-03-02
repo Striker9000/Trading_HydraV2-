@@ -1,0 +1,308 @@
+{
+  "backtest_info": {
+    "run_date": "2026-02-14T04:44:05.857464",
+    "symbols": [
+      "AAPL",
+      "AMD",
+      "AMZN",
+      "GOOGL",
+      "IWM",
+      "META",
+      "MSFT",
+      "NVDA",
+      "QQQ",
+      "SPY",
+      "TSLA"
+    ],
+    "total_bars": 21759,
+    "position_size_usd": 1000.0,
+    "entry_method": "momentum_breakout"
+  },
+  "ranking": [
+    {
+      "rank": 1,
+      "strategy": "volume_confirmed",
+      "total_pnl": 1626.69,
+      "win_rate_pct": 43.7,
+      "profit_factor": 1.14,
+      "max_drawdown_pct": 7.06,
+      "hunts_avoided": 33,
+      "hunt_candidates": 179,
+      "improvement_vs_baseline_pct": 25750.5
+    },
+    {
+      "rank": 2,
+      "strategy": "invisible_stop",
+      "total_pnl": 862.4,
+      "win_rate_pct": 45.4,
+      "profit_factor": 1.06,
+      "max_drawdown_pct": 11.53,
+      "hunts_avoided": 46,
+      "hunt_candidates": 179,
+      "improvement_vs_baseline_pct": 13604.7
+    },
+    {
+      "rank": 3,
+      "strategy": "randomized_offset",
+      "total_pnl": 208.49,
+      "win_rate_pct": 41.3,
+      "profit_factor": 1.02,
+      "max_drawdown_pct": 10.61,
+      "hunts_avoided": 13,
+      "hunt_candidates": 179,
+      "improvement_vs_baseline_pct": 3213.2
+    },
+    {
+      "rank": 4,
+      "strategy": "time_delayed",
+      "total_pnl": 192.19,
+      "win_rate_pct": 47.7,
+      "profit_factor": 1.01,
+      "max_drawdown_pct": 12.07,
+      "hunts_avoided": 63,
+      "hunt_candidates": 179,
+      "improvement_vs_baseline_pct": 2954.2
+    },
+    {
+      "rank": 5,
+      "strategy": "baseline_fixed",
+      "total_pnl": 6.29,
+      "win_rate_pct": 41.2,
+      "profit_factor": 1.0,
+      "max_drawdown_pct": 10.82,
+      "hunts_avoided": 6,
+      "hunt_candidates": 179,
+      "improvement_vs_baseline_pct": 0.0
+    },
+    {
+      "rank": 6,
+      "strategy": "atr_adaptive",
+      "total_pnl": -807.02,
+      "win_rate_pct": 37.4,
+      "profit_factor": 0.92,
+      "max_drawdown_pct": 13.03,
+      "hunts_avoided": 32,
+      "hunt_candidates": 179,
+      "improvement_vs_baseline_pct": -12924.7
+    },
+    {
+      "rank": 7,
+      "strategy": "vwap_zone",
+      "total_pnl": -1326.43,
+      "win_rate_pct": 44.1,
+      "profit_factor": 0.88,
+      "max_drawdown_pct": 18.92,
+      "hunts_avoided": 59,
+      "hunt_candidates": 179,
+      "improvement_vs_baseline_pct": -21178.9
+    }
+  ],
+  "strategy_details": [
+    {
+      "strategy": "volume_confirmed",
+      "description": "Volume-confirmed: 2.0% stop requires 1.3x avg volume",
+      "config": {
+        "stop_pct": 2.0,
+        "volume_threshold": 1.3,
+        "take_profit_pct": 4.0,
+        "max_bars": 50
+      },
+      "metrics": {
+        "num_trades": 1246,
+        "win_rate_pct": 43.7,
+        "total_pnl": 1626.69,
+        "avg_pnl_per_trade": 1.31,
+        "avg_winner": 24.86,
+        "avg_loser": -16.95,
+        "profit_factor": 1.14,
+        "max_drawdown_pct": 7.06,
+        "avg_bars_held": 31.9,
+        "hunt_candidates": 179,
+        "hunts_avoided": 33,
+        "hunt_save_rate_pct": 18.4
+      }
+    },
+    {
+      "strategy": "invisible_stop",
+      "description": "In-memory invisible: 2.0% stop, executes only on bar CLOSE (no wicks)",
+      "config": {
+        "stop_pct": 2.0,
+        "take_profit_pct": 4.0,
+        "max_bars": 50
+      },
+      "metrics": {
+        "num_trades": 1246,
+        "win_rate_pct": 45.4,
+        "total_pnl": 862.4,
+        "avg_pnl_per_trade": 0.69,
+        "avg_winner": 26.02,
+        "avg_loser": -20.39,
+        "profit_factor": 1.06,
+        "max_drawdown_pct": 11.53,
+        "avg_bars_held": 34.4,
+        "hunt_candidates": 179,
+        "hunts_avoided": 46,
+        "hunt_save_rate_pct": 25.7
+      }
+    },
+    {
+      "strategy": "randomized_offset",
+      "description": "Randomized offset: 2.0% \u00b1 0.5% jitter",
+      "config": {
+        "base_stop_pct": 2.0,
+        "jitter_pct": 0.5,
+        "take_profit_pct": 4.0,
+        "max_bars": 50
+      },
+      "metrics": {
+        "num_trades": 1246,
+        "win_rate_pct": 41.3,
+        "total_pnl": 208.49,
+        "avg_pnl_per_trade": 0.17,
+        "avg_winner": 24.42,
+        "avg_loser": -16.86,
+        "profit_factor": 1.02,
+        "max_drawdown_pct": 10.61,
+        "avg_bars_held": 31.0,
+        "hunt_candidates": 179,
+        "hunts_avoided": 13,
+        "hunt_save_rate_pct": 7.3
+      }
+    },
+    {
+      "strategy": "time_delayed",
+      "description": "Time-delayed: 2.0% stop requires 2-bar confirmation",
+      "config": {
+        "stop_pct": 2.0,
+        "confirmation_bars": 2,
+        "take_profit_pct": 4.0,
+        "max_bars": 50
+      },
+      "metrics": {
+        "num_trades": 1246,
+        "win_rate_pct": 47.7,
+        "total_pnl": 192.19,
+        "avg_pnl_per_trade": 0.15,
+        "avg_winner": 24.18,
+        "avg_loser": -21.74,
+        "profit_factor": 1.01,
+        "max_drawdown_pct": 12.07,
+        "avg_bars_held": 35.0,
+        "hunt_candidates": 179,
+        "hunts_avoided": 63,
+        "hunt_save_rate_pct": 35.2
+      }
+    },
+    {
+      "strategy": "baseline_fixed",
+      "description": "Fixed 2.0% stop-loss, 4.0% take-profit (control group)",
+      "config": {
+        "stop_pct": 2.0,
+        "take_profit_pct": 4.0,
+        "max_bars": 50
+      },
+      "metrics": {
+        "num_trades": 1246,
+        "win_rate_pct": 41.2,
+        "total_pnl": 6.29,
+        "avg_pnl_per_trade": 0.01,
+        "avg_winner": 24.48,
+        "avg_loser": -17.13,
+        "profit_factor": 1.0,
+        "max_drawdown_pct": 10.82,
+        "avg_bars_held": 30.9,
+        "hunt_candidates": 179,
+        "hunts_avoided": 6,
+        "hunt_save_rate_pct": 3.4
+      }
+    },
+    {
+      "strategy": "atr_adaptive",
+      "description": "ATR-adaptive stop (2.5x ATR), widens in volatile markets",
+      "config": {
+        "atr_multiplier": 2.5,
+        "tp_atr_multiplier": 4.0,
+        "max_bars": 50
+      },
+      "metrics": {
+        "num_trades": 1246,
+        "win_rate_pct": 37.4,
+        "total_pnl": -807.02,
+        "avg_pnl_per_trade": -0.65,
+        "avg_winner": 20.58,
+        "avg_loser": -13.33,
+        "profit_factor": 0.92,
+        "max_drawdown_pct": 13.03,
+        "avg_bars_held": 16.1,
+        "hunt_candidates": 179,
+        "hunts_avoided": 32,
+        "hunt_save_rate_pct": 17.9
+      }
+    },
+    {
+      "strategy": "vwap_zone",
+      "description": "VWAP zone: exit on close below VWAP - 1.0%",
+      "config": {
+        "vwap_offset_pct": 1.0,
+        "zone_width_pct": 0.5,
+        "take_profit_pct": 4.0,
+        "max_bars": 50
+      },
+      "metrics": {
+        "num_trades": 1246,
+        "win_rate_pct": 44.1,
+        "total_pnl": -1326.43,
+        "avg_pnl_per_trade": -1.06,
+        "avg_winner": 18.34,
+        "avg_loser": -16.35,
+        "profit_factor": 0.88,
+        "max_drawdown_pct": 18.92,
+        "avg_bars_held": 26.4,
+        "hunt_candidates": 179,
+        "hunts_avoided": 59,
+        "hunt_save_rate_pct": 33.0
+      }
+    }
+  ],
+  "hunt_analysis": {
+    "total_hunt_candidates": 179,
+    "best_hunt_avoider": "time_delayed",
+    "strategy_hunt_rates": {
+      "baseline_fixed": {
+        "avoided": 6,
+        "total": 179,
+        "save_rate_pct": 3.4
+      },
+      "atr_adaptive": {
+        "avoided": 32,
+        "total": 179,
+        "save_rate_pct": 17.9
+      },
+      "randomized_offset": {
+        "avoided": 13,
+        "total": 179,
+        "save_rate_pct": 7.3
+      },
+      "time_delayed": {
+        "avoided": 63,
+        "total": 179,
+        "save_rate_pct": 35.2
+      },
+      "volume_confirmed": {
+        "avoided": 33,
+        "total": 179,
+        "save_rate_pct": 18.4
+      },
+      "invisible_stop": {
+        "avoided": 46,
+        "total": 179,
+        "save_rate_pct": 25.7
+      },
+      "vwap_zone": {
+        "avoided": 59,
+        "total": 179,
+        "save_rate_pct": 33.0
+      }
+    }
+  }
+}
