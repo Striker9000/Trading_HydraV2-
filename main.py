@@ -34,9 +34,16 @@ The system will:
 # This must be at the very top so all subsequent imports see the env vars
 
 import os
+import sys
 import tempfile
 import platform
 from pathlib import Path
+
+# Force UTF-8 output on Windows so emojis/arrows in print statements don't crash
+if sys.stdout and hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+if sys.stderr and hasattr(sys.stderr, 'reconfigure'):
+    sys.stderr.reconfigure(encoding='utf-8', errors='replace')
 
 # Find .env file - check current dir, parent, and script location
 def _find_and_load_dotenv():
@@ -730,7 +737,7 @@ def main():
     """
     # Acquire exclusive process lock - prevents duplicate instances from rate-limiting Alpaca
     _lock_handle = _acquire_process_lock()
-    print("🔒 Process lock acquired (single instance mode)")
+    print("[LOCK] Process lock acquired (single instance mode)")
     
     # =========================================================================
     # FULLBOT MODE DETECTION - Customer drop-in deployment
