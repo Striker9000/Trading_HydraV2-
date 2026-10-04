@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Python twin of the Key Maker page (keymaker/core.js). Same phrase + month -> same key.
+"""Python twin of the Key Maker page (02-key-maker/core.js). Same phrase + month -> same key.
 
   python3 derive_keys.py --cookout "your long cookout phrase" [--kitchen "kitchen phrase"] [--month 2026-11]
 
@@ -8,8 +8,8 @@ Use it to provision radios over USB:  meshtastic --seturl "<link>"
 """
 import argparse, base64, datetime, hashlib, re, sys, unicodedata
 from pathlib import Path
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "provisioning"))
-from gen_channels import url, settings, default_longfast, load_keys  # noqa: E402
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "03-channels-and-devices"))
+from gen_channels import url, settings, default_longfast  # noqa: E402
 
 ITER = 600_000
 
@@ -31,7 +31,8 @@ def main():
     ap.add_argument("--kitchen")
     ap.add_argument("--month", default=datetime.date.today().strftime("%Y-%m"))
     a = ap.parse_args()
-    block = base64.b64decode(load_keys()["BLESH_BLOCK_PSK"])
+    pub = (Path(__file__).resolve().parent.parent / "03-channels-and-devices/out/block-public.txt").read_text()
+    block = base64.b64decode(re.search(r"BLESH_BLOCK_PSK=(\S+)", pub).group(1))
     chans = [default_longfast(), settings("Bleshtastic", block)]
     ck = derive(a.cookout, "cookout", a.month); chans.append(settings("Cookout", ck))
     print(f"Month {a.month}\nCookout check code: {check_code(ck)}")

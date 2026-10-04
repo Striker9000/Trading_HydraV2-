@@ -4,7 +4,7 @@ bleshtastic-keymaker-offline.html (one file, works with no internet: save it to 
 from pathlib import Path
 import re
 H = Path(__file__).resolve().parent
-env = (H.parent / "provisioning/channels.env").read_text()
+env = (H.parent / "03-channels-and-devices/out/block-public.txt").read_text()
 block = re.search(r"BLESH_BLOCK_PSK=(\S+)", env).group(1)
 src = (H / "index.src.html").read_text()
 core = (H / "core.js").read_text()

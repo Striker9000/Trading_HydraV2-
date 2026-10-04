@@ -13,7 +13,7 @@ Five vertical (9:16) ads, each broken into shots. Every shot has a **start-frame
 2. **Make the start frame** for each shot as an image (9:16) with the start-frame prompt. Regenerate until it's right.
 3. **Animate it** with image-to-video using the motion prompt. Higgsfield has camera-move presets. The preset named in each shot is the move to look for, so pick the closest one if names differ.
 4. **Film the real device yourself.** AI can't draw a T1000-E, Pager or T-Deck accurately; it'll invent buttons. Shoot 3–5 second phone clips of the real thing (pulling the card out of a wallet, the pager buzzing, thumbs on the T-Deck) and cut them in. These real shots also make the ad believable.
-5. **Edit in CapCut:** captions, the Bleshtastic wordmark, the end card (use `print/out/sticker.png`, which has the working QR), music, and voiceover.
+5. **Edit in CapCut:** captions, the Bleshtastic wordmark, the end card (use `05-print-designs/out/sticker.png`, which has the working QR), music, and voiceover.
 6. **Voiceover:** your own voice or a friend's beats any AI voice for this audience. Record on your phone in a closet (clothes kill echo).
 
 ### Style line (paste at the end of every start-frame prompt)

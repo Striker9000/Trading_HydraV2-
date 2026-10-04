@@ -1,0 +1,2 @@
+BLESH_BLOCK_PSK=q7HrzNrm5Gop9Vy+G9AnqoGTLFU6Amk7ZgIdka7yB/M=
+BLOCK_ADD_URL=https://meshtastic.org/e/?add=true#CjESIKux68za5uRqKfVcvhvQJ6qBkyxVOgJpO2YCHZGu8gfzGgtCbGVzaHRhc3RpYzoAEggIATgBQANIAQ

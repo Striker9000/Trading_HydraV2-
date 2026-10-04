@@ -4,8 +4,8 @@ import re, subprocess
 from pathlib import Path
 H = Path(__file__).resolve().parent
 import io, segno
-links = (H.parent / "provisioning/out/links.txt").read_text()
-link = re.search(r"Add channel Bleshtastic\n(\S+)", links).group(1)
+pub = (H.parent / "03-channels-and-devices/out/block-public.txt").read_text()
+link = re.search(r"BLOCK_ADD_URL=(\S+)", pub).group(1)
 buf = io.BytesIO()
 segno.make(link, error="m").save(buf, kind="svg", xmldecl=False, svgns=True, omitsize=True, border=0, dark="#18142B")
 qr = buf.getvalue().decode()

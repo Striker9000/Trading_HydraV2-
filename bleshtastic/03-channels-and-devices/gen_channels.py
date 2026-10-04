@@ -117,6 +117,9 @@ def main():
         emit(f"add-{tier}.svg", f"[{note}] Add channel {name}", url([ch], add=True))
 
     (OUT / "links.txt").write_text("\n".join(lines))
+    # Public on purpose (it is on the flyer). Safe to commit; the build scripts read this.
+    (OUT / "block-public.txt").write_text(
+        f"BLESH_BLOCK_PSK={keys['BLESH_BLOCK_PSK']}\nBLOCK_ADD_URL={url([chans[0]], add=True)}\n")
     print("\n".join(lines))
     print(f"QR codes in {OUT/'qr'}")
 

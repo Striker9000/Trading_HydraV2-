@@ -8,7 +8,7 @@ Element app (phone) ⇄ Matrix homeserver ⇄ mmrelay on Raspberry Pi ⇄ USB ra
 
 ## Parts (~$80–120)
 - Raspberry Pi 4 or 5 (2 GB is plenty), power supply, 32 GB microSD
-- One Meshtastic radio provisioned with `provisioning/provision.sh` (a Heltec V3 or RAK4631 works well), USB cable
+- One Meshtastic radio provisioned with `03-channels-and-devices/provision.sh` (a Heltec V3 or RAK4631 works well), USB cable
 - Optional: put the gateway radio's antenna high. The gateway is also a Tower.
 
 ## 1. Matrix homeserver
