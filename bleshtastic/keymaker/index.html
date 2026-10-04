@@ -1,0 +1,267 @@
+<title>Bleshtastic Key Maker</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Figtree:wght@400;500;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<style>
+/* Layout: one narrow phone column. Form card on top, the setup QR card appears under it. */
+:root{
+  --bg:#F1EFF6; --surface:#FFFFFF; --fg:#18142B; --muted:#5D5775; --line:#D9D4E6;
+  --accent:#6B1E8F; --accent-fg:#FFFFFF; --gold:#9A6400; --gold-soft:#F6E7C4; --bad:#B42318; --good:#1E7A46;
+  --display:"Archivo Black",Impact,"Arial Black",sans-serif;
+  --body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F0D1A; --surface:#1A1729; --fg:#EEEAF7; --muted:#A39CBB; --line:#2E2945;
+  --accent:#C58AF0; --accent-fg:#160F22; --gold:#F2C14E; --gold-soft:#2E2512; --bad:#FF8A7A; --good:#6FD39A; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F0D1A; --surface:#1A1729; --fg:#EEEAF7; --muted:#A39CBB; --line:#2E2945;
+  --accent:#C58AF0; --accent-fg:#160F22; --gold:#F2C14E; --gold-soft:#2E2512; --bad:#FF8A7A; --good:#6FD39A; color-scheme:dark}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.55 var(--body)}
+.wrap{max-width:560px;margin:0 auto;padding:20px 16px 40px;display:grid;gap:18px}
+header{display:grid;gap:6px}
+.logo{font-family:var(--display);font-size:1.05rem;letter-spacing:.02em}
+.logo span{color:var(--accent)}
+h1{font-family:var(--display);font-weight:400;font-size:2rem;line-height:1.05;margin:0;text-wrap:balance}
+.lede{color:var(--muted);margin:0}
+.safe{display:inline-flex;gap:8px;align-items:center;font:500 .78rem var(--mono);color:var(--good);letter-spacing:.04em}
+.safe::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--good)}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:20px;display:grid;gap:16px;min-width:0}
+label,.lbl{font-weight:700;display:block}
+.hint{font-size:.85rem;color:var(--muted);margin:4px 0 0}
+select,input[type=password],input[type=text]{font:inherit;width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--fg)}
+.pw{position:relative}
+.pw input{padding-right:70px}
+.pw button{position:absolute;right:6px;top:6px;bottom:6px;border:0;border-radius:8px;background:var(--surface);color:var(--muted);font:500 .8rem var(--mono);padding:0 10px;cursor:pointer}
+.meter{font-size:.82rem;font-weight:500;margin:6px 0 0;min-height:1.2em}
+.meter.weak{color:var(--bad)} .meter.ok{color:var(--gold)} .meter.strong{color:var(--good)}
+.tier{display:inline-block;font:500 .7rem var(--mono);letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:99px;margin-left:6px;vertical-align:2px}
+.t-cook{background:var(--gold-soft);color:var(--gold)}
+.t-kit{background:var(--fg);color:var(--bg)}
+.btn{font:700 1rem var(--body);padding:14px 18px;border-radius:12px;border:2px solid var(--fg);background:transparent;color:var(--fg);cursor:pointer;width:100%}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+.btn:disabled{opacity:.6;cursor:wait}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.row .btn{flex:1 1 140px;width:auto}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.err{color:var(--bad);font-weight:500;margin:0}
+
+.result h2{font-family:var(--display);font-weight:400;font-size:1.35rem;margin:0}
+.plate{background:#fff;border-radius:14px;padding:12px;justify-self:center;width:min(100%,320px);aspect-ratio:1/1}
+.plate svg{width:100%;height:100%;display:block}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{font:500 .9rem var(--mono);padding:8px 12px;border-radius:10px;background:var(--bg);border:1px solid var(--line);font-variant-numeric:tabular-nums}
+.chip b{font-family:var(--body);font-weight:700;margin-right:6px}
+.chans{font:500 .82rem var(--mono);color:var(--muted);margin:0;overflow-wrap:anywhere}
+details{border-top:1px solid var(--line);padding-top:12px}
+summary{cursor:pointer;font-weight:700}
+.keys{display:grid;gap:8px;margin-top:10px}
+.keys code{display:block;font:500 .78rem var(--mono);background:var(--bg);border-radius:8px;padding:8px 10px;overflow-wrap:anywhere}
+.note{font-size:.9rem;color:var(--muted);margin:0}
+.how{display:grid;gap:10px;font-size:.92rem;color:var(--muted)}
+.how ol{margin:0;padding-left:20px;display:grid;gap:6px}
+.flow{font:500 .8rem var(--mono);color:var(--fg);background:var(--surface);border:1px dashed var(--line);border-radius:12px;padding:12px;overflow-wrap:anywhere}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="logo">BLESH<span>TASTIC</span></div>
+    <h1>Key Maker</h1>
+    <p class="lede">Type the phrase you were given. Get this month's setup code for your radio.</p>
+    <span class="safe">Runs on your phone. Nothing gets sent anywhere.</span>
+  </header>
+
+  <form class="card" id="f" autocomplete="off" novalidate>
+    <div>
+      <label for="month">Keys for</label>
+      <select id="month"></select>
+      <p class="hint" id="rollnote"></p>
+    </div>
+    <div>
+      <label for="cook">Cookout phrase <span class="tier t-cook">trusted</span></label>
+      <div class="pw"><input id="cook" type="password" placeholder="The whole sentence, exactly as you heard it" autocapitalize="off" autocorrect="off" spellcheck="false"><button type="button" data-show="cook">Show</button></div>
+      <p class="meter" id="m-cook" aria-live="polite"></p>
+    </div>
+    <div>
+      <label for="kit">Kitchen phrase <span class="tier t-kit">inner circle</span></label>
+      <div class="pw"><input id="kit" type="password" placeholder="Leave empty if you weren't given one" autocapitalize="off" autocorrect="off" spellcheck="false"><button type="button" data-show="kit">Show</button></div>
+      <p class="meter" id="m-kit" aria-live="polite"></p>
+    </div>
+    <p class="hint">Capital letters, punctuation and extra spaces don't matter. Spelling does.</p>
+    <button class="btn primary" id="go" type="submit">Make my setup code</button>
+    <p class="err" id="err" hidden></p>
+  </form>
+
+  <section class="card result" id="res" hidden>
+    <h2 id="res-h">Setup code</h2>
+    <div class="plate" id="qr"></div>
+    <div class="chips" id="chips"></div>
+    <p class="note">Check codes are safe to say out loud. Compare with a friend: if yours match, you're both on the same key. Never read out the phrase itself.</p>
+    <p class="chans" id="chans"></p>
+    <div class="row">
+      <button class="btn" type="button" id="copy">Copy setup link</button>
+      <button class="btn" type="button" id="clear">Clear everything</button>
+    </div>
+    <p class="hint" id="copied" aria-live="polite"></p>
+    <details>
+      <summary>Type the keys in by hand instead</summary>
+      <div class="keys" id="keys"></div>
+      <p class="hint">In the Meshtastic app: Channels → the channel → Key/PSK → paste. Name must match exactly.</p>
+    </details>
+  </section>
+
+  <section class="how">
+    <div class="lbl" style="color:var(--fg)">How to use it</div>
+    <ol>
+      <li>Connect your radio in the <b>Meshtastic</b> app.</li>
+      <li>Make the code here, then scan it from the app. If it's on this same phone, use <b>Copy setup link</b> and open the link instead.</li>
+      <li>Your radio restarts with LongFast, Bleshtastic, and the circles you're in.</li>
+      <li>Do it again on the 1st of every month. Same phrase, new key.</li>
+    </ol>
+    <div class="flow">phrase + month → slow scramble (600,000 rounds) → 256-bit key → setup code</div>
+    <p style="margin:0">Cut off? The phrase gets changed and only the people still in get the new one. Your old phrase stops working on the 1st.</p>
+  </section>
+</div>
+
+<script>// Bleshtastic key maker core. Runs in the browser and in Node 20+ (WebCrypto).
+// A phrase + a tier + a month -> a 256-bit Meshtastic channel key -> a setup link.
+// Spec (v1), mirrored in derive_keys.py:
+//   phrase  = NFKC, lowercase, keep only letters/digits/spaces, collapse spaces, trim
+//   salt    = "bleshtastic/v1/<tier>/<YYYY-MM>"
+//   key     = PBKDF2-HMAC-SHA256(phrase, salt, 600000 iterations, 32 bytes)
+//   check   = first 3 bytes of SHA-256(key), hex, "7F3-A21" style (safe to say out loud)
+(function (root) {
+  const ITER = 600000;
+  const enc = new TextEncoder();
+  const subtle = (root.crypto || globalThis.crypto).subtle;
+
+  function normalize(p) {
+    return p.normalize("NFKC").toLowerCase()
+      .replace(/[^\p{L}\p{N}\s]/gu, "")
+      .replace(/\s+/g, " ").trim();
+  }
+
+  async function deriveKey(phrase, tier, month) {
+    const base = await subtle.importKey("raw", enc.encode(normalize(phrase)), "PBKDF2", false, ["deriveBits"]);
+    const bits = await subtle.deriveBits(
+      { name: "PBKDF2", hash: "SHA-256", salt: enc.encode(`bleshtastic/v1/${tier}/${month}`), iterations: ITER },
+      base, 256);
+    return new Uint8Array(bits);
+  }
+
+  async function checkCode(key) {
+    const h = new Uint8Array(await subtle.digest("SHA-256", key));
+    const hex = Array.from(h.slice(0, 3), b => b.toString(16).padStart(2, "0")).join("").toUpperCase();
+    return hex.slice(0, 3) + "-" + hex.slice(3);
+  }
+
+  // --- minimal protobuf writer (only what a ChannelSet needs) ---
+  function varint(n) { const o = []; while (n > 127) { o.push((n & 127) | 128); n >>>= 7; } o.push(n); return o; }
+  const tag = (f, w) => varint((f << 3) | w);
+  const vfield = (f, v) => [...tag(f, 0), ...varint(v)];
+  const lfield = (f, bytes) => [...tag(f, 2), ...varint(bytes.length), ...bytes];
+
+  function channelSettings(name, psk) {
+    let b = lfield(2, Array.from(psk));
+    if (!name) return b;                      // default LongFast: key only, like the stock config
+    b = b.concat(lfield(3, Array.from(enc.encode(name))));
+    return b.concat(lfield(7, []));          // module_settings{position_precision:0} = location off
+  }
+  function loraConfig() {                     // US, LONG_FAST preset, 3 hops, transmit on
+    return [...vfield(1, 1), ...vfield(7, 1), ...vfield(8, 3), ...vfield(9, 1)];
+  }
+  function b64url(bytes) {
+    let s = ""; bytes.forEach(b => s += String.fromCharCode(b));
+    return btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  }
+  const b64 = bytes => { let s = ""; bytes.forEach(b => s += String.fromCharCode(b)); return btoa(s); };
+
+  // channels: [{name, psk:Uint8Array}] in slot order. add=true keeps what's already on the radio.
+  function setupURL(channels, add) {
+    let body = [];
+    channels.forEach(c => body = body.concat(lfield(1, channelSettings(c.name, c.psk))));
+    body = body.concat(lfield(2, loraConfig()));
+    return `https://meshtastic.org/e/${add ? "?add=true" : ""}#${b64url(body)}`;
+  }
+
+  function monthKey(d) { return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`; }
+
+  root.BleshKeys = { ITER, normalize, deriveKey, checkCode, setupURL, monthKey, b64 };
+})(typeof window !== "undefined" ? window : globalThis);
+</script>
+<script>
+const BLOCK_PSK = "q7HrzNrm5Gop9Vy+G9AnqoGTLFU6Amk7ZgIdka7yB/M="; // public on purpose: same key as the flyer QR
+const $ = id => document.getElementById(id);
+const K = window.BleshKeys;
+const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+(function months(){
+  const now = new Date(), sel = $("month");
+  [-1,0,1].forEach(off=>{
+    const d = new Date(now.getFullYear(), now.getMonth()+off, 1);
+    const o = document.createElement("option");
+    o.value = K.monthKey(d);
+    o.textContent = `${MONTHS[d.getMonth()]} ${d.getFullYear()}` + (off===0?" (this month)":off===1?" (next month)":" (last month)");
+    if(off===0) o.selected = true;
+    sel.appendChild(o);
+  });
+  const next = new Date(now.getFullYear(), now.getMonth()+1, 1);
+  $("rollnote").textContent = `Keys roll over on ${MONTHS[next.getMonth()]} 1. Pick next month near the end of the month to get ahead.`;
+})();
+
+document.querySelectorAll("[data-show]").forEach(b=>b.addEventListener("click",()=>{
+  const i=$(b.dataset.show); const show=i.type==="password"; i.type=show?"text":"password"; b.textContent=show?"Hide":"Show";
+}));
+
+function rate(p){
+  const n = K.normalize(p); if(!n) return ["",""];
+  const words = n.split(" ").length;
+  if(n.length < 20 || words < 5) return ["weak","Too short. Someone could guess it. Use a full sentence, 6+ words."];
+  if(n.length < 32 || words < 7) return ["ok","Okay. Longer and weirder is safer."];
+  return ["strong","Strong phrase."];
+}
+["cook","kit"].forEach(id=>$(id).addEventListener("input",()=>{const [c,t]=rate($(id).value);const m=$("m-"+id);m.className="meter "+c;m.textContent=t;}));
+
+let lastURL = "";
+$("f").addEventListener("submit", async e=>{
+  e.preventDefault();
+  const cook=$("cook").value, kit=$("kit").value, month=$("month").value, err=$("err");
+  err.hidden=true;
+  if(!K.normalize(cook)){ err.textContent="Enter the Cookout phrase first."; err.hidden=false; $("cook").focus(); return; }
+  const go=$("go"); go.disabled=true; go.textContent="Working… (slow on purpose)";
+  try{
+    const block = Uint8Array.from(atob(BLOCK_PSK), c=>c.charCodeAt(0));
+    const chans=[{name:"",psk:new Uint8Array([1])},{name:"Bleshtastic",psk:block}];
+    const ck = await K.deriveKey(cook,"cookout",month); chans.push({name:"Cookout",psk:ck});
+    const chips=[["Cookout",await K.checkCode(ck)]], keys=[["Cookout",K.b64(ck)]];
+    if(K.normalize(kit)){ const kk=await K.deriveKey(kit,"kitchen",month); chans.push({name:"Kitchen",psk:kk}); chips.push(["Kitchen",await K.checkCode(kk)]); keys.push(["Kitchen",K.b64(kk)]); }
+    lastURL = K.setupURL(chans,false);
+    const q=qrcode(0,"M"); q.addData(lastURL); q.make();
+    $("qr").innerHTML=q.createSvgTag({cellSize:4,margin:2,scalable:true});
+    const label=$("month").selectedOptions[0].textContent.replace(/ \(.*\)/,"");
+    $("res-h").textContent=`Setup code · ${label}`;
+    $("chips").innerHTML=chips.map(([n,c])=>`<span class="chip"><b>${n}</b>${c}</span>`).join("");
+    $("chans").textContent="Replaces your channels with: LongFast · Bleshtastic · "+chips.map(c=>c[0]).join(" · ")+" · location off";
+    $("keys").innerHTML=keys.map(([n,k])=>`<div><b>${n}</b><code>base64:${k}</code></div>`).join("");
+    $("copied").textContent="";
+    $("res").hidden=false; $("res").scrollIntoView({behavior:"smooth",block:"start"});
+  }catch(x){ err.textContent="This browser couldn't make the key. Try Chrome or Safari, updated."; err.hidden=false; }
+  finally{ go.disabled=false; go.textContent="Make my setup code"; }
+});
+
+$("copy").addEventListener("click",()=>{
+  navigator.clipboard.writeText(lastURL).then(()=>$("copied").textContent="Copied. Paste it into your browser with the Meshtastic app installed.")
+  .catch(()=>{$("copied").textContent=lastURL;});
+});
+$("clear").addEventListener("click",()=>{
+  ["cook","kit"].forEach(id=>{$(id).value="";$(id).type="password";$("m-"+id).textContent="";});
+  document.querySelectorAll("[data-show]").forEach(b=>b.textContent="Show");
+  $("qr").innerHTML=""; $("keys").innerHTML=""; $("chips").innerHTML=""; lastURL="";
+  $("res").hidden=true; $("cook").focus();
+});
+</script>

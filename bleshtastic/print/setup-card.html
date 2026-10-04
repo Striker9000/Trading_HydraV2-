@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Bleshtastic Setup Card</title>
+<link rel="stylesheet" href="fonts/fonts.css">
+<style>
+/* 6 x 4 in two-sided insert. Page 1 = setup steps. Page 2 = the three channel tiers + house rules. */
+@page { size: 6in 4in; margin: 0 }
+:root{
+  --ink:#18142B; --purple:#6B1E8F; --gold:#E9AE2B; --paper:#FFFFFF; --mist:#F1EEF6; --muted:#5D5775;
+  --display:"Archivo Black",Impact,sans-serif; --body:"Figtree",Arial,sans-serif; --mono:"IBM Plex Mono",monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--paper);color:var(--ink);font-family:var(--body);-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.side{width:6in;height:4in;overflow:hidden;page-break-after:always;break-after:page;position:relative}
+.side:last-child{page-break-after:auto;break-after:auto}
+.k{font:500 7pt var(--mono);letter-spacing:.14em;text-transform:uppercase}
+
+/* FRONT */
+.front{display:grid;grid-template-columns:2.05in 1fr}
+.front .l{background:var(--ink);color:#fff;padding:.28in .25in;display:grid;align-content:space-between}
+.logo{font-family:var(--display);font-size:13pt}
+.logo span{color:var(--gold)}
+.front h1{font-family:var(--display);font-weight:400;font-size:25pt;line-height:.95}
+.front h1 em{font-style:normal;color:var(--gold);display:block}
+.front .l .k{color:#B9B1CF}
+.id{border-top:1px solid #3A3156;padding-top:8pt;display:grid;gap:5pt}
+.id .box{font:500 10pt var(--mono);white-space:nowrap;border:1.5px dashed #6B5E8C;border-radius:6pt;padding:5pt 7pt;color:#fff;min-height:22pt}
+.front .r{padding:.26in .28in;display:grid;align-content:start;gap:9pt}
+.front .r .k{color:var(--purple)}
+.steps{list-style:none;display:grid;gap:8pt;counter-reset:s}
+.steps li{counter-increment:s;display:grid;grid-template-columns:22pt 1fr;gap:4pt;align-items:start}
+.steps li::before{content:counter(s);font-family:var(--display);font-size:15pt;line-height:1;color:var(--purple)}
+.steps b{display:block;font-size:10.5pt;line-height:1.15}
+.steps span{font-size:8.5pt;line-height:1.3;color:var(--muted)}
+.pin{font:500 8.5pt var(--mono);background:var(--mist);padding:1pt 4pt;border-radius:3pt;color:var(--ink)}
+
+/* BACK */
+.back{padding:.24in .28in;display:grid;grid-template-rows:auto auto 1fr;gap:12pt}
+.back .top{display:flex;justify-content:space-between;align-items:baseline}
+.back h2{font-family:var(--display);font-weight:400;font-size:15pt}
+.back .top .k{color:var(--purple)}
+.tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:7pt}
+.tier{border-radius:9pt;padding:8pt 9pt;display:grid;gap:3pt;align-content:start}
+.tier svg{width:24pt;height:24pt}
+.tier h3{font-family:var(--display);font-weight:400;font-size:11pt;line-height:1}
+.tier .ch{font:500 7.5pt var(--mono)}
+.tier p{font-size:7.8pt;line-height:1.3}
+.t1{background:var(--mist)} .t1 .ch{color:var(--purple)} .t1 p{color:var(--muted)}
+.t2{background:#F6E7C4} .t2 .ch{color:#8A5A00} .t2 p{color:#5B4A2A}
+.t3{background:var(--ink);color:#fff} .t3 .ch{color:var(--gold)} .t3 p{color:#CFC8E0}
+.bot{display:grid;grid-template-columns:1fr 1.05in;gap:12pt;align-items:center}
+.rules{list-style:none;display:grid;gap:3.5pt}
+.rules li{font-size:8pt;line-height:1.3;padding-left:10pt;position:relative}
+.rules li::before{content:"";position:absolute;left:0;top:4pt;width:5pt;height:5pt;border-radius:50%;background:var(--gold)}
+.mini{display:grid;gap:3pt;justify-items:center;text-align:center}
+.mini .qr{width:1.0in;height:1.0in}
+.mini .qr svg{width:100%;height:100%;display:block}
+.mini p{font-size:6.5pt;line-height:1.2;color:var(--muted)}
+</style>
+</head>
+<body>
+<section class="side front">
+  <div class="l">
+    <div class="logo">BLESH<span>TASTIC</span></div>
+    <div>
+      <div class="k">Welcome to</div>
+      <h1>the<em>Block.</em></h1>
+    </div>
+    <div class="id">
+      <div class="k">Your device</div>
+      <div class="box">Blesh ___-____</div>
+    </div>
+  </div>
+  <div class="r">
+    <div class="k">Setup · about 5 minutes</div>
+    <ol class="steps">
+      <li><div><b>Charge it</b><span>Magnetic USB cable, about 2 hours. Hold the button about 3 seconds to turn it on.</span></div></li>
+      <li><div><b>Get the app</b><span>Search <b style="display:inline;font-size:inherit">Meshtastic</b> in the App Store or Google Play. It's free.</span></div></li>
+      <li><div><b>Pair it</b><span>In the app tap <b style="display:inline;font-size:inherit">+</b> and pick the name on your label. PIN <span class="pin">123456</span></span></div></li>
+      <li><div><b>Pull up</b><span>Open the <b style="display:inline;font-size:inherit">Bleshtastic</b> channel and say what's up. Your channels are already loaded.</span></div></li>
+    </ol>
+  </div>
+</section>
+
+<section class="side back">
+  <div class="top"><h2>Your channels</h2><span class="k">Inner circles work like IG close friends</span></div>
+  <div class="tiers">
+    <div class="tier t1">
+      <svg viewBox="0 0 32 32"><path d="M4 28V14l12-9 12 9v14z" fill="#6B1E8F"/><rect x="13" y="18" width="6" height="10" fill="#F1EEF6"/></svg>
+      <h3>The Block</h3><div class="ch">#Bleshtastic</div>
+      <p>Everybody. Say hi, ask around, share what's going on. Open to all.</p>
+    </div>
+    <div class="tier t2">
+      <svg viewBox="0 0 32 32"><ellipse cx="16" cy="14" rx="12" ry="5" fill="#18142B"/><path d="M4 14a12 9 0 0 0 24 0z" fill="#18142B"/><path d="M10 22l-3 8M22 22l3 8M16 23v7" stroke="#18142B" stroke-width="2.4" stroke-linecap="round"/><path d="M11 9c0-3 2-3 2-6M16 9c0-3 2-3 2-6M21 9c0-3 2-3 2-6" stroke="#E9AE2B" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+      <h3>The Cookout</h3><div class="ch">#Cookout · invite only</div>
+      <p>Trusted people. You got invited. Somebody had to bring you.</p>
+    </div>
+    <div class="tier t3">
+      <svg viewBox="0 0 32 32"><rect x="5" y="14" width="22" height="13" rx="3" fill="#E9AE2B"/><rect x="3" y="12" width="26" height="4" rx="2" fill="#E9AE2B"/><rect x="13" y="8" width="6" height="4" rx="1.5" fill="#E9AE2B"/><path d="M11 6c0-2 2-2 2-4M19 6c0-2 2-2 2-4" stroke="#CFC8E0" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>
+      <h3>The Kitchen</h3><div class="ch">#Kitchen · inner circle</div>
+      <p>Close friends only. Not everybody at the cookout gets to cook.</p>
+    </div>
+  </div>
+  <div class="bot">
+    <ul class="rules">
+      <li>Location sharing is <b>off</b>. Keep it that way.</li>
+      <li>Never post or screenshot a Cookout or Kitchen QR. Share it face to face.</li>
+      <li>Alerts count only with an operator tag, like <b>[OP-SLA1 20:42]</b>.</li>
+      <li>Lost your device? Tell whoever brought you in so they can change the keys.</li>
+    </ul>
+    <div class="mini"><div class="qr">{{QR_BLOCK}}</div><p>Bring someone to the Block: they scan this in the Meshtastic app.</p></div>
+  </div>
+</section>
+</body>
+</html>

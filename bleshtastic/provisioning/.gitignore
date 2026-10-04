@@ -1,0 +1,9 @@
+# Private channel keys and anything that encodes them. Never commit.
+channels.env
+channels.env.bak.*
+out/links.txt
+out/qr/*cookout*
+out/qr/*kitchen*
+out/qr/*Cookout*
+out/qr/*Kitchen*
+inventory/

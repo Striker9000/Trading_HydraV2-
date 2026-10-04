@@ -1,0 +1,15 @@
+# sudo cp bleshtastic-gateway.service /etc/systemd/system/
+# sudo systemctl enable --now bleshtastic-gateway
+[Unit]
+Description=Bleshtastic Matrix <-> Mesh gateway (mmrelay)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=pi
+ExecStart=/home/pi/.local/bin/mmrelay
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

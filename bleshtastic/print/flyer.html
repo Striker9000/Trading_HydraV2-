@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Bleshtastic Flyer</title>
+<link rel="stylesheet" href="fonts/fonts.css">
+<style>
+/* US Letter flyer, 8.5 x 11 in. Top: dark "signal" block with the headline over a mesh map. Bottom: the three devices, the join QR, and a write-in line. */
+@page { size: 8.5in 11in; margin: 0 }
+:root{
+  --ink:#18142B; --plum:#4A1466; --purple:#6B1E8F; --gold:#E9AE2B; --paper:#FFFFFF; --mist:#F1EEF6; --muted:#5D5775;
+  --display:"Archivo Black",Impact,sans-serif; --body:"Figtree",Arial,sans-serif; --mono:"IBM Plex Mono",monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:8.5in;height:11in;background:var(--paper);color:var(--ink);font-family:var(--body);-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.page{width:8.5in;height:11in;display:grid;grid-template-rows:5.05in 1fr;overflow:hidden}
+
+.top{position:relative;background:var(--ink);color:#fff;padding:.55in .6in .5in;display:grid;align-content:space-between;overflow:hidden}
+.top svg.map{position:absolute;inset:0;width:100%;height:100%}
+.brand{position:relative;display:flex;justify-content:space-between;align-items:center}
+.logo{font-family:var(--display);font-size:26pt;letter-spacing:.02em}
+.logo span{color:var(--gold)}
+.chip{font:500 9pt var(--mono);letter-spacing:.14em;text-transform:uppercase;border:1.5px solid rgba(255,255,255,.5);border-radius:99px;padding:6pt 11pt}
+.headline{position:relative}
+.headline h1{font-family:var(--display);font-weight:400;font-size:68pt;line-height:.92;letter-spacing:-.01em}
+.headline h1 em{font-style:normal;color:var(--gold);display:block}
+.headline p{font-size:16pt;line-height:1.35;margin-top:14pt;max-width:4.9in;color:#E6E1F0}
+.headline p b{color:#fff}
+
+.bottom{padding:.4in .6in .38in;display:grid;grid-template-rows:auto auto auto;gap:.28in;align-content:start}
+.devices{display:grid;grid-template-columns:repeat(3,1fr);gap:.22in}
+.dev{display:grid;grid-template-columns:.75in 1fr;gap:10pt;align-items:center}
+.dev svg{width:.75in;height:.75in}
+.dev h3{font-family:var(--display);font-weight:400;font-size:13pt;line-height:1}
+.dev .p{font:500 9pt var(--mono);color:var(--purple);margin-top:3pt}
+.dev .w{font-size:9.5pt;line-height:1.3;color:var(--muted);margin-top:3pt}
+
+.join{display:grid;grid-template-columns:2.15in 1fr;gap:.35in;align-items:center;background:var(--mist);border-radius:18pt;padding:.25in}
+.qr{background:#fff;border-radius:10pt;padding:8pt;width:2.15in;height:2.15in}
+.qr svg{width:100%;height:100%;display:block}
+.join .k{font:500 9pt var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--purple)}
+.join h2{font-family:var(--display);font-weight:400;font-size:27pt;line-height:1;margin-top:6pt}
+.join ol{list-style:none;margin-top:12pt;display:grid;gap:6pt;counter-reset:s}
+.join li{counter-increment:s;display:grid;grid-template-columns:20pt 1fr;align-items:baseline;font-size:11.5pt;line-height:1.3}
+.join li::before{content:counter(s);font-family:var(--display);color:var(--purple)}
+.join .no{margin-top:10pt;font-size:10.5pt;color:var(--muted)}
+
+.foot{display:grid;grid-template-columns:1fr auto;gap:.3in;align-items:end}
+.ask{font-size:14pt;font-weight:700}
+.ask .line{display:inline-block;width:2.9in;border-bottom:2pt solid var(--ink);margin-left:6pt;transform:translateY(-3pt)}
+.legal{font-size:7pt;color:var(--muted);text-align:right;max-width:2.4in;line-height:1.35}
+</style>
+</head>
+<body>
+<div class="page">
+  <section class="top">
+    <svg class="map" viewBox="0 0 850 505" preserveAspectRatio="xMaxYMid slice" aria-hidden="true">
+      <g stroke="#3A3156" stroke-width="2" fill="none">
+        <path d="M600 470 L650 380 L740 360 L820 400 M650 380 L700 450 L740 360 M700 450 L800 480 L820 400 M600 470 L700 450 M800 480 L740 360"/>
+      </g>
+      <g stroke="#E9AE2B" stroke-width="4" fill="none" stroke-linecap="round"><path d="M600 470 L650 380 L740 360 L820 400"/></g>
+      <g fill="#6B5E8C"><circle cx="700" cy="450" r="6"/><circle cx="800" cy="480" r="6"/></g>
+      <g fill="#E9AE2B"><circle cx="600" cy="470" r="8"/><circle cx="650" cy="380" r="7"/><circle cx="740" cy="360" r="9"/><circle cx="820" cy="400" r="11" fill="#B884E0"/></g>
+    </svg>
+    <div class="brand"><div class="logo">BLESH<span>TASTIC</span></div><div class="chip">Pull up to the Block</div></div>
+    <div class="headline">
+      <h1>No bars?<em>Still delivered.</em></h1>
+      <p>Text your people with <b>no cell service, no Wi-Fi, no monthly bill.</b> Little radios pass your message hand to hand across the neighborhood.</p>
+    </div>
+  </section>
+
+  <section class="bottom">
+    <div class="devices">
+      <div class="dev">
+        <svg viewBox="0 0 80 80"><rect x="6" y="18" width="68" height="44" rx="7" fill="#18142B"/><rect x="13" y="25" width="15" height="11" rx="2" fill="#E9AE2B"/><circle cx="64" cy="27" r="3" fill="#B884E0"/></svg>
+        <div><h3>The Card</h3><div class="p">~$40</div><div class="w">Fits in your wallet. Uses your phone.</div></div>
+      </div>
+      <div class="dev">
+        <svg viewBox="0 0 80 80"><rect x="12" y="8" width="56" height="64" rx="9" fill="#18142B"/><rect x="19" y="15" width="42" height="22" rx="3" fill="#6B1E8F"/><g fill="#F1EEF6"><rect x="19" y="43" width="9" height="6" rx="2"/><rect x="30" y="43" width="9" height="6" rx="2"/><rect x="41" y="43" width="9" height="6" rx="2"/><rect x="52" y="43" width="9" height="6" rx="2"/><rect x="19" y="52" width="9" height="6" rx="2"/><rect x="30" y="52" width="31" height="6" rx="2"/></g></svg>
+        <div><h3>The Pager</h3><div class="p">~$90</div><div class="w">Own screen and keys. No phone needed.</div></div>
+      </div>
+      <div class="dev">
+        <svg viewBox="0 0 80 80"><rect x="15" y="4" width="50" height="72" rx="8" fill="#18142B"/><rect x="20" y="9" width="40" height="27" rx="3" fill="#F1EEF6"/><rect x="24" y="14" width="22" height="4" rx="2" fill="#6B1E8F"/><rect x="31" y="22" width="25" height="4" rx="2" fill="#E9AE2B"/><g fill="#F1EEF6"><rect x="20" y="41" width="6" height="5" rx="1.5"/><rect x="28" y="41" width="6" height="5" rx="1.5"/><rect x="36" y="41" width="6" height="5" rx="1.5"/><rect x="44" y="41" width="6" height="5" rx="1.5"/><rect x="52" y="41" width="6" height="5" rx="1.5"/><rect x="20" y="49" width="6" height="5" rx="1.5"/><rect x="28" y="49" width="6" height="5" rx="1.5"/><rect x="36" y="49" width="6" height="5" rx="1.5"/><rect x="44" y="49" width="6" height="5" rx="1.5"/><rect x="52" y="49" width="6" height="5" rx="1.5"/><rect x="26" y="57" width="28" height="5" rx="1.5"/></g><circle cx="40" cy="68" r="3.5" fill="#E9AE2B"/></svg>
+        <div><h3>The Communicator</h3><div class="p">~$100</div><div class="w">Full keyboard. The BlackBerry feel.</div></div>
+      </div>
+    </div>
+
+    <div class="join">
+      <div class="qr">{{QR_BLOCK}}</div>
+      <div>
+        <div class="k">Got a Meshtastic radio?</div>
+        <h2>Scan to join Bleshtastic</h2>
+        <ol>
+          <li><span>Open the free <b>Meshtastic</b> app with your radio connected.</span></li>
+          <li><span>Scan this code. It adds the <b>Bleshtastic</b> channel.</span></li>
+          <li><span>Say what's up. You're on the Block.</span></li>
+        </ol>
+        <p class="no">No radio yet? Ask the person below. They'll get you set up.</p>
+      </div>
+    </div>
+
+    <div class="foot">
+      <div class="ask">Ask<span class="line"></span></div>
+      <p class="legal">Works with Meshtastic®, free open-source mesh software. Bleshtastic is an independent community project, not affiliated with Meshtastic LLC. License-free 915 MHz radios.</p>
+    </div>
+  </section>
+</div>
+</body>
+</html>

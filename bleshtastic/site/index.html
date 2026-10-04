@@ -1,0 +1,359 @@
+<title>Bleshtastic</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Figtree:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one phone-first column; hero with a live mesh drawing, then three paths in (phone, card/pager/communicator, tower), invite, FAQ. */
+:root{
+  --bg:#F1EFF6; --surface:#FFFFFF; --fg:#18142B; --muted:#5D5775; --line:#D9D4E6;
+  --accent:#6B1E8F; --accent-fg:#FFFFFF; --gold:#B87A00; --gold-soft:#F6E7C4;
+  --display:"Archivo Black",Impact,"Arial Black",sans-serif;
+  --body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F0D1A; --surface:#1A1729; --fg:#EEEAF7; --muted:#A39CBB; --line:#2E2945;
+  --accent:#C58AF0; --accent-fg:#160F22; --gold:#F2C14E; --gold-soft:#2E2512; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F0D1A; --surface:#1A1729; --fg:#EEEAF7; --muted:#A39CBB; --line:#2E2945;
+  --accent:#C58AF0; --accent-fg:#160F22; --gold:#F2C14E; --gold-soft:#2E2512; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:16px/1.6 var(--body);margin:0}
+.wrap{max-width:1040px;margin:0 auto;padding-inline:20px}
+h1,h2,h3{font-family:var(--display);font-weight:400;line-height:1.05;text-wrap:balance;margin:0}
+h2{font-size:clamp(1.7rem,4.5vw,2.6rem)}
+h3{font-size:1.2rem;letter-spacing:.01em}
+p{margin:0}
+a{color:var(--accent)}
+.label{font:500 .75rem/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+
+/* top bar */
+.bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:16px;flex-wrap:wrap}
+.logo{font-family:var(--display);font-size:1.25rem;letter-spacing:.02em}
+.logo span{color:var(--accent)}
+.langs{display:flex;gap:4px;flex-wrap:wrap}
+.langs button{font:500 .8rem var(--mono);background:transparent;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:6px 10px;cursor:pointer}
+.langs button[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+
+/* hero */
+.hero{display:grid;grid-template-columns:1.1fr .9fr;gap:32px;align-items:center;padding-block:28px 48px}
+.hero h1{font-size:clamp(2.6rem,8vw,5rem);letter-spacing:-.01em}
+.hero h1 em{font-style:normal;color:var(--accent)}
+.hero .sub{font-size:1.15rem;color:var(--muted);max-width:34ch;margin-top:18px}
+.ctas{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}
+.btn{display:inline-flex;align-items:center;gap:8px;font:700 1rem var(--body);padding:14px 22px;border-radius:12px;border:2px solid var(--fg);text-decoration:none;cursor:pointer;background:transparent;color:var(--fg)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+.meshbox{position:relative;aspect-ratio:1/1;max-width:100%;border-radius:24px;background:var(--surface);border:1px solid var(--line);overflow:hidden}
+.meshbox canvas{width:100%;height:100%;display:block}
+.meshbox .tag{position:absolute;left:14px;bottom:12px;font:500 .72rem var(--mono);color:var(--muted)}
+.status{display:flex;align-items:center;gap:8px;font:500 .8rem var(--mono);color:var(--muted);margin-top:22px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--gold)}
+
+section{padding-block:56px;border-top:1px solid var(--line)}
+.head{display:grid;gap:10px;margin-bottom:28px;max-width:60ch}
+.head p{color:var(--muted)}
+
+/* two ways */
+.ways{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.way{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:24px;display:grid;gap:12px;align-content:start;min-width:0}
+.way .chain{font:500 .82rem/1.8 var(--mono);color:var(--muted);overflow-wrap:anywhere}
+.way .chain b{color:var(--fg);font-weight:500}
+.pill{justify-self:start;font:500 .72rem var(--mono);letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;border-radius:999px;background:var(--gold-soft);color:var(--gold)}
+
+/* devices */
+.devices{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.device{display:grid;gap:10px;align-content:start;min-width:0}
+.device svg{width:100%;height:auto;max-width:100%;border-radius:16px;background:var(--surface);border:1px solid var(--line)}
+.device .price{font:500 .85rem var(--mono);color:var(--muted);font-variant-numeric:tabular-nums}
+.device p{color:var(--muted)}
+.for{font-weight:700;color:var(--fg)}
+
+.tower{display:grid;grid-template-columns:auto 1fr;gap:24px;align-items:center;background:var(--fg);color:var(--bg);border-radius:20px;padding:28px;margin-top:28px}
+.tower h3{color:var(--bg)}
+.tower p{color:var(--bg);opacity:.8;max-width:56ch}
+.tower .big{font-family:var(--display);font-size:3rem;color:var(--gold);line-height:1}
+
+/* steps */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;counter-reset:s;list-style:none;padding:0;margin:0}
+.steps li{counter-increment:s;display:grid;gap:8px;align-content:start;min-width:0}
+.steps li::before{content:counter(s);font-family:var(--display);font-size:2rem;color:var(--accent);line-height:1}
+.steps p{color:var(--muted)}
+
+/* invite */
+.invite{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:start}
+form{display:grid;gap:14px;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:24px;min-width:0}
+label{display:grid;gap:6px;font-weight:500}
+input,select{font:inherit;padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--fg);width:100%}
+.out{display:grid;gap:10px}
+.out pre{white-space:pre-wrap;font:.9rem/1.5 var(--mono);background:var(--bg);border:1px dashed var(--line);border-radius:10px;padding:14px;margin:0;overflow-wrap:anywhere}
+.small{font-size:.85rem;color:var(--muted)}
+
+/* faq */
+details{border-bottom:1px solid var(--line);padding-block:16px}
+summary{cursor:pointer;font-weight:700;font-size:1.05rem}
+details p{color:var(--muted);margin-top:10px;max-width:65ch}
+
+footer{padding-block:40px;border-top:1px solid var(--line);color:var(--muted);font-size:.85rem;display:grid;gap:6px}
+
+@media (max-width:820px){
+  .hero,.ways,.invite{grid-template-columns:1fr}
+  .devices{grid-template-columns:1fr}
+  .steps{grid-template-columns:1fr 1fr}
+  .tower{grid-template-columns:1fr}
+  .meshbox{max-width:420px}
+}
+@media (max-width:440px){.steps{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style>
+
+<div class="wrap">
+  <header class="bar">
+    <div class="logo">BLESH<span>TASTIC</span></div>
+    <nav class="langs" aria-label="Language">
+      <button type="button" data-lang="en" aria-pressed="true">EN</button>
+      <button type="button" data-lang="es" aria-pressed="false">ES</button>
+      <button type="button" data-lang="ht" aria-pressed="false">KREYÒL</button>
+      <button type="button" data-lang="fr" aria-pressed="false">FR</button>
+    </nav>
+  </header>
+
+  <div class="hero">
+    <div>
+      <p class="label" data-i18n="eyebrow">Community mesh network · Works with Meshtastic</p>
+      <h1 style="margin-top:14px" data-i18n-html="h1">Our network.<br>Our info.<br><em>Even when the towers go down.</em></h1>
+      <p class="sub" data-i18n="sub">Text your people with no cell service and no Wi-Fi. A $40 card in your wallet talks to the radios around you, and the radios pass it along.</p>
+      <div class="ctas">
+        <a class="btn primary" href="#invite" data-i18n="cta1">Get an invite</a>
+        <a class="btn" href="#gear" data-i18n="cta2">See the gear</a>
+      </div>
+      <p class="status"><span class="dot"></span><span data-i18n="status">Launching neighborhood by neighborhood</span></p>
+    </div>
+    <div class="meshbox" aria-hidden="true">
+      <canvas id="mesh"></canvas>
+      <span class="tag">915 MHz · LoRa · no towers</span>
+    </div>
+  </div>
+</div>
+
+<section>
+  <div class="wrap">
+    <div class="head">
+      <p class="label" data-i18n="waysLabel">Two ways in</p>
+      <h2 data-i18n="waysH">Start on your phone. Add a radio when you're ready.</h2>
+      <p data-i18n="waysP">Same people, same chat. The radio just keeps you connected when everything else drops.</p>
+    </div>
+    <div class="ways">
+      <div class="way">
+        <span class="pill" data-i18n="phonePill">No gear needed</span>
+        <h3 data-i18n="phoneH">Phone Mode</h3>
+        <p data-i18n="phoneP">Download a free chat app, accept your invite, and you're in the Bleshtastic room. Messages pass to and from the radio mesh.</p>
+        <p class="chain"><b>Your phone</b> → internet → Bleshtastic gateway → <b>the mesh</b></p>
+        <p class="small" data-i18n="phoneNote">Needs internet. When the internet goes down, Phone Mode goes with it.</p>
+      </div>
+      <div class="way">
+        <span class="pill" data-i18n="radioPill">Works off-grid</span>
+        <h3 data-i18n="radioH">Radio Mode</h3>
+        <p data-i18n="radioP">Pair a Bleshtastic Card, Pager, or Communicator. Messages hop radio to radio across the neighborhood with no towers involved.</p>
+        <p class="chain"><b>Your radio</b> → nearby radios → rooftop Towers → <b>everyone in range</b></p>
+        <p class="small" data-i18n="radioNote">Keeps working during outages, overloaded networks, and emergencies.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="gear">
+  <div class="wrap">
+    <div class="head">
+      <p class="label" data-i18n="gearLabel">The gear</p>
+      <h2 data-i18n="gearH">Pick the one that fits your life.</h2>
+      <p data-i18n="gearP">Every Bleshtastic device ships already set up. Charge it, pair it, done.</p>
+    </div>
+    <div class="devices">
+      <div class="device">
+        <svg viewBox="0 0 300 200" role="img" aria-label="Credit-card sized radio">
+          <rect x="70" y="40" width="160" height="110" rx="14" fill="var(--fg)"/>
+          <rect x="84" y="54" width="34" height="26" rx="4" fill="var(--gold)"/>
+          <text x="84" y="135" font-family="Archivo Black, sans-serif" font-size="14" fill="var(--bg)">BLESHTASTIC</text>
+          <circle cx="212" cy="62" r="5" fill="var(--accent)"/>
+        </svg>
+        <h3 data-i18n="cardH">The Card</h3>
+        <p class="price">~$40 · SenseCAP T1000-E</p>
+        <p><span class="for" data-i18n="cardFor">"I don't want another gadget."</span> <span data-i18n="cardP">Credit-card size. Lives in your wallet or bag and uses your phone as the screen. Weeks of standby.</span></p>
+      </div>
+      <div class="device">
+        <svg viewBox="0 0 300 200" role="img" aria-label="Pager-style radio">
+          <rect x="80" y="30" width="140" height="140" rx="18" fill="var(--fg)"/>
+          <rect x="94" y="44" width="112" height="56" rx="6" fill="var(--accent)"/>
+          <text x="102" y="68" font-family="IBM Plex Mono, monospace" font-size="11" fill="var(--accent-fg)">Cookout moved</text>
+          <text x="102" y="86" font-family="IBM Plex Mono, monospace" font-size="11" fill="var(--accent-fg)">to the park 4pm</text>
+          <g fill="var(--bg)"><rect x="96" y="112" width="20" height="10" rx="3"/><rect x="120" y="112" width="20" height="10" rx="3"/><rect x="144" y="112" width="20" height="10" rx="3"/><rect x="168" y="112" width="20" height="10" rx="3"/><rect x="96" y="128" width="20" height="10" rx="3"/><rect x="120" y="128" width="68" height="10" rx="3"/><rect x="192" y="112" width="12" height="26" rx="3"/></g>
+        </svg>
+        <h3 data-i18n="pagerH">The Pager</h3>
+        <p class="price">~$80–100 · LilyGo T-LoRa Pager</p>
+        <p><span class="for" data-i18n="pagerFor">"Just let me read and reply."</span> <span data-i18n="pagerP">Its own screen and keyboard. No phone needed. Hand it to your grandmother and it still works.</span></p>
+      </div>
+      <div class="device">
+        <svg viewBox="0 0 300 200" role="img" aria-label="Keyboard communicator">
+          <rect x="85" y="20" width="130" height="165" rx="16" fill="var(--fg)"/>
+          <rect x="97" y="32" width="106" height="70" rx="6" fill="var(--surface)"/>
+          <rect x="105" y="42" width="60" height="8" rx="4" fill="var(--accent)"/>
+          <rect x="125" y="58" width="70" height="8" rx="4" fill="var(--gold)"/>
+          <rect x="105" y="74" width="50" height="8" rx="4" fill="var(--accent)"/>
+          <g fill="var(--bg)">
+            <rect x="99" y="112" width="12" height="10" rx="3"/><rect x="114" y="112" width="12" height="10" rx="3"/><rect x="129" y="112" width="12" height="10" rx="3"/><rect x="144" y="112" width="12" height="10" rx="3"/><rect x="159" y="112" width="12" height="10" rx="3"/><rect x="174" y="112" width="12" height="10" rx="3"/><rect x="189" y="112" width="12" height="10" rx="3"/>
+            <rect x="99" y="127" width="12" height="10" rx="3"/><rect x="114" y="127" width="12" height="10" rx="3"/><rect x="129" y="127" width="12" height="10" rx="3"/><rect x="144" y="127" width="12" height="10" rx="3"/><rect x="159" y="127" width="12" height="10" rx="3"/><rect x="174" y="127" width="12" height="10" rx="3"/><rect x="189" y="127" width="12" height="10" rx="3"/>
+            <rect x="99" y="142" width="12" height="10" rx="3"/><rect x="114" y="142" width="72" height="10" rx="3"/><rect x="189" y="142" width="12" height="10" rx="3"/>
+          </g>
+          <circle cx="150" cy="168" r="7" fill="var(--gold)"/>
+        </svg>
+        <h3 data-i18n="commH">The Communicator</h3>
+        <p class="price">~$80–110 · LilyGo T-Deck Plus</p>
+        <p><span class="for" data-i18n="commFor">"I'm really gonna use this."</span> <span data-i18n="commP">The BlackBerry feel. Full keyboard, trackball, color screen, GPS. Works with or without your phone.</span></p>
+      </div>
+    </div>
+
+    <div class="tower">
+      <div class="big">↑</div>
+      <div style="display:grid;gap:8px;min-width:0">
+        <h3 data-i18n="towerH">Host a Tower</h3>
+        <p data-i18n="towerP">Pocket radios reach about a mile in the city. Rooftop Towers are what carry the network across a neighborhood. If you own a shop, a church, or a building with roof access, one solar Tower from you covers hundreds of people.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="head">
+      <p class="label" data-i18n="howLabel">How you get on</p>
+      <h2 data-i18n="howH">Somebody brings you in.</h2>
+    </div>
+    <ol class="steps">
+      <li><h3 data-i18n="s1H">Hear about it</h3><p data-i18n="s1P">From a member. That's the only way.</p></li>
+      <li><h3 data-i18n="s2H">Get vouched for</h3><p data-i18n="s2P">The member who told you sponsors your invite and puts their name on you.</p></li>
+      <li><h3 data-i18n="s3H">Scan your code</h3><p data-i18n="s3P">One QR code sets up everything. No settings, no tech talk.</p></li>
+      <li><h3 data-i18n="s4H">You're on</h3><p data-i18n="s4P">Phone Mode today. Add a radio whenever you want.</p></li>
+    </ol>
+  </div>
+</section>
+
+<section id="invite">
+  <div class="wrap invite">
+    <div class="head" style="margin:0">
+      <p class="label" data-i18n="invLabel">Request an invite</p>
+      <h2 data-i18n="invH">Who told you about Bleshtastic?</h2>
+      <p data-i18n="invP">Fill this out and we'll write the message for you. Send it to the member who told you. They forward it to your city's crew to approve.</p>
+    </div>
+    <form id="req" novalidate>
+      <label for="f-name"><span data-i18n="fName">Your name</span><input id="f-name" name="name" autocomplete="name" value="Keisha M."></label>
+      <label for="f-city"><span data-i18n="fCity">City / neighborhood</span><input id="f-city" name="city" value="South LA"></label>
+      <label for="f-sponsor"><span data-i18n="fSponsor">Who told you?</span><input id="f-sponsor" name="sponsor" value="Dre from the barbershop"></label>
+      <label for="f-path"><span data-i18n="fPath">How do you want to start?</span>
+        <select id="f-path" name="path">
+          <option value="phone" data-i18n="oPhone">Phone Mode first</option>
+          <option value="card" data-i18n="oCard">The Card</option>
+          <option value="pager" data-i18n="oPager">The Pager</option>
+          <option value="comm" data-i18n="oComm">The Communicator</option>
+        </select>
+      </label>
+      <button class="btn primary" type="submit" data-i18n="fBtn">Write my invite request</button>
+      <div class="out" id="out" hidden>
+        <pre id="msg"></pre>
+        <button class="btn" type="button" id="copy" data-i18n="fCopy">Copy message</button>
+        <p class="small" id="copied" aria-live="polite"></p>
+      </div>
+      <p class="small" data-i18n="fNote">Nothing is sent from this page. You send the message yourself.</p>
+    </form>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="head"><p class="label">FAQ</p><h2 data-i18n="faqH">Real questions</h2></div>
+    <details><summary data-i18n="q1">Do I need a license or a phone plan?</summary><p data-i18n="a1">No. The radios use a free, license-free band (915 MHz in the US). No SIM card, no monthly bill for the radio.</p></details>
+    <details><summary data-i18n="q2">How far does it reach?</summary><p data-i18n="a2">Pocket radios reach roughly half a mile to two miles in the city. Every radio passes messages along, and rooftop Towers stretch it across whole neighborhoods. The more of us, the farther it goes.</p></details>
+    <details><summary data-i18n="q3">Is it private?</summary><p data-i18n="a3">Messages are encrypted, so outsiders with radios can't read them. Anyone who has the channel code can, though. Treat the main chat like a big group text and don't post anything you wouldn't want screenshotted. Location sharing comes switched off.</p></details>
+    <details><summary data-i18n="q4">What happens in an emergency?</summary><p data-i18n="a4">Trusted operators in each city post verified alerts on Bleshtastic, tagged like [OP-SLA1 20:42]: what to avoid, where help is, and when it was last checked. If it doesn't come from a known operator, double-check it before you share it.</p></details>
+    <details><summary data-i18n="q5">Can I just use the Meshtastic app?</summary><p data-i18n="a5">The Meshtastic app needs a radio to talk to. With no radio, use Phone Mode through the Bleshtastic chat room instead.</p></details>
+  </div>
+</section>
+
+<div class="wrap">
+  <footer>
+    <span>Bleshtastic · Our network. Our info.</span>
+    <span>Works with Meshtastic®, open-source mesh software. Bleshtastic is an independent community project and is not affiliated with or endorsed by Meshtastic LLC.</span>
+  </footer>
+</div>
+
+<script>
+const T = {
+ es:{eyebrow:"Red comunitaria en malla · Funciona con Meshtastic",h1:"Nuestra red.<br>Nuestra info.<br><em>Aunque se caigan las torres.</em>",sub:"Escríbele a tu gente sin señal de celular y sin Wi-Fi. Una tarjeta de $40 en tu cartera habla con los radios a tu alrededor, y ellos pasan el mensaje.",cta1:"Pide tu invitación",cta2:"Ver los equipos",status:"Lanzando barrio por barrio",waysLabel:"Dos formas de entrar",waysH:"Empieza en tu teléfono. Agrega un radio cuando quieras.",waysP:"La misma gente, el mismo chat. El radio te mantiene conectado cuando todo lo demás falla.",phonePill:"Sin equipo",phoneH:"Modo Teléfono",phoneP:"Descarga una app de chat gratis, acepta tu invitación y ya estás en la sala Bleshtastic. Los mensajes pasan hacia y desde la red de radios.",phoneNote:"Necesita internet. Si se cae el internet, el Modo Teléfono también.",radioPill:"Funciona sin red",radioH:"Modo Radio",radioP:"Conecta una Tarjeta, Pager o Comunicador Bleshtastic. Los mensajes saltan de radio en radio por todo el barrio, sin torres.",radioNote:"Sigue funcionando en apagones, redes saturadas y emergencias.",gearLabel:"Los equipos",gearH:"Escoge el que va contigo.",gearP:"Cada equipo Bleshtastic llega ya configurado. Cárgalo, emparéjalo y listo.",cardH:"La Tarjeta",cardFor:"\"No quiero otro aparato.\"",cardP:"Tamaño de tarjeta de crédito. Va en tu cartera y usa tu teléfono como pantalla.",pagerH:"El Pager",pagerFor:"\"Solo quiero leer y responder.\"",pagerP:"Pantalla y teclado propios. No necesita teléfono.",commH:"El Comunicador",commFor:"\"Lo voy a usar de verdad.\"",commP:"Estilo BlackBerry. Teclado completo, pantalla a color, GPS. Con o sin teléfono.",towerH:"Ten una Torre",towerP:"Los radios de bolsillo alcanzan como una milla en la ciudad. Las Torres en los techos llevan la red por todo el barrio. Si tienes un negocio, una iglesia o un edificio con acceso al techo, una Torre solar cubre a cientos de personas.",howLabel:"Cómo entrar",howH:"Alguien te tiene que traer.",s1H:"Te enteras",s1P:"Por un miembro. Es la única forma.",s2H:"Te recomiendan",s2P:"El miembro que te contó patrocina tu invitación y responde por ti.",s3H:"Escanea tu código",s3P:"Un código QR lo configura todo.",s4H:"Ya estás",s4P:"Modo Teléfono hoy. Agrega un radio cuando quieras.",invLabel:"Pide tu invitación",invH:"¿Quién te habló de Bleshtastic?",invP:"Llena esto y te escribimos el mensaje. Envíaselo al miembro que te contó.",fName:"Tu nombre",fCity:"Ciudad / barrio",fSponsor:"¿Quién te contó?",fPath:"¿Cómo quieres empezar?",oPhone:"Modo Teléfono primero",oCard:"La Tarjeta",oPager:"El Pager",oComm:"El Comunicador",fBtn:"Escribir mi solicitud",fCopy:"Copiar mensaje",fNote:"Esta página no envía nada. Tú mandas el mensaje.",faqH:"Preguntas reales",q1:"¿Necesito licencia o plan de teléfono?",a1:"No. Los radios usan una banda libre y gratuita (915 MHz en EE. UU.). Sin SIM ni pago mensual.",q2:"¿Qué tan lejos llega?",a2:"Los radios de bolsillo llegan de media milla a dos millas en la ciudad. Cada radio pasa los mensajes y las Torres extienden la red.",q3:"¿Es privado?",a3:"Los mensajes van cifrados. Pero cualquiera con el código del canal los puede leer. Trata el chat principal como un grupo grande. La ubicación viene apagada.",q4:"¿Qué pasa en una emergencia?",a4:"Operadores de confianza publican alertas verificadas en Bleshtastic con su etiqueta de operador. Si no viene de un operador conocido, verifícalo antes de compartirlo.",q5:"¿Puedo usar solo la app de Meshtastic?",a5:"La app de Meshtastic necesita un radio. Sin radio, usa el Modo Teléfono por la sala de chat Bleshtastic."},
+ ht:{eyebrow:"Rezo kominotè · Mache ak Meshtastic",h1:"Rezo nou.<br>Enfòmasyon nou.<br><em>Menm lè antèn yo tonbe.</em>",sub:"Voye mesaj bay moun ou san siyal telefòn e san Wi-Fi. Yon ti kat $40 nan bous ou pale ak radyo ki toupre w, epi yo pase mesaj la.",cta1:"Mande yon envitasyon",cta2:"Gade aparèy yo",status:"N ap lanse katye pa katye",waysLabel:"De fason pou antre",waysH:"Kòmanse sou telefòn ou. Ajoute yon radyo lè w pare.",waysP:"Menm moun yo, menm chat la. Radyo a kenbe w konekte lè tout lòt bagay tonbe.",phonePill:"Pa bezwen aparèy",phoneH:"Mòd Telefòn",phoneP:"Telechaje yon aplikasyon chat gratis, aksepte envitasyon w, epi w nan sal Bleshtastic la.",phoneNote:"Li bezwen entènèt. Si entènèt la tonbe, Mòd Telefòn tonbe tou.",radioPill:"Mache san rezo",radioH:"Mòd Radyo",radioP:"Konekte yon Kat, Pager oswa Kominikatè Bleshtastic. Mesaj yo sote de radyo an radyo nan tout katye a, san antèn.",radioNote:"Li kontinye mache pandan blakawout ak ijans.",gearLabel:"Aparèy yo",gearH:"Chwazi sa ki bon pou ou.",gearP:"Chak aparèy rive tou pare. Chaje l, konekte l, fini.",cardH:"Kat la",cardFor:"\"Mwen pa vle yon lòt aparèy.\"",cardP:"Gwosè yon kat kredi. Li rete nan bous ou epi li sèvi ak telefòn ou kòm ekran.",pagerH:"Pager a",pagerFor:"\"Kite m li epi reponn sèlman.\"",pagerP:"Li gen pwòp ekran ak klavye l. Pa bezwen telefòn.",commH:"Kominikatè a",commFor:"\"Mwen pral sèvi ak li toutbon.\"",commP:"Style BlackBerry. Klavye konplè, ekran koulè, GPS.",towerH:"Mete yon Tou",towerP:"Radyo pòch yo rive anviwon yon mil nan vil la. Tou sou do kay yo pote rezo a nan tout katye a. Si w gen yon biznis, yon legliz oswa yon bilding, yon Tou solè ka kouvri plizyè santèn moun.",howLabel:"Kijan pou antre",howH:"Se yon moun ki pou mennen w.",s1H:"Ou tande pale",s1P:"Pa yon manm. Se sèl fason.",s2H:"Yon moun garanti w",s2P:"Manm ki di w la parenen envitasyon w.",s3H:"Eskane kòd ou",s3P:"Yon kòd QR regle tout bagay.",s4H:"Ou ladan l",s4P:"Mòd Telefòn jodi a. Ajoute yon radyo lè w vle.",invLabel:"Mande yon envitasyon",invH:"Kiyès ki te pale w de Bleshtastic?",invP:"Ranpli sa a epi n ap ekri mesaj la pou ou. Voye l bay manm ki te pale w la.",fName:"Non ou",fCity:"Vil / katye",fSponsor:"Kiyès ki te di w?",fPath:"Kijan ou vle kòmanse?",oPhone:"Mòd Telefòn anvan",oCard:"Kat la",oPager:"Pager a",oComm:"Kominikatè a",fBtn:"Ekri demann mwen",fCopy:"Kopye mesaj la",fNote:"Paj sa a pa voye anyen. Se ou ki voye mesaj la.",faqH:"Vrè kesyon",q1:"Èske m bezwen yon lisans oswa yon plan telefòn?",a1:"Non. Radyo yo sèvi ak yon bann gratis (915 MHz Ozetazini). Pa gen SIM, pa gen frè chak mwa.",q2:"Ki distans li rive?",a2:"Radyo pòch yo rive mwatye mil rive de mil nan vil la. Chak radyo pase mesaj yo, epi Tou yo fè rezo a pi lwen.",q3:"Èske li prive?",a3:"Mesaj yo chifre. Men nenpòt moun ki gen kòd chanèl la ka li yo. Pa poste anyen ou pa ta vle moun wè. Pozisyon w etenn pa default.",q4:"Kisa k ap pase nan yon ijans?",a4:"Operatè ki gen konfyans poste alèt verifye sou Bleshtastic ak tag operatè yo. Si l pa soti nan yon operatè ou konnen, verifye l anvan w pataje l.",q5:"Èske m ka sèvi ak aplikasyon Meshtastic la sèlman?",a5:"Aplikasyon Meshtastic la bezwen yon radyo. San radyo, sèvi ak Mòd Telefòn nan sal chat Bleshtastic la."},
+ fr:{eyebrow:"Réseau maillé communautaire · Compatible Meshtastic",h1:"Notre réseau.<br>Nos infos.<br><em>Même quand les antennes tombent.</em>",sub:"Écris à tes proches sans réseau mobile ni Wi-Fi. Une carte à 40 $ dans ton portefeuille parle aux radios autour de toi, qui relaient le message.",cta1:"Demander une invitation",cta2:"Voir le matériel",status:"Lancement quartier par quartier",waysLabel:"Deux façons d'entrer",waysH:"Commence sur ton téléphone. Ajoute une radio quand tu veux.",waysP:"Les mêmes personnes, le même chat. La radio te garde connecté quand tout le reste lâche.",phonePill:"Sans matériel",phoneH:"Mode Téléphone",phoneP:"Télécharge une appli de chat gratuite, accepte ton invitation et te voilà dans le salon Bleshtastic.",phoneNote:"Nécessite internet. Sans internet, le Mode Téléphone ne marche plus.",radioPill:"Fonctionne hors réseau",radioH:"Mode Radio",radioP:"Associe une Carte, un Pager ou un Communicateur Bleshtastic. Les messages sautent de radio en radio dans tout le quartier, sans antennes.",radioNote:"Continue de marcher pendant les pannes et les urgences.",gearLabel:"Le matériel",gearH:"Choisis celui qui te va.",gearP:"Chaque appareil arrive déjà configuré. Charge-le, associe-le, c'est fini.",cardH:"La Carte",cardFor:"« Je ne veux pas un gadget de plus. »",cardP:"Format carte bancaire. Elle reste dans ton portefeuille et utilise ton téléphone comme écran.",pagerH:"Le Pager",pagerFor:"« Juste lire et répondre. »",pagerP:"Son propre écran et clavier. Pas besoin de téléphone.",commH:"Le Communicateur",commFor:"« Je vais vraiment m'en servir. »",commP:"Le style BlackBerry. Clavier complet, écran couleur, GPS.",towerH:"Héberger une Tour",towerP:"Les radios de poche portent environ 1,5 km en ville. Les Tours sur les toits portent le réseau dans tout le quartier. Un commerce, une église ou un immeuble avec accès au toit peut couvrir des centaines de personnes.",howLabel:"Comment entrer",howH:"Quelqu'un doit te faire entrer.",s1H:"Tu en entends parler",s1P:"Par un membre. C'est la seule façon.",s2H:"On se porte garant",s2P:"Le membre qui t'en a parlé parraine ton invitation.",s3H:"Scanne ton code",s3P:"Un code QR configure tout.",s4H:"Tu es dedans",s4P:"Mode Téléphone aujourd'hui. Une radio quand tu veux.",invLabel:"Demander une invitation",invH:"Qui t'a parlé de Bleshtastic ?",invP:"Remplis ceci et on écrit le message pour toi. Envoie-le au membre qui t'en a parlé.",fName:"Ton nom",fCity:"Ville / quartier",fSponsor:"Qui t'en a parlé ?",fPath:"Comment veux-tu commencer ?",oPhone:"Mode Téléphone d'abord",oCard:"La Carte",oPager:"Le Pager",oComm:"Le Communicateur",fBtn:"Écrire ma demande",fCopy:"Copier le message",fNote:"Cette page n'envoie rien. C'est toi qui envoies le message.",faqH:"Vraies questions",q1:"Faut-il une licence ou un forfait ?",a1:"Non. Les radios utilisent une bande libre et gratuite (915 MHz aux États-Unis). Pas de SIM, pas d'abonnement.",q2:"Quelle portée ?",a2:"Une radio de poche porte de 800 m à 3 km en ville. Chaque radio relaie, et les Tours étendent le réseau.",q3:"Est-ce privé ?",a3:"Les messages sont chiffrés. Mais toute personne qui a le code du canal peut les lire. Traite le chat principal comme un grand groupe. La localisation est désactivée par défaut.",q4:"Et en cas d'urgence ?",a4:"Des opérateurs de confiance publient des alertes vérifiées sur Bleshtastic avec leur tag d'opérateur. Si ça ne vient pas d'un opérateur connu, vérifie avant de partager.",q5:"Puis-je utiliser seulement l'appli Meshtastic ?",a5:"L'appli Meshtastic a besoin d'une radio. Sans radio, utilise le Mode Téléphone via le salon Bleshtastic."}
+};
+const EN = {};
+document.querySelectorAll("[data-i18n]").forEach(el=>EN[el.dataset.i18n]=el.textContent);
+document.querySelectorAll("[data-i18n-html]").forEach(el=>EN[el.dataset.i18nHtml]=el.innerHTML);
+const MSG = {
+ en:(n,c,s,p)=>`Hey ${s} — it's ${n}. I want in on Bleshtastic.\nCity: ${c}\nStarting with: ${p}\nCan you vouch for me and pass this to the ${c} crew?`,
+ es:(n,c,s,p)=>`Hola ${s}, soy ${n}. Quiero entrar a Bleshtastic.\nCiudad: ${c}\nEmpiezo con: ${p}\n¿Puedes recomendarme y pasarle esto al equipo de ${c}?`,
+ ht:(n,c,s,p)=>`Sak pase ${s}, se ${n}. Mwen vle antre nan Bleshtastic.\nVil: ${c}\nMwen kòmanse ak: ${p}\nÈske w ka garanti m epi voye sa bay ekip ${c} la?`,
+ fr:(n,c,s,p)=>`Salut ${s}, c'est ${n}. Je veux rejoindre Bleshtastic.\nVille : ${c}\nJe commence avec : ${p}\nTu peux te porter garant et transmettre ça à l'équipe de ${c} ?`
+};
+let lang="en";
+function setLang(l){
+  lang=l; document.documentElement.lang=l==="ht"?"ht":l;
+  const d=l==="en"?EN:T[l];
+  document.querySelectorAll("[data-i18n]").forEach(el=>{const v=d[el.dataset.i18n];if(v)el.textContent=v});
+  document.querySelectorAll("[data-i18n-html]").forEach(el=>{const v=d[el.dataset.i18nHtml];if(v)el.innerHTML=v});
+  document.querySelectorAll(".langs button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.lang===l));
+  try{localStorage.setItem("blesh-lang",l)}catch(e){}
+  if(!document.getElementById("out").hidden)write();
+}
+document.querySelectorAll(".langs button").forEach(b=>b.addEventListener("click",()=>setLang(b.dataset.lang)));
+try{const s=localStorage.getItem("blesh-lang");if(s&&(s==="en"||T[s]))setLang(s)}catch(e){}
+
+const form=document.getElementById("req");
+function write(){
+  const f=new FormData(form);
+  const sel=form.querySelector("#f-path");
+  const p=sel.options[sel.selectedIndex].textContent;
+  const v=k=>(f.get(k)||"").toString().trim()||"—";
+  document.getElementById("msg").textContent=MSG[lang](v("name"),v("city"),v("sponsor"),p);
+  document.getElementById("out").hidden=false;
+}
+form.addEventListener("submit",e=>{e.preventDefault();write()});
+document.getElementById("copy").addEventListener("click",()=>{
+  const pre=document.getElementById("msg"), note=document.getElementById("copied");
+  navigator.clipboard.writeText(pre.textContent).then(()=>{note.textContent="Copied. Paste it into a text to your sponsor."})
+  .catch(()=>{const r=document.createRange();r.selectNodeContents(pre);const s=getSelection();s.removeAllRanges();s.addRange(r);note.textContent="Selected. Copy it with your keyboard or long-press."});
+});
+
+/* mesh drawing: fixed node layout, a message pulse hopping along edges */
+(function(){
+  const c=document.getElementById("mesh"), x=c.getContext("2d");
+  const N=[[.18,.22],[.42,.14],[.72,.2],[.86,.44],[.62,.42],[.34,.46],[.12,.6],[.4,.74],[.68,.7],[.88,.84],[.22,.88],[.52,.92]];
+  const E=[[0,1],[1,2],[2,3],[1,4],[2,4],[4,3],[0,5],[5,4],[5,6],[5,7],[7,8],[4,8],[8,3],[8,9],[6,10],[10,7],[7,11],[11,8],[11,9]];
+  const path=[6,5,4,8,9];
+  const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let t=0,W=0,H=0;
+  function col(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim()}
+  function size(){const r=c.getBoundingClientRect(),d=devicePixelRatio||1;W=r.width;H=r.height;c.width=W*d;c.height=H*d;x.setTransform(d,0,0,d,0,0)}
+  function draw(){
+    const line=col("--line"),fg=col("--fg"),acc=col("--accent"),gold=col("--gold");
+    x.clearRect(0,0,W,H);
+    x.lineWidth=1.5;x.strokeStyle=line;
+    E.forEach(([a,b])=>{x.beginPath();x.moveTo(N[a][0]*W,N[a][1]*H);x.lineTo(N[b][0]*W,N[b][1]*H);x.stroke()});
+    const seg=Math.floor(t)%(path.length-1), f=t%1;
+    x.strokeStyle=acc;x.lineWidth=3;
+    for(let i=0;i<=seg;i++){const a=N[path[i]],b=N[path[i+1]],k=i<seg?1:f;x.beginPath();x.moveTo(a[0]*W,a[1]*H);x.lineTo((a[0]+(b[0]-a[0])*k)*W,(a[1]+(b[1]-a[1])*k)*H);x.stroke()}
+    N.forEach((n,i)=>{const on=path.slice(0,seg+1).includes(i);x.beginPath();x.arc(n[0]*W,n[1]*H,i===3||i===2?9:6,0,7);x.fillStyle=(i===3||i===2)?gold:(on?acc:fg);x.fill()});
+    const a=N[path[seg]],b=N[path[seg+1]];x.beginPath();x.arc((a[0]+(b[0]-a[0])*f)*W,(a[1]+(b[1]-a[1])*f)*H,5,0,7);x.fillStyle=acc;x.fill();
+  }
+  function loop(){t=(t+0.012)%(path.length-1);draw();requestAnimationFrame(loop)}
+  size();addEventListener("resize",()=>{size();draw()});
+  if(reduce){t=path.length-1.001;draw()}else{t=2.5;loop()}
+})();
+</script>

@@ -1,0 +1,23 @@
+# mmrelay config for a Bleshtastic gateway.
+# Check against `mmrelay --generate-config` for your installed version.
+matrix:
+  homeserver: https://matrix.org            # or https://chat.bleshtastic.org
+  access_token: "REPLACE_WITH_BOT_ACCESS_TOKEN"
+  bot_user_id: "@bleshbot:matrix.org"
+
+matrix_rooms:
+  # Channel numbers match provisioning/gen_channels.py (0 = LongFast, not bridged)
+  - id: "#blesh-block:matrix.org"       # public
+    meshtastic_channel: 1
+  - id: "#blesh-cookout:matrix.org"     # trusted. Bridge only if you trust the server
+    meshtastic_channel: 2
+  # Kitchen (channel 3) is deliberately NOT bridged: inner circle stays radio-only.
+
+meshtastic:
+  connection_type: serial                    # serial | tcp | ble
+  serial_port: /dev/ttyACM0                  # `ls /dev/tty{ACM,USB}*` to find it
+  meshnet_name: Bleshtastic
+  broadcast_enabled: true
+
+logging:
+  level: info

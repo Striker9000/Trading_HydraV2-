@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Bleshtastic Sticker</title>
+<link rel="stylesheet" href="fonts/fonts.css">
+<style>
+/* 3 x 3 in square sticker, rounded corners. Dark field, gold wordmark, white QR plate. Keep text >= .1in from edge for cut tolerance. */
+@page { size: 3in 3in; margin: 0 }
+:root{ --ink:#18142B; --gold:#E9AE2B; --lilac:#B884E0; --paper:#FFFFFF;
+  --display:"Archivo Black",Impact,sans-serif; --mono:"IBM Plex Mono",monospace; --body:"Figtree",Arial,sans-serif; }
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:3in;height:3in;background:transparent;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.s{width:3in;height:3in;border-radius:.3in;background:var(--ink);color:#fff;display:grid;grid-template-rows:auto 1fr auto;justify-items:center;padding:.17in .17in .14in;gap:.06in;overflow:hidden;position:relative}
+.logo{font-family:var(--display);font-size:17pt;letter-spacing:.02em;line-height:1}
+.logo span{color:var(--gold)}
+.plate{background:var(--paper);border-radius:.1in;padding:.06in;width:1.86in;height:1.86in;align-self:center}
+.plate svg{width:100%;height:100%;display:block}
+.cap{text-align:center;display:grid;gap:2pt}
+.cap b{font-family:var(--display);font-weight:400;font-size:10.5pt;color:var(--gold);letter-spacing:.02em}
+.cap span{font:500 6.3pt var(--mono);letter-spacing:.1em;text-transform:uppercase;color:#CFC8E0}
+.dot{position:absolute;width:7pt;height:7pt;border-radius:50%}
+</style>
+</head>
+<body>
+<div class="s">
+  <span class="dot" style="background:var(--gold);top:.16in;left:.17in"></span>
+  <span class="dot" style="background:var(--lilac);top:.16in;right:.17in"></span>
+  <div class="logo">BLESH<span>TASTIC</span></div>
+  <div class="plate">{{QR_BLOCK}}</div>
+  <div class="cap"><b>PULL UP TO THE BLOCK</b><span>Scan in the Meshtastic app</span></div>
+</div>
+</body>
+</html>
