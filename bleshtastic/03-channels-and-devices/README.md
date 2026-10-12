@@ -31,6 +31,18 @@ python3 gen_channels.py --rotate kitchen   # new Kitchen key (someone got cut of
 | `out/qr/add-cookout.svg` | Adds Cookout. Show it on your phone and let them scan, in person |
 | `out/qr/add-kitchen.svg` | Adds Kitchen. Same rule, tighter circle |
 
+## Add the channels to a radio that already has channels (keeps everything else)
+Radio plugged into a laptop by USB. Close the Meshtastic app first or disconnect it from the radio.
+```bash
+pip install meshtastic
+python3 add_channels.py --dry-run     # shows exactly what it would do
+python3 add_channels.py               # adds Bleshtastic + Cookout + Kitchen to empty slots
+```
+- Only fills **empty** slots. Never edits or removes your other channels, and never changes region or preset.
+- Saves a restore backup in `backups/` first (private, since it holds keys).
+- Already there with the right key? Skipped. Same name with a different key? Left alone and reported.
+- Windows: add `--port COM5` (check Device Manager). Over Bluetooth: `--ble "<radio name>"`.
+
 ## Put the channels on a T1000-E (no laptop needed)
 1. Charge the T1000-E. Press and hold the button until it beeps on.
 2. Phone: open the **Meshtastic** app → connect the T1000 over Bluetooth (default PIN `123456`).
